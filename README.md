@@ -1,6 +1,6 @@
 # DAO Module
-[![Build Status](https://github.com/gnosis/dao-module/workflows/dao-module/badge.svg?branch=main)](https://github.com/gnosis/dao-module/actions)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/dao-module/badge.svg?branch=main)](https://coveralls.io/github/gnosis/dao-module)
+[![Build Status](https://github.com/gnosis/delay-module/workflows/delay-module/badge.svg?branch=main)](https://github.com/gnosis/delay-module/actions)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/delay-module/badge.svg?branch=main)](https://coveralls.io/github/gnosis/delay-module)
 
 This module allows for execution of transactions that have been approved via a Realitio question for execution. The question asked on Realitio consists of a proposal ID (e.g. an ipfs hash) that can be used to provide more information for the transactions to be executed. And of an array of EIP-712 based transaction hashes that represent the transactions that should be executed.
 
