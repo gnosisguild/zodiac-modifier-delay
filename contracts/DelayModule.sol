@@ -149,11 +149,24 @@ contract DelayModule {
   function executeNextTx(address to, uint256 value, bytes calldata data, Enum.Operation operation)
     public
   {
+    require(txNonce < queueNonce, "Transaction queue is empty");
     require(block.timestamp - txCreatedAt[txNonce] >= txCooldown, "Transaction is still in cooldown");
     require(txCreatedAt[txNonce] + txCooldown + txExpiration > block.timestamp, "Transaction expired");
     require(txHash[txNonce] == getTransactionHash(to, value, data, operation), "Transaction hashes do not match");
     require(executor.execTransactionFromModule(to, value, data, operation), "Module transaction failed");
     txNonce ++;
+  }
+
+  function skipExpired()
+    public
+  {
+    while (
+      txExpiration != 0 &&
+      txCreatedAt[txNonce] + txCooldown + txExpiration < block.timestamp &&
+      txNonce <= queueNonce)
+    {
+      txNonce ++;
+    }
   }
 
   function getTransactionHash(address to, uint256 value, bytes memory data, Enum.Operation operation)

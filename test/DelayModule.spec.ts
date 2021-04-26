@@ -245,9 +245,18 @@ describe("DelayModule", async () => {
         );
     });
   });
-  
+
   describe('executeNextTx()', async () => {
-    it('should fail if cooldown has not passed', async () => {
+    it('throws if there is nothing in queue', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await expect(module.executeNextTx(user1.address,42,"0x",0))
+        .to.be.revertedWith("Transaction queue is empty");
+    });
+
+    it('throws if cooldown has not passed', async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const tx = await module.populateTransaction.enableModule(user1.address);
       await executor.exec(module.address,0,tx.data);
@@ -257,7 +266,7 @@ describe("DelayModule", async () => {
         .to.be.revertedWith("Transaction is still in cooldown");
     });
 
-    it('should fail if transaction has expired', async () => {
+    it('throws if transaction has expired', async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const tx = await module.populateTransaction.enableModule(user1.address);
       await executor.exec(module.address,0,tx.data);
@@ -270,7 +279,7 @@ describe("DelayModule", async () => {
         .to.be.revertedWith("Transaction expired");
     });
 
-    it('should fail if transaction hashes do not match', async () => {
+    it('throws if transaction hashes do not match', async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const tx = await module.populateTransaction.enableModule(user1.address);
       await executor.exec(module.address,0,tx.data);
@@ -284,7 +293,7 @@ describe("DelayModule", async () => {
         .to.be.revertedWith("Transaction hashes do not match");
     });
 
-    it('should fail if transaction module transaction fails', async () => {
+    it('throws if transaction module transaction throws', async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const tx = await module.populateTransaction.enableModule(user1.address);
       await executor.exec(module.address,0,tx.data);
@@ -298,7 +307,7 @@ describe("DelayModule", async () => {
         .to.be.revertedWith("Module transaction failed");
     });
 
-    it('should execute transaction', async () => {
+    it('executes transaction', async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const tx = await module.populateTransaction.enableModule(user1.address);
       await executor.exec(module.address,0,tx.data);
@@ -311,4 +320,32 @@ describe("DelayModule", async () => {
       await expect(module.executeNextTx(user1.address,0,"0x",0));
     });
   });
+
+  describe('skipExpired()', async () => {
+    it('should skip to the next nonce that has not yet expired', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await executor.setModule(module.address);
+      for (let i = 0; i < 3; i++) {
+        await module.execTransactionFromModule(user1.address,0,"0x",0);
+      }
+      let block = await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+      let timestamp = parseInt(block.timestamp) + 424242;
+      await hre.network.provider.send("evm_setNextBlockTimestamp", [timestamp]);
+      await expect(module.executeNextTx(user1.address,0,"0x",0))
+        .to.be.revertedWith("Transaction expired");
+      for (let i = 0; i < 2; i++) {
+        await module.execTransactionFromModule(user1.address,0,"0x",0);
+      }
+      await expect(module.skipExpired());
+      let txNonce = await module.txNonce();
+      let queueNonce = await module.queueNonce();
+      await expect(parseInt(txNonce._hex)).to.be.equals(3);
+      await expect(parseInt(queueNonce._hex)).to.be.equals(5);
+      await expect(module.executeNextTx(user1.address,0,"0x",0));
+    });
+  });
+
 })
