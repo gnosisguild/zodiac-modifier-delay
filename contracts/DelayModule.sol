@@ -21,21 +21,25 @@ interface Executor {
 contract DelayModule {
 
   event TransactionAdded(
-      uint indexed nonce,
-      bytes32 indexed txHash
+      uint indexed queueNonce,
+      bytes32 indexed txHash,
+      address to,
+      uint256 value,
+      bytes data,
+      Enum.Operation operation
   );
 
   event EnabledModule(address module);
   event DisabledModule(address module);
 
   Executor public immutable executor;
-  uint32 public txCooldown;
-  uint32 public txExpiration;
-  uint256 public nonce;
+  uint256 public txCooldown;
+  uint256 public txExpiration;
+  uint256 public txNonce;
   uint256 public queueNonce;
-  // Mapping of transaction nonce to transaction hash.
+  // Mapping of queue nonce to transaction hash.
   mapping(uint256 => bytes32) public txHash;
-  // Mapping of transaction id to creation timestamp.
+  // Mapping of queue nonce to creation timestamp.
   mapping(uint256 => uint256) public txCreatedAt;
   // Mapping of approved modules
   mapping(address => bool) public modules;
@@ -44,7 +48,7 @@ contract DelayModule {
   /// @param cooldown Cooldown in seconds that should be required after a transaction is proposed
   /// @param expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
   /// @notice There need to be at least 60 seconds between end of cooldown and expiration
-  constructor(Executor _executor, uint32 cooldown, uint32 expiration) {
+  constructor(Executor _executor, uint256 cooldown, uint256 expiration) {
     require(cooldown > 0, "Cooldown must to be greater than 0");
     require(expiration == 0 || expiration >= 60 , "Expiratition must be 0 or at least 60 seconds");
     executor = _executor;
@@ -89,7 +93,7 @@ contract DelayModule {
   /// @dev Sets the cooldown before a transaction can be executed.
   /// @param cooldown Cooldown in seconds that should be required before the transaction can be executed
   /// @notice This can only be called by the executor
-  function setTxCooldown(uint32 cooldown)
+  function setTxCooldown(uint256 cooldown)
     public
     executorOnly()
   {
@@ -100,7 +104,7 @@ contract DelayModule {
   /// @param expiration Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
   /// @notice There need to be at least 60 seconds between end of cooldown and expiration
   /// @notice This can only be called by the executor
-  function setTxExpiration(uint32 expiration)
+  function setTxExpiration(uint256 expiration)
     public
     executorOnly()
   {
@@ -111,13 +115,13 @@ contract DelayModule {
   /// @dev Sets transaction nonce. Used to invalidate or skip transactions in queue.
   /// @param _nonce New transaction nonce
   /// @notice This can only be called by the executor
-  function setTxNonce(uint32 _nonce)
+  function setTxNonce(uint256 _nonce)
     public
     executorOnly()
   {
-    require(_nonce > nonce, "New nonce must be higher than current nonce");
-    require(_nonce <= queueNonce + 1, "New nonce too high"); 
-    nonce = _nonce;
+    require(_nonce > txNonce, "New nonce must be higher than current txNonce");
+    require(_nonce <= queueNonce, "Cannot be higher than queueNonce");
+    txNonce = _nonce;
   }
 
   /// @dev Adds a transaction to the queue (same as executor interface so that this can be placed between other modules and the safe).
@@ -130,9 +134,10 @@ contract DelayModule {
     public
     moduleOnly()
   {
-    queueNonce++;
     txHash[queueNonce] = getTransactionHash(to, value, data, operation);
     txCreatedAt[queueNonce] = block.timestamp;
+    emit TransactionAdded(queueNonce, txHash[queueNonce], to, value, data, operation);
+    queueNonce++;
   }
 
   /// @dev Executes the next transaction only if the cooldown has passed and the transaction has not expired
@@ -141,14 +146,14 @@ contract DelayModule {
   /// @param data Data payload of module transaction
   /// @param operation Operation type of module transaction
   /// @notice The txIndex used by this function is always 0
-  function executeNextTransaction(address to, uint256 value, bytes calldata data, Enum.Operation operation)
+  function executeNextTx(address to, uint256 value, bytes calldata data, Enum.Operation operation)
     public
   {
-    require(block.timestamp - txCreatedAt[nonce] >= txCooldown, "Transaction is still in cooldown");
-    require(txCreatedAt[nonce] + txCooldown + txExpiration < block.timestamp, "Transaction expired");
-    require(txHash[nonce] == getTransactionHash(to, value, data, operation), "Transaction hashes do not match");
+    require(block.timestamp - txCreatedAt[txNonce] >= txCooldown, "Transaction is still in cooldown");
+    require(txCreatedAt[txNonce] + txCooldown + txExpiration > block.timestamp, "Transaction expired");
+    require(txHash[txNonce] == getTransactionHash(to, value, data, operation), "Transaction hashes do not match");
     require(executor.execTransactionFromModule(to, value, data, operation), "Module transaction failed");
-    nonce ++;
+    txNonce ++;
   }
 
   function getTransactionHash(address to, uint256 value, bytes memory data, Enum.Operation operation)

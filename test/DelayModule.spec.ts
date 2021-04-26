@@ -45,1409 +45,304 @@ describe("DelayModule", async () => {
   const setupTestWithTestExecutor = deployments.createFixture(async () => {
     const base = await baseSetup();
     const Module = await hre.ethers.getContractFactory("DelayModule");
-    const module = await Module.deploy(base.executor.address, 42, 1337);
+    const module = await Module.deploy(base.executor.address, 42, "0x1337");
     return { ...base, Module, module };
   })
 
-  const setupTestWithMockExecutor = deployments.createFixture(async () => {
-    const base = await baseSetup();
-    const Module = await hre.ethers.getContractFactory("DelayModule");
-    const module = await Module.deploy(base.mock.address, 42, 1337);
-    return { ...base, Module, module };
-  })
+  // const setupTestWithMockExecutor = deployments.createFixture(async () => {
+  //   const base = await baseSetup();
+  //   const Module = await hre.ethers.getContractFactory("DelayModule");
+  //   const module = await Module.deploy(base.mock.address, 42, 1337);
+  //   return { ...base, Module, module };
+  // })
 
   const [user1] = waffle.provider.getWallets();
 
-  describe("constructor()", async () => {
-    it("throws if cooldown is 0", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule")
-      await expect(
-          Module.deploy(user1.address, 0, 0)
-      ).to.be.revertedWith("Cooldown must to be greater than 0")
-    })
-
-    it("throws if not enough time between txCooldown and txExpiration", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule")
-      await expect(
-          Module.deploy(user1.address, 1, 59)
-      ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds")
-    })
-
-    it("txExpiration can be 0", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule")
-      await Module.deploy(user1.address, 1, 0)
-    })
-  })
-
-  describe('disableModule()', async () => {
-    it('throws if not authorized', async () => {
-      const { module } = await setupTestWithTestExecutor();
-      await expect(
-          module.disableModule(user1.address)
-      ).to.be.revertedWith("Not authorized");
-    });
-
-    it('disables a module()', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const enable = await module.populateTransaction.enableModule(user1.address);
-      const disable = await module.populateTransaction.disableModule(user1.address);
-
-      await executor.exec(module.address,0,enable.data);
-      await expect(await module.getModuleStatus(user1.address)).to.be.equals(true);
-      await executor.exec(module.address,0,disable.data);
-      await expect(await module.getModuleStatus(user1.address)).to.be.equals(false);
-    });
-  });
-
-  describe('enableModule()', async () => {
-    it('throws if not authorized', async () => {
-      const { module } = await setupTestWithTestExecutor();
-      await expect(
-          module.enableModule(user1.address)
-      ).to.be.revertedWith("Not authorized");
-    });
-
-    it('enables a module', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const enable = await module.populateTransaction.enableModule(user1.address);
-
-      await executor.exec(module.address,0,enable.data);
-      await expect(await module.getModuleStatus(user1.address)).to.be.equals(true);
-    });
-  });
-
-  describe('setTxCooldown()', async () => {
-    it('throws if not authorized', async () => {
-      const { module } = await setupTestWithTestExecutor();
-      await expect(
-          module.setTxCooldown(42)
-      ).to.be.revertedWith("Not authorized");
-    });
-
-    it('sets cooldown', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const tx = await module.populateTransaction.setTxCooldown(43);
-
-      await expect(await module.txCooldown()).to.be.equals(42);
-      await executor.exec(module.address,0,tx.data)
-      await expect(await module.txCooldown()).to.be.equals(43);
-    });
-  });
-
-  describe('setTxExpiration()', async () => {
-    it('throws if not authorized', async () => {
-      const { module } = await setupTestWithTestExecutor();
-      await expect(
-          module.setTxExpiration(42)
-      ).to.be.revertedWith("Not authorized");
-    });
-
-    it('thows if expiration is less than 60 seconds.', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const tx = await module.populateTransaction.setTxExpiration(59);
-
-      await expect(
-        executor.exec(module.address,0,tx.data)
-      ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds");
-    });
-
-    it('sets expiration', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const tx = await module.populateTransaction.setTxExpiration(31337);
-
-      await expect(await module.txExpiration()).to.be.equals(1337);
-      await executor.exec(module.address,0,tx.data)
-      await expect(await module.txExpiration()).to.be.equals(31337);
-    });
-
-  });
-
-  describe('setTxNonce()', async () => {
-    it('throws if not authorized', async () => {
-      const { module } = await setupTestWithTestExecutor();
-      await expect(
-          module.setTxNonce(42)
-      ).to.be.revertedWith("Not authorized");
-    });
-
-    it('thows if nonce is less than current nonce.', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const tx = await module.populateTransaction.setTxExpiration(60);
-      const tx2 = await module.populateTransaction.setTxNonce(0);
-      await expect(executor.exec(module.address,0,tx.data));
-
-      await expect(
-        executor.exec(module.address,0,tx2.data)
-      ).to.be.revertedWith("New nonce must be higher than current nonce");
-    });
-
-
-    it('thows if nonce is more than queueNonce + 1.', async () => {
-      const { executor, module } = await setupTestWithTestExecutor();
-      const tx = await module.populateTransaction.enableModule(user1.address);
-      const tx2 = await module.populateTransaction.setTxNonce(42);
-      await expect(executor.exec(module.address,0,tx.data));
-      await module.execTransactionFromModule(user1.address,0,"0x",0);
-
-      await expect(
-        executor.exec(module.address,0,tx2.data)
-      ).to.be.revertedWith("New nonce too high");
-    });
-
-    it('sets nonce', async () => {
-      // const { executor, module } = await setupTestWithTestExecutor();
-      // const tx = await module.populateTransaction.setNonce(100);
-      //
-      // await expect(await module.txExpiration()).to.be.equals(1337);
-      // await executor.exec(module.address,0,tx.data)
-      // await expect(await module.txExpiration()).to.be.equals(31337);
-    });
-
-  });
-
-
-  // describe("setQuestionTimeout", async () => {
-  //       it("throws if not authorized", async () => {
-  //           const { module } = await setupTestWithTestExecutor();
-  //           await expect(
-  //               module.setQuestionTimeout(2)
-  //           ).to.be.revertedWith("Not authorized");
-  //       })
-  //
-  //       it("throws if timeout is 0", async () => {
-  //           const { executor, module } = await setupTestWithTestExecutor();
-  //           const calldata = module.interface.encodeFunctionData("setQuestionTimeout", [0])
-  //           await expect(
-  //               executor.exec(module.address, 0, calldata)
-  //           ).to.be.revertedWith("Timeout has to be greater 0");
-  //       })
-  //
-  //       it("updates question timeout", async () => {
-  //           const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //           expect(
-  //               await module.questionTimeout()
-  //           ).to.be.equals(42);
-  //
-  //           const calldata = module.interface.encodeFunctionData("setQuestionTimeout", [511])
-  //           await executor.exec(module.address, 0, calldata)
-  //
-  //           expect(
-  //               await module.questionTimeout()
-  //           ).to.be.equals(511);
-  //       })
+  // describe("constructor()", async () => {
+  //   it("throws if cooldown is 0", async () => {
+  //     const Module = await hre.ethers.getContractFactory("DelayModule")
+  //     await expect(
+  //         Module.deploy(user1.address, 0, 0)
+  //     ).to.be.revertedWith("Cooldown must to be greater than 0")
   //   })
   //
-  // describe("setQuestionCooldown", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         await expect(
-  //             module.setQuestionCooldown(2)
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
+  //   it("throws if not enough time between txCooldown and txExpiration", async () => {
+  //     const Module = await hre.ethers.getContractFactory("DelayModule")
+  //     await expect(
+  //         Module.deploy(user1.address, 1, 59)
+  //     ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds")
+  //   })
   //
-  //     it("throws if not enough time between cooldown and expiration", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [100])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const setQuestionCooldownInvalid = module.interface.encodeFunctionData("setQuestionCooldown", [41])
-  //         await expect(
-  //             executor.exec(module.address, 0, setQuestionCooldownInvalid)
-  //         ).to.be.revertedWith("There need to be at least 60s between end of cooldown and expiration")
-  //
-  //         const setQuestionCooldown = module.interface.encodeFunctionData("setQuestionCooldown", [40])
-  //         await executor.exec(module.address, 0, setQuestionCooldown)
-  //
-  //         expect(
-  //             await module.questionCooldown()
-  //         ).to.be.equals(40);
-  //     })
-  //
-  //     it("can reset to 0", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [100])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const setQuestionCooldown = module.interface.encodeFunctionData("setQuestionCooldown", [40])
-  //         await executor.exec(module.address, 0, setQuestionCooldown)
-  //
-  //         expect(
-  //             await module.questionCooldown()
-  //         ).to.be.equals(40);
-  //
-  //         const resetQuestionCooldown = module.interface.encodeFunctionData("setQuestionCooldown", [0])
-  //         await executor.exec(module.address, 0, resetQuestionCooldown)
-  //
-  //         expect(
-  //             await module.questionCooldown()
-  //         ).to.be.equals(0);
-  //     })
-  //
-  //     it("updates question cooldown", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         expect(
-  //             await module.questionCooldown()
-  //         ).to.be.equals(23);
-  //
-  //         const calldata = module.interface.encodeFunctionData("setQuestionCooldown", [511])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.questionCooldown()
-  //         ).to.be.equals(511);
-  //     })
+  //   it("txExpiration can be 0", async () => {
+  //     const Module = await hre.ethers.getContractFactory("DelayModule")
+  //     await Module.deploy(user1.address, 1, 0)
+  //   })
   // })
   //
-  // describe("setAnswerExpiration", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         await expect(
-  //             module.setAnswerExpiration(2)
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
-  //
-  //     it("throws if not enough time between cooldown and expiration", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const setQuestionCooldown = module.interface.encodeFunctionData("setQuestionCooldown", [40])
-  //         await executor.exec(module.address, 0, setQuestionCooldown)
-  //
-  //         const setAnswerExpirationInvalid = module.interface.encodeFunctionData("setAnswerExpiration", [99])
-  //         await expect(
-  //             executor.exec(module.address, 0, setAnswerExpirationInvalid)
-  //         ).to.be.revertedWith("There need to be at least 60s between end of cooldown and expiration")
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [100])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         expect(
-  //             await module.answerExpiration()
-  //         ).to.be.equals(100);
-  //     })
-  //
-  //     it("updates question cooldown", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         expect(
-  //             await module.answerExpiration()
-  //         ).to.be.equals(0);
-  //
-  //         const calldata = module.interface.encodeFunctionData("setAnswerExpiration", [511])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.answerExpiration()
-  //         ).to.be.equals(511);
-  //     })
-  // })
-  //
-  // describe("setArbitrator", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         await expect(
-  //             module.setArbitrator(ethers.constants.AddressZero)
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
-  //
-  //     it("updates arbitrator", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         expect(
-  //             await module.questionArbitrator()
-  //         ).to.be.equals(executor.address);
-  //
-  //         const calldata = module.interface.encodeFunctionData("setArbitrator", [ethers.constants.AddressZero])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.questionArbitrator()
-  //         ).to.be.equals(ethers.constants.AddressZero);
-  //     })
-  // })
-  //
-  // describe("setMinimumBond", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         await expect(
-  //             module.setMinimumBond(2)
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
-  //
-  //     it("updates minimum bond", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         expect(
-  //             (await module.minimumBond()).toNumber()
-  //         ).to.be.equals(0);
-  //
-  //         const calldata = module.interface.encodeFunctionData("setMinimumBond", [424242])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             (await module.minimumBond()).toNumber()
-  //         ).to.be.equals(424242);
-  //     })
-  // })
-  //
-  // describe("setTemplate", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         await expect(
-  //             module.setTemplate(2)
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
-  //
-  //     it("updates template", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         expect(
-  //             (await module.template()).toNumber()
-  //         ).to.be.equals(1337);
-  //
-  //         const calldata = module.interface.encodeFunctionData("setTemplate", [112358])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             (await module.template()).toNumber()
-  //         ).to.be.equals(112358);
-  //     })
-  // })
-  //
-  // describe("markProposalAsInvalidByHash", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         const randomHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         await expect(
-  //             module.markProposalAsInvalidByHash(randomHash)
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
-  //
-  //     it("marks unknown question id as invalid", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const randomHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         expect(
-  //             await module.questionIds(randomHash)
-  //         ).to.be.equals(ZERO_STATE);
-  //
-  //         const calldata = module.interface.encodeFunctionData("markProposalAsInvalidByHash", [randomHash])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.questionIds(randomHash)
-  //         ).to.be.deep.equals(INVALIDATED_STATE);
-  //     })
-  //
-  //     it("marks known question id as invalid", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         const calldata = module.interface.encodeFunctionData("markProposalAsInvalidByHash", [questionHash])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(INVALIDATED_STATE);
-  //     })
-  // })
-  //
-  // describe("markProposalAsInvalid", async () => {
-  //     it("throws if not authorized", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         const randomHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         await expect(
-  //             module.markProposalAsInvalid(randomHash, [randomHash])
-  //         ).to.be.revertedWith("Not authorized");
-  //     })
-  //
-  //     it("marks unknown question id as invalid", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.equals(ZERO_STATE);
-  //
-  //         const calldata = module.interface.encodeFunctionData("markProposalAsInvalid", [id, [txHash]])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(INVALIDATED_STATE);
-  //     })
-  //
-  //     it("marks known question id as invalid", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         const calldata = module.interface.encodeFunctionData("markProposalAsInvalid", [id, [txHash]])
-  //         await executor.exec(module.address, 0, calldata)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(INVALIDATED_STATE);
-  //     })
-  // })
-  //
-  // describe("markProposalWithExpiredAnswerAsInvalid", async () => {
-  //     it("throws if answer cannot expire", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //
-  //         await expect(
-  //             module.markProposalWithExpiredAnswerAsInvalid(questionHash)
-  //         ).to.be.revertedWith("Answers are valid forever");
-  //     })
-  //
-  //     it("throws if answer is already invalidated", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [90])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //
-  //         const markProposalAsInvalidByHash = module.interface.encodeFunctionData("markProposalAsInvalidByHash", [questionHash])
-  //         await executor.exec(module.address, 0, markProposalAsInvalidByHash)
-  //
-  //         await expect(
-  //             module.markProposalWithExpiredAnswerAsInvalid(questionHash)
-  //         ).to.be.revertedWith("Proposal is already invalidated");
-  //     })
-  //
-  //     it("throws if question is unknown", async () => {
-  //         const { module, executor } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [90])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //
-  //         await expect(
-  //             module.markProposalWithExpiredAnswerAsInvalid(questionHash)
-  //         ).to.be.revertedWith("No question id set for provided proposal");
-  //     })
-  //
-  //     it("throws if answer was not accepted", async () => {
-  //         const { mock, module, executor, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [90])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("resultFor"), INVALIDATED_STATE)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await expect(
-  //             module.markProposalWithExpiredAnswerAsInvalid(questionHash)
-  //         ).to.be.revertedWith("Only positive answers can expire");
-  //     })
-  //
-  //     it("throws if answer is not expired", async () => {
-  //         const { mock, module, executor, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [90])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await expect(
-  //             module.markProposalWithExpiredAnswerAsInvalid(questionHash)
-  //         ).to.be.revertedWith("Answer has not expired yet");
-  //     })
-  //
-  //     it("can mark proposal with expired accepted answer as invalid", async () => {
-  //         const { mock, module, executor, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [90])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await nextBlockTime(hre, block.timestamp + 91)
-  //
-  //         await module.markProposalWithExpiredAnswerAsInvalid(questionHash);
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(INVALIDATED_STATE);
-  //     })
-  // })
-  //
-  // describe("getTransactionHash", async () => {
-  //     it("correctly generates hash for tx without data", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         const chainId = await module.getChainId()
-  //         const domain = {
-  //             "chainId": chainId,
-  //             "verifyingContract": module.address,
-  //         }
-  //         const tx = { to: user1.address, value: 0, data: "0x", operation: 0, nonce: 0 }
-  //         expect(
-  //             await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         ).to.be.equals(_TypedDataEncoder.hash(domain, EIP712_TYPES, tx));
-  //     })
-  //
-  //     it("correctly generates hash for complex tx", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         const chainId = await module.getChainId()
-  //         const domain = {
-  //             "chainId": chainId,
-  //             "verifyingContract": module.address,
-  //         }
-  //         const tx = { to: user1.address, value: 23, data: "0xbaddad", operation: 1, nonce: 13 }
-  //         expect(
-  //             await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         ).to.be.equals(_TypedDataEncoder.hash(domain, EIP712_TYPES, tx));
-  //     })
-  // })
-  //
-  // describe("buildQuestion", async () => {
-  //     it("concatenats id and hashed hashes as ascii strings", async () => {
-  //         const { module } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const tx1Hash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         const tx2Hash = ethers.utils.solidityKeccak256(["string"], ["some_other_tx_data"]);
-  //         const hashesHash = ethers.utils.solidityKeccak256(["bytes32[]"], [[tx1Hash, tx2Hash]]).slice(2);
-  //         expect(
-  //             await module.buildQuestion(id, [tx1Hash, tx2Hash])
-  //         ).to.be.equals(`${id}␟${hashesHash}`);
-  //     })
-  // })
-  //
-  // describe("addProposal", async () => {
-  //     it("throws if unexpected question id is returned", async () => {
-  //         const { module, mock, oracle } = await setupTestWithTestExecutor();
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), 42)
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.be.revertedWith("Unexpected question id");
-  //     })
-  //
-  //     it("throws if proposed question was already invalidated before creation", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0);
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId);
-  //
-  //         const markInvalid = module.interface.encodeFunctionData(
-  //             "markProposalAsInvalid",
-  //             [id, [txHash]]
-  //         );
-  //         await executor.exec(module.address, 0, markInvalid);
-  //
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.be.revertedWith("Proposal has already been submitted");
-  //     })
-  //
-  //     it("throws if proposal was already submitted", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0);
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId);
-  //
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.be.revertedWith("Proposal has already been submitted");
-  //     })
-  //
-  //     it("throws if proposal was already submitted when question params were different", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0);
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId);
-  //
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const updateQuestionTimeout = module.interface.encodeFunctionData(
-  //             "setQuestionTimeout",
-  //             [31]
-  //         )
-  //         await executor.exec(module.address, 0, updateQuestionTimeout)
-  //
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.be.revertedWith("Proposal has already been submitted");
-  //     })
-  //
-  //     it("calls askQuestion with correct data", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //
-  //         await expect(
-  //             module.addProposal(id, [txHash])
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         const askQuestionCalldata = oracle.interface.encodeFunctionData("askQuestion", [1337, question, executor.address, 42, 0, 0])
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(askQuestionCalldata)).toNumber()
-  //         ).to.be.equals(1);
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(1);
-  //     })
-  // })
-  //
-  // describe("addProposalWithNonce", async () => {
-  //     it("throws if previous nonce was not invalid", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), 42)
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const previousQuestionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), previousQuestionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 1)
-  //         ).to.be.revertedWith("Previous proposal was not invalidated");
-  //     })
-  //
-  //     it("calls askQuestion with correct data", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 1)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         const previousQuestionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), previousQuestionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         const resultForCalldata = oracle.interface.encodeFunctionData("resultFor", [previousQuestionId])
-  //         await mock.givenCalldataReturnUint(resultForCalldata, INVALIDATED_STATE)
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 1)
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         const askQuestionCalldata = oracle.interface.encodeFunctionData("askQuestion", [1337, question, executor.address, 42, 0, 1])
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(askQuestionCalldata)).toNumber()
-  //         ).to.be.equals(1);
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(2);
-  //     })
-  //
-  //     it("can invalidate after question param change", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         const previousQuestionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), previousQuestionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const updateQuestionTimeout = module.interface.encodeFunctionData(
-  //             "setQuestionTimeout",
-  //             [23]
-  //         )
-  //         await executor.exec(module.address, 0, updateQuestionTimeout)
-  //
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 23, 0, 11)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await mock.givenCalldataReturnUint(oracle.interface.encodeFunctionData("resultFor", [previousQuestionId]), INVALIDATED_STATE)
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 11)
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         const askQuestionCalldata = oracle.interface.encodeFunctionData("askQuestion", [1337, question, executor.address, 23, 0, 11])
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(askQuestionCalldata)).toNumber()
-  //         ).to.be.equals(1);
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(2);
-  //     })
-  //
-  //     it("can invalidate multiple times", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 1)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         const previousQuestionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), previousQuestionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await mock.givenCalldataReturnUint(oracle.interface.encodeFunctionData("resultFor", [previousQuestionId]), INVALIDATED_STATE)
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 1)
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         // Nonce doesn't need to increase 1 by 1
-  //         const finalQuestionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 1337)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), finalQuestionId)
-  //         await mock.givenCalldataReturnUint(oracle.interface.encodeFunctionData("resultFor", [questionId]), INVALIDATED_STATE)
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 1337)
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(finalQuestionId, id)
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(finalQuestionId)
-  //
-  //         const askQuestionCalldata = oracle.interface.encodeFunctionData("askQuestion", [1337, question, executor.address, 42, 0, 1337])
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(askQuestionCalldata)).toNumber()
-  //         ).to.be.equals(1);
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(3);
-  //     })
-  //
-  //     it("does not create proposal if previous nonce was internally invalidated", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         const questionIdNonce0 = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         const questionIdNonce1 = await module.getQuestionId(1337, question, executor.address, 42, 0, 1)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionIdNonce0)
-  //         const proposalParameters = [id, [txHash]]
-  //         await module.addProposal(...proposalParameters)
-  //
-  //         const markAsInvalidCalldata = module.interface.encodeFunctionData("markProposalAsInvalid", [...proposalParameters])
-  //         await executor.exec(module.address, 0, markAsInvalidCalldata);
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.deep.equal(INVALIDATED_STATE)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("resultFor"), INVALIDATED_STATE)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionIdNonce1)
-  //         await expect(
-  //             module.addProposalWithNonce(...proposalParameters, 1)
-  //         ).to.be.revertedWith("This proposal has been marked as invalid")
-  //     })
-  //
-  //     it("cannot ask again if follop up was not invalidated", async () => {
-  //         const { module, mock, oracle, executor } = await setupTestWithTestExecutor();
-  //         const id = "some_random_id";
-  //         const txHash = ethers.utils.solidityKeccak256(["string"], ["some_tx_data"]);
-  //
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 42)
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         const previousQuestionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), previousQuestionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await mock.givenCalldataReturnUint(oracle.interface.encodeFunctionData("resultFor", [previousQuestionId]), INVALIDATED_STATE)
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 42)
-  //         ).to.emit(module, "ProposalQuestionCreated").withArgs(questionId, id)
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //
-  //         await mock.givenCalldataReturnBool(oracle.interface.encodeFunctionData("resultFor", [questionId]), true)
-  //
-  //         await expect(
-  //             module.addProposalWithNonce(id, [txHash], 1337)
-  //         ).to.be.revertedWith("Previous proposal was not invalidated")
-  //     })
-  // })
-  //
-  // describe("executeProposal", async () => {
-  //     it("throws if question id was not set", async () => {
-  //         const { module } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("No question id set for provided proposal");
-  //     })
-  //
-  //     it("throws if proposal has been invalidated", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const markInvalid = module.interface.encodeFunctionData(
-  //             "markProposalAsInvalid",
-  //             [id, [txHash]]
-  //         )
-  //         await executor.exec(module.address, 0, markInvalid)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Proposal has been invalidated");
-  //     })
-  //
-  //     it("Proposal stays invalid after question param updates", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const markInvalid = module.interface.encodeFunctionData(
-  //             "markProposalAsInvalid",
-  //             [id, [txHash]]
-  //         )
-  //         await executor.exec(module.address, 0, markInvalid)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Proposal has been invalidated");
-  //
-  //         const updateQuestionTimeout = module.interface.encodeFunctionData(
-  //             "setQuestionTimeout",
-  //             [31]
-  //         )
-  //         await executor.exec(module.address, 0, updateQuestionTimeout)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Proposal has been invalidated");
-  //     })
-  //
-  //     it("throws if tx data doesn't belong to proposal", async () => {
-  //         const { mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 1 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Unexpected transaction hash");
-  //     })
-  //
-  //     it("throws if tx data doesn't belong to questionId", async () => {
-  //         const { mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, []);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [])
-  //
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("No question id set for provided proposal");
-  //     })
-  //
-  //     it("throws if tx was not approved", async () => {
-  //         const { mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), false)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Transaction was not approved");
-  //     })
-  //
-  //     it("throws if bond was not high enough", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //
-  //         const setMinimumBond = module.interface.encodeFunctionData(
-  //             "setMinimumBond",
-  //             [7331]
-  //         )
-  //         await executor.exec(module.address, 0, setMinimumBond)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Bond on question not high enough");
-  //     })
-  //
-  //     it("triggers module transaction when bond is high enough", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithTestExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const setMinimumBond = module.interface.encodeFunctionData(
-  //             "setMinimumBond",
-  //             [7331]
-  //         )
-  //         await executor.exec(module.address, 0, setMinimumBond)
-  //         await executor.setModule(module.address)
-  //
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.reset()
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getBond"), 7331)
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //         await module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation);
-  //
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), txHash)
-  //         ).to.be.equals(true)
-  //     })
-  //
-  //     it("throws if cooldown was not over", async () => {
-  //         const { mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Wait for additional cooldown");
-  //     })
-  //
-  //     it("throws if answer expired", async () => {
-  //         const { mock, module, oracle, executor } = await setupTestWithTestExecutor();
-  //
-  //         await user1.sendTransaction({ to: executor.address, value: 100 })
-  //         await executor.setModule(module.address)
-  //         const setAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [90])
-  //         await executor.exec(module.address, 0, setAnswerExpiration)
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: mock.address, value: 42, data: "0x", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, executor.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), true)
-  //         await nextBlockTime(hre, block.timestamp + 91)
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Answer has expired");
-  //
-  //         // Reset answer expiration time, so that we can execute the transaction
-  //         const resetAnswerExpiration = module.interface.encodeFunctionData("setAnswerExpiration", [0])
-  //         await executor.exec(module.address, 0, resetAnswerExpiration)
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(1)
-  //         expect(
-  //             (await hre.ethers.provider.getBalance(mock.address)).toNumber()
-  //         ).to.be.equals(0)
-  //
-  //         await module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(2)
-  //         expect(
-  //             (await hre.ethers.provider.getBalance(mock.address)).toNumber()
-  //         ).to.be.equals(42)
-  //     })
-  //
-  //     it("throws if tx was already executed for that question", async () => {
-  //         const { mock, module, oracle, executor } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), true)
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //         await module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation);
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Cannot execute transaction again");
-  //     })
-  //
-  //     it("throws if module transaction failed", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: mock.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), false)
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(1)
-  //         await expect(
-  //             module.executeProposalWithIndex(id, [txHash], tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         ).to.be.revertedWith("Module transaction failed");
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), txHash)
-  //         ).to.be.equals(false)
-  //
-  //         // Return success and check that it can be executed
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), true)
-  //         await module.executeProposalWithIndex(id, [txHash], tx.to, tx.value, tx.data, tx.operation, tx.nonce);
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), txHash)
-  //         ).to.be.equals(true)
-  //     })
-  //
-  //     it("triggers module transaction", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const txHash = await module.getTransactionHash(tx.to, tx.value, tx.data, tx.operation, tx.nonce)
-  //         const question = await module.buildQuestion(id, [txHash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [txHash])
-  //
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.reset()
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), true)
-  //         await nextBlockTime(hre, block.timestamp + 23)
-  //         await expect(
-  //             module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //         ).to.be.revertedWith("Wait for additional cooldown");
-  //
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //         await module.executeProposal(id, [txHash], tx.to, tx.value, tx.data, tx.operation)
-  //
-  //         const questionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(question))
-  //         expect(
-  //             await module.questionIds(questionHash)
-  //         ).to.be.deep.equals(questionId)
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), txHash)
-  //         ).to.be.equals(true)
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(1)
-  //         const execTransactionFromModuleCalldata = executor.interface.encodeFunctionData(
-  //             "execTransactionFromModule",
-  //             [tx.to, tx.value, tx.data, tx.operation]
-  //         )
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(execTransactionFromModuleCalldata)).toNumber()
-  //         ).to.be.equals(1)
-  //     })
-  //
-  //     it("throws if previous tx in tx array was not executed yet", async () => {
-  //         const { mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx1 = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const tx1Hash = await module.getTransactionHash(tx1.to, tx1.value, tx1.data, tx1.operation, tx1.nonce)
-  //         const tx2 = { to: user1.address, value: 23, data: "0xdeaddeed", operation: 0, nonce: 1 }
-  //         const tx2Hash = await module.getTransactionHash(tx2.to, tx2.value, tx2.data, tx2.operation, tx2.nonce)
-  //         const question = await module.buildQuestion(id, [tx1Hash, tx2Hash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [tx1Hash, tx2Hash])
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //         await expect(
-  //             module.executeProposalWithIndex(id, [tx1Hash, tx2Hash], tx2.to, tx2.value, tx2.data, tx2.operation, tx2.nonce)
-  //         ).to.be.revertedWith("Previous transaction not executed yet");
-  //     })
-  //
-  //     it("allows to execute the transactions in different blocks", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx1 = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const tx1Hash = await module.getTransactionHash(tx1.to, tx1.value, tx1.data, tx1.operation, tx1.nonce)
-  //         const tx2 = { to: user1.address, value: 23, data: "0xdeaddeed", operation: 0, nonce: 1 }
-  //         const tx2Hash = await module.getTransactionHash(tx2.to, tx2.value, tx2.data, tx2.operation, tx2.nonce)
-  //         const question = await module.buildQuestion(id, [tx1Hash, tx2Hash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [tx1Hash, tx2Hash])
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.reset()
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), true)
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //
-  //         await module.executeProposal(id, [tx1Hash, tx2Hash], tx1.to, tx1.value, tx1.data, tx1.operation)
-  //
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), tx1Hash)
-  //         ).to.be.equals(true)
-  //
-  //         const execTransaction1FromModuleCalldata = executor.interface.encodeFunctionData(
-  //             "execTransactionFromModule",
-  //             [tx1.to, tx1.value, tx1.data, tx1.operation]
-  //         )
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(execTransaction1FromModuleCalldata)).toNumber()
-  //         ).to.be.equals(1)
-  //
-  //         await module.executeProposalWithIndex(id, [tx1Hash, tx2Hash], tx2.to, tx2.value, tx2.data, tx2.operation, tx2.nonce)
-  //
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), tx2Hash)
-  //         ).to.be.equals(true)
-  //         const execTransaction2FromModuleCalldata = executor.interface.encodeFunctionData(
-  //             "execTransactionFromModule",
-  //             [tx2.to, tx2.value, tx2.data, tx2.operation]
-  //         )
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(execTransaction2FromModuleCalldata)).toNumber()
-  //         ).to.be.equals(1)
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(2)
-  //     })
-  //
-  //     it("allows to send same tx (with different nonce) multiple times in proposal", async () => {
-  //         const { executor, mock, module, oracle } = await setupTestWithMockExecutor();
-  //
-  //         const id = "some_random_id";
-  //         const tx1 = { to: user1.address, value: 0, data: "0xbaddad", operation: 0, nonce: 0 }
-  //         const tx1Hash = await module.getTransactionHash(tx1.to, tx1.value, tx1.data, tx1.operation, tx1.nonce)
-  //         const tx2 = { ...tx1, nonce: 1 }
-  //         const tx2Hash = await module.getTransactionHash(tx2.to, tx2.value, tx2.data, tx2.operation, tx2.nonce)
-  //         expect(tx1Hash).to.be.not.equals(tx2Hash)
-  //
-  //         const question = await module.buildQuestion(id, [tx1Hash, tx2Hash]);
-  //         const questionId = await module.getQuestionId(1337, question, mock.address, 42, 0, 0)
-  //
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("askQuestion"), questionId)
-  //         await module.addProposal(id, [tx1Hash, tx2Hash])
-  //         const block = await ethers.provider.getBlock("latest")
-  //         await mock.reset()
-  //         await mock.givenMethodReturnBool(oracle.interface.getSighash("resultFor"), true)
-  //         await mock.givenMethodReturnUint(oracle.interface.getSighash("getFinalizeTS"), block.timestamp)
-  //         await mock.givenMethodReturnBool(executor.interface.getSighash("execTransactionFromModule"), true)
-  //         await nextBlockTime(hre, block.timestamp + 24)
-  //
-  //         await module.executeProposal(id, [tx1Hash, tx2Hash], tx1.to, tx1.value, tx1.data, tx1.operation)
-  //
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), tx1Hash)
-  //         ).to.be.equals(true)
-  //
-  //         const execTransactionFromModuleCalldata = executor.interface.encodeFunctionData(
-  //             "execTransactionFromModule",
-  //             [tx1.to, tx1.value, tx1.data, tx1.operation]
-  //         )
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(execTransactionFromModuleCalldata)).toNumber()
-  //         ).to.be.equals(1)
-  //
-  //         await module.executeProposalWithIndex(id, [tx1Hash, tx2Hash], tx2.to, tx2.value, tx2.data, tx2.operation, tx2.nonce)
-  //
-  //         expect(
-  //             await module.executedProposalTransactions(ethers.utils.solidityKeccak256(["string"], [question]), tx2Hash)
-  //         ).to.be.equals(true)
-  //         expect(
-  //             (await mock.callStatic.invocationCountForCalldata(execTransactionFromModuleCalldata)).toNumber()
-  //         ).to.be.equals(2)
-  //
-  //         expect(
-  //             (await mock.callStatic.invocationCount()).toNumber()
-  //         ).to.be.equals(2)
-  //     })
-  // })
+  // describe('disableModule()', async () => {
+  //   it('throws if not authorized', async () => {
+  //     const { module } = await setupTestWithTestExecutor();
+  //     await expect(
+  //         module.disableModule(user1.address)
+  //     ).to.be.revertedWith("Not authorized");
+  //   });
+  //
+  //   it('disables a module()', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const enable = await module.populateTransaction.enableModule(user1.address);
+  //     const disable = await module.populateTransaction.disableModule(user1.address);
+  //
+  //     await executor.exec(module.address,0,enable.data);
+  //     await expect(await module.getModuleStatus(user1.address)).to.be.equals(true);
+  //     await executor.exec(module.address,0,disable.data);
+  //     await expect(await module.getModuleStatus(user1.address)).to.be.equals(false);
+  //   });
+  // });
+  //
+  // describe('enableModule()', async () => {
+  //   it('throws if not authorized', async () => {
+  //     const { module } = await setupTestWithTestExecutor();
+  //     await expect(
+  //         module.enableModule(user1.address)
+  //     ).to.be.revertedWith("Not authorized");
+  //   });
+  //
+  //   it('enables a module', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const enable = await module.populateTransaction.enableModule(user1.address);
+  //
+  //     await executor.exec(module.address,0,enable.data);
+  //     await expect(await module.getModuleStatus(user1.address)).to.be.equals(true);
+  //   });
+  // });
+  //
+  // describe('setTxCooldown()', async () => {
+  //   it('throws if not authorized', async () => {
+  //     const { module } = await setupTestWithTestExecutor();
+  //     await expect(
+  //         module.setTxCooldown(42)
+  //     ).to.be.revertedWith("Not authorized");
+  //   });
+  //
+  //   it('sets cooldown', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.setTxCooldown(43);
+  //     let cooldown = await module.txCooldown();
+  //
+  //     await expect(cooldown._hex).to.be.equals("0x2a");
+  //     await executor.exec(module.address,0,tx.data)
+  //     cooldown = await module.txCooldown();
+  //     await expect(cooldown._hex).to.be.equals("0x2b");
+  //   });
+  // });
+  //
+  // describe('setTxExpiration()', async () => {
+  //   it('throws if not authorized', async () => {
+  //     const { module } = await setupTestWithTestExecutor();
+  //     await expect(
+  //         module.setTxExpiration(42)
+  //     ).to.be.revertedWith("Not authorized");
+  //   });
+  //
+  //   it('thows if expiration is less than 60 seconds.', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.setTxExpiration(59);
+  //
+  //     await expect(
+  //       executor.exec(module.address,0,tx.data)
+  //     ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds");
+  //   });
+  //
+  //   it('sets expiration', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.setTxExpiration("0x031337");
+  //     let expiration = await module.txExpiration();
+  //
+  //     await expect(expiration._hex).to.be.equals("0x1337");
+  //     await executor.exec(module.address,0,tx.data)
+  //     expiration = await module.txExpiration();
+  //     await expect(expiration._hex).to.be.equals("0x031337");
+  //   });
+  //
+  // });
+  //
+  // describe('setTxNonce()', async () => {
+  //   it('throws if not authorized', async () => {
+  //     const { module } = await setupTestWithTestExecutor();
+  //     await expect(
+  //         module.setTxNonce(42)
+  //     ).to.be.revertedWith("Not authorized");
+  //   });
+  //
+  //   it('thows if nonce is less than current nonce.', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.setTxExpiration(60);
+  //     const tx2 = await module.populateTransaction.setTxNonce(0);
+  //     await expect(executor.exec(module.address,0,tx.data));
+  //
+  //     await expect(
+  //       executor.exec(module.address,0,tx2.data)
+  //     ).to.be.revertedWith("New nonce must be higher than current txNonce");
+  //   });
+  //
+  //
+  //   it('thows if nonce is more than queueNonce + 1.', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.enableModule(user1.address);
+  //     const tx2 = await module.populateTransaction.setTxNonce(42);
+  //     await expect(executor.exec(module.address,0,tx.data));
+  //     await module.execTransactionFromModule(user1.address,0,"0x",0);
+  //
+  //     await expect(
+  //       executor.exec(module.address,0,tx2.data)
+  //     ).to.be.revertedWith("Cannot be higher than queueNonce");
+  //   });
+  //
+  //   it('sets nonce', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.enableModule(user1.address);
+  //     const tx2 = await module.populateTransaction.setTxNonce(1);
+  //     let txNonce = await module.txNonce();
+  //
+  //     await expect(txNonce._hex).to.be.equals("0x00");
+  //     await executor.exec(module.address,0,tx.data);
+  //     await module.execTransactionFromModule(user1.address,0,"0x",0);
+  //     await expect(executor.exec(module.address,0,tx2.data));
+  //     txNonce = await module.txNonce();
+  //     await expect(txNonce._hex).to.be.equals("0x01");
+  //   });
+  // });
+  //
+  // describe('execTransactionFromModule()', async () => {
+  //   it('throws if not authorized', async () => {
+  //     const { module } = await setupTestWithTestExecutor();
+  //     await expect(
+  //         module.execTransactionFromModule(user1.address,0,"0x",0)
+  //     ).to.be.revertedWith("Module not authorized");
+  //   });
+  //
+  //   it('increments queueNonce', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.enableModule(user1.address);
+  //     await executor.exec(module.address,0,tx.data);
+  //     let queueNonce = await module.queueNonce();
+  //
+  //     await expect(queueNonce._hex).to.be.equals("0x00");
+  //     await module.execTransactionFromModule(user1.address,0,"0x",0)
+  //     queueNonce = await module.queueNonce();
+  //     await expect(queueNonce._hex).to.be.equals("0x01");
+  //   });
+  //
+  //   it('sets txHash', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.enableModule(user1.address);
+  //     await executor.exec(module.address,0,tx.data);
+  //
+  //     let txHash = await module.getTransactionHash(user1.address,0,"0x",0);
+  //
+  //     await expect(await module.getTxHash(0)).to.be.equals(ZERO_STATE);
+  //     await module.execTransactionFromModule(user1.address,0,"0x",0)
+  //     await expect(await module.getTxHash(0)).to.be.equals(txHash);
+  //   });
+  //
+  //   it('sets txCreatedAt', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.enableModule(user1.address);
+  //     let expectedTimestamp = await module.getTxCreatedAt(0);
+  //     await executor.exec(module.address,0,tx.data);
+  //
+  //     await expect(expectedTimestamp._hex).to.be.equals("0x00");
+  //     let receipt = await module.execTransactionFromModule(user1.address,0,"0x",0);
+  //     let blockNumber = receipt.blockNumber;
+  //
+  //     let block = await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+  //
+  //     expectedTimestamp = await module.getTxCreatedAt(0);
+  //     await expect(block.timestamp).to.be.equals(expectedTimestamp._hex);
+  //   });
+  //
+  //   it('emits transaction details', async () => {
+  //     const { executor, module } = await setupTestWithTestExecutor();
+  //     const tx = await module.populateTransaction.enableModule(user1.address);
+  //     await executor.exec(module.address,0,tx.data);
+  //     const expectedQueueNonce = await module.queueNonce;
+  //
+  //     await expect(module.execTransactionFromModule(user1.address,42,"0x",0))
+  //       .to.emit(module, 'TransactionAdded')
+  //       .withArgs(
+  //         expectedQueueNonce,
+  //         await module.getTransactionHash(user1.address,42,"0x",0),
+  //         user1.address,
+  //         42,
+  //         "0x",
+  //         0
+  //       );
+  //   });
+  // });
+  //
+  describe('executeNextTx()', async () => {
+    it('should fail if cooldown has not passed', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await module.execTransactionFromModule(user1.address,42,"0x",0);
+      await expect(module.executeNextTx(user1.address,42,"0x",0))
+        .to.be.revertedWith("Transaction is still in cooldown");
+    });
+
+    it('should fail if transaction has expired', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await executor.setModule(module.address);
+      await module.execTransactionFromModule(user1.address,0,"0x",0);
+      let expiry = await module.txCreatedAt(0);
+      await hre.network.provider.send("evm_setNextBlockTimestamp", [4242424242]);
+      await expect(module.executeNextTx(user1.address,0,"0x",0))
+        .to.be.revertedWith("Transaction expired");
+    });
+
+    it('should fail if transaction hashes do not match', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await executor.setModule(module.address);
+      await module.execTransactionFromModule(user1.address,0,"0x",0);
+      let block = await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+      let timestamp = parseInt(block.timestamp) + 100;
+      await hre.network.provider.send("evm_setNextBlockTimestamp", [timestamp]);
+      await expect(module.executeNextTx(user1.address,1,"0x",0))
+        .to.be.revertedWith("Transaction hashes do not match");
+    });
+
+    it('should fail if transaction module transaction fails', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await executor.setModule(module.address);
+      await module.execTransactionFromModule(user1.address,1,"0x",0);
+      let block = await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+      let timestamp = parseInt(block.timestamp) + 100;
+      await hre.network.provider.send("evm_setNextBlockTimestamp", [timestamp]);
+      await expect(module.executeNextTx(user1.address,1,"0x",0))
+        .to.be.revertedWith("Module transaction failed");
+    });
+
+    it('should execute transaction', async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const tx = await module.populateTransaction.enableModule(user1.address);
+      await executor.exec(module.address,0,tx.data);
+
+      await executor.setModule(module.address);
+      await module.execTransactionFromModule(user1.address,0,"0x",0);
+      let block = await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+      let timestamp = parseInt(block.timestamp) + 100;
+      await hre.network.provider.send("evm_setNextBlockTimestamp", [timestamp]);
+      await expect(module.executeNextTx(user1.address,0,"0x",0));
+    });
+  });
 })
