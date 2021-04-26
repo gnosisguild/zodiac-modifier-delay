@@ -1,7 +1,7 @@
 {
-  "name": "@gnosis/dao-module",
+  "name": "@gnosis/delay-module",
   "version": "1.0.0",
-  "description": "Snapshot DAO oracle module for the Gnosis Safe",
+  "description": "Module for delayed transactions for the Gnosis Safe",
   "directories": {
     "test": "test"
   },
