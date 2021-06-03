@@ -39,7 +39,7 @@ Before an address can enqueue transactions, it will need to be added as a module
 
 ## Monitoring your module
 
-For the delay module to be effective, it is important to know which itmems are in queue. To make sure that all the involved stakeholders can react in a timely manner, the events emitted by the delay-module contract should be monitored. Each time a new transaction is added the contract will emit a `TransactionAdded` event with the following parameters:
+For the delay module to be effective, it is important to know which items are in queue. To make sure that all the involved stakeholders can react in a timely manner, the events emitted by the delay-module contract should be monitored. Each time a new transaction is added the contract will emit a `TransactionAdded` event with the following parameters:
 ```
 event TransactionAdded(
   uint indexed queueNonce, // the transactions place in the queue

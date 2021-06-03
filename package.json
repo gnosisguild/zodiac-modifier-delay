@@ -1,7 +1,7 @@
 {
-  "name": "@gnosis/delay-module",
+  "name": "@gnosis/SafeDelay",
   "version": "1.0.0",
-  "description": "Module for delayed transactions for the Gnosis Safe",
+  "description": "Module for delayed transactions in the Gnosis Safe",
   "directories": {
     "test": "test"
   },
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git"
   },
-  "author": "richard@gnosis.io",
+  "author": "auryn.macmillan@gnosis.io",
   "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",

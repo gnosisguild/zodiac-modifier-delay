@@ -1,6 +1,6 @@
 # DAO Module
-[![Build Status](https://github.com/gnosis/delay-module/workflows/delay-module/badge.svg?branch=main)](https://github.com/gnosis/delay-module/actions)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/delay-module/badge.svg?branch=main)](https://coveralls.io/github/gnosis/delay-module)
+[![Build Status](https://github.com/gnosis/SafeDelay/workflows/SafeDelay/badge.svg?branch=main)](https://github.com/gnosis/SafeDelay/actions)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/SafeDelay/badge.svg?branch=main)](https://coveralls.io/github/gnosis/SafeDelay)
 
 This module allows for execution of transactions created by an approved address, only after a cooldown period and, optionally, before an expiration time.
 
