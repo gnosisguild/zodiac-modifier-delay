@@ -17,31 +17,35 @@ describe("DelayModule", async () => {
 
   const setupTestWithTestExecutor = deployments.createFixture(async () => {
     const base = await baseSetup();
-    const Module = await hre.ethers.getContractFactory("DelayModule");
-    const module = await Module.deploy(base.executor.address, 42, "0x1337");
+    const Module = await hre.ethers.getContractFactory("DelayModuleMock");
+    const module = await Module.deploy();
+    await module.setUp(base.executor.address, 42, "0x1337");
     return { ...base, Module, module };
   })
 
   const [user1] = waffle.provider.getWallets();
 
-  describe("constructor()", async () => {
+  describe("setUp()", async () => {
     it("throws if cooldown is 0", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule")
+      const Module = await hre.ethers.getContractFactory("DelayModuleMock")
+      const module = await Module.deploy()
       await expect(
-          Module.deploy(user1.address, 0, 0)
+          module.setUp(user1.address, 0, 0)
       ).to.be.revertedWith("Cooldown must to be greater than 0")
     })
 
     it("throws if not enough time between txCooldown and txExpiration", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule")
+      const Module = await hre.ethers.getContractFactory("DelayModuleMock")
+      const module = await Module.deploy()
       await expect(
-          Module.deploy(user1.address, 1, 59)
+          module.setUp(user1.address, 1, 59)
       ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds")
     })
 
     it("txExpiration can be 0", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule")
-      await Module.deploy(user1.address, 1, 0)
+      const Module = await hre.ethers.getContractFactory("DelayModuleMock")
+      const module = await Module.deploy()
+      await module.setUp(user1.address, 1, 0)
     })
   })
 

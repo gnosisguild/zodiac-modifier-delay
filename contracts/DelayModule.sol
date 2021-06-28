@@ -19,7 +19,7 @@ interface Executor {
 }
 
 contract DelayModule {
-
+  event DelayModuleSetup(address indexed initiator, address indexed safe);
   event TransactionAdded(
       uint indexed queueNonce,
       bytes32 indexed txHash,
@@ -32,7 +32,7 @@ contract DelayModule {
   event EnabledModule(address module);
   event DisabledModule(address module);
 
-  Executor public immutable executor;
+  Executor public executor;
   uint256 public txCooldown;
   uint256 public txExpiration;
   uint256 public txNonce;
@@ -44,17 +44,27 @@ contract DelayModule {
   // Mapping of approved modules
   mapping(address => bool) public modules;
 
+  bool public isInitialized = false;
+
+  constructor() {
+    isInitialized = true;
+  }
+  
   /// @param _executor Address of the executor (e.g. a Safe)
   /// @param cooldown Cooldown in seconds that should be required after a transaction is proposed
   /// @param expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
   /// @notice There need to be at least 60 seconds between end of cooldown and expiration
-  constructor(Executor _executor, uint256 cooldown, uint256 expiration) {
+  function setUp(Executor _executor, uint256 cooldown, uint256 expiration) external {
+    require(!isInitialized, "Module is already initialized");
     require(cooldown > 0, "Cooldown must to be greater than 0");
     require(expiration == 0 || expiration >= 60 , "Expiratition must be 0 or at least 60 seconds");
     executor = _executor;
     txExpiration = expiration;
     txCooldown = cooldown;
-  }
+    isInitialized = true;
+
+    emit DelayModuleSetup(msg.sender, address(_executor));
+}
 
   modifier executorOnly() {
     require(msg.sender == address(executor), "Not authorized");
