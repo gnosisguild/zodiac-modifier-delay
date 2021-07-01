@@ -26,7 +26,6 @@ describe("DelayModule", async () => {
   const [user1] = waffle.provider.getWallets();
 
   describe("setUp()", async () => {
-
     it("throws if not enough time between txCooldown and txExpiration", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
       const module = await Module.deploy();
