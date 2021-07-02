@@ -45,7 +45,14 @@ contract DelayModule {
     // Mapping of approved modules
     mapping(address => bool) public modules;
 
-    bool public isInitialized = false;
+
+    constructor(     
+        Executor _executor,
+        uint256 cooldown,
+        uint256 expiration
+    ) {
+        setUp(_executor, cooldown, expiration);
+    }
 
     /// @param _executor Address of the executor (e.g. a Safe)
     /// @param cooldown Cooldown in seconds that should be required after a transaction is proposed
@@ -55,8 +62,8 @@ contract DelayModule {
         Executor _executor,
         uint256 cooldown,
         uint256 expiration
-    ) external {
-        require(!isInitialized, "Module is already initialized");
+    ) public {
+        require(address(executor) == address(0), "Module is already initialized");
         require(
             expiration == 0 || expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
@@ -64,7 +71,6 @@ contract DelayModule {
         executor = _executor;
         txExpiration = expiration;
         txCooldown = cooldown;
-        isInitialized = true;
 
         emit DelayModuleSetup(msg.sender, address(_executor));
     }

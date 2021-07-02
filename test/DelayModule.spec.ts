@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-ethers";
 
 const ZERO_STATE =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 describe("DelayModule", async () => {
   const baseSetup = deployments.createFixture(async () => {
@@ -18,7 +19,7 @@ describe("DelayModule", async () => {
   const setupTestWithTestExecutor = deployments.createFixture(async () => {
     const base = await baseSetup();
     const Module = await hre.ethers.getContractFactory("DelayModule");
-    const module = await Module.deploy();
+    const module = await Module.deploy(ZERO_ADDRESS, 0, "0x1337");
     await module.setUp(base.executor.address, 0, "0x1337");
     return { ...base, Module, module };
   });
@@ -28,16 +29,14 @@ describe("DelayModule", async () => {
   describe("setUp()", async () => {
     it("throws if not enough time between txCooldown and txExpiration", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
-      const module = await Module.deploy();
-      await expect(module.setUp(user1.address, 1, 59)).to.be.revertedWith(
+      await expect(Module.deploy(ZERO_ADDRESS, 1, 59)).to.be.revertedWith(
         "Expiratition must be 0 or at least 60 seconds"
       );
     });
 
     it("txExpiration can be 0", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
-      const module = await Module.deploy();
-      await module.setUp(user1.address, 1, 0);
+      await Module.deploy(user1.address, 1, 0);
     });
   });
 
