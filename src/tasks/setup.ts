@@ -3,6 +3,8 @@ import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { Contract } from "ethers";
 
+const FIRST_ADDRESS = "0x0000000000000000000000000000000000000001";
+
 task("setup", "Deploys a SafeDelay module")
     .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
     .addParam("cooldown", "Cooldown in seconds that should be required after a oracle provided answer", 24 * 3600, types.int, true)
@@ -18,7 +20,7 @@ task("setup", "Deploys a SafeDelay module")
 
 task("factory-setup", "Deploys a SafeDelay module through a proxy")
     .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
-    .addParam("singleton", "Address of the Delay Module Master Copy", undefined, types.string)
+    .addParam("mastercopy", "Address of the Delay Module Master Copy", undefined, types.string)
     .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
     .addParam("cooldown", "Cooldown in seconds that should be required after a oracle provided answer", 24 * 3600, types.int, true)
     .addParam("expiration", "Time duration in seconds for which a positive answer is valid. After this time the answer is expired", 7 * 24 * 3600, types.int, true)
@@ -28,7 +30,7 @@ task("factory-setup", "Deploys a SafeDelay module through a proxy")
 
         const FactoryAbi = [
             `function deployModule(
-                   address singleton, 
+                   address masterCopy, 
                    bytes memory initializer
              ) public returns (address clone)`,
          ];
@@ -42,7 +44,7 @@ task("factory-setup", "Deploys a SafeDelay module through a proxy")
             taskArgs.expiration,
         ])
 
-        const receipt = await Factory.deployModule(taskArgs.singleton, initParams).then((tx: any) => tx.wait(3));
+        const receipt = await Factory.deployModule(taskArgs.mastercopy, initParams).then((tx: any) => tx.wait(3));
         console.log("Module deployed to:", receipt.logs[1].address);
 
     });
@@ -60,5 +62,23 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
             ]
         })
     });
+
+
+task("deployMasterCopy", "deploy a master copy of Delay Module").setAction(
+    async (_, hardhatRuntime) => {
+        const [caller] = await hardhatRuntime.ethers.getSigners();
+        console.log("Using the account:", caller.address);
+        const Module = await hardhatRuntime.ethers.getContractFactory("DelayModule");
+        const module = await Module.deploy(FIRST_ADDRESS, 0, 0);
+    
+        await module.deployTransaction.wait(3);
+    
+        console.log("Module deployed to:", module.address);
+        await hardhatRuntime.run("verify:verify", {
+            address: module.address,
+            constructorArguments: [FIRST_ADDRESS, 0, 0]
+        });
+    }
+);
 
 export { };

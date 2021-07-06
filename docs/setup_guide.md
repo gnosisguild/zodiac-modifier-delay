@@ -15,7 +15,7 @@ The first step is to deploy the module. Every Safe will have their own module. T
 ### Deploying the module
 
 
-Hardhat tasks can be used to deploy a delay-module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xE9E80739Af9D0DD8AaE6255c96a1266c059469ba` and the singleton of the Delay Module: `0xC67cE465f76eAa84bb7560d19F7339D1aEdA201a`.
+Hardhat tasks can be used to deploy a delay-module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Delay Module: `0x3cc7aBD1908906e2102D302249c82d083975e1EF`.
 
  These setup tasks requires the following parameters: `dao` (the address of the Safe). There are also optional parameters (cooldown and expiration, by default they are set to 24 hours and 7 days, respectively), for more information run `yarn hardhat setup --help` or `yarn hardhat factory-setup --help`.
 
@@ -24,7 +24,7 @@ An example for this on Rinkeby would be:
 
 or
 
-`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --singleton <singleton_address> --dao <safe_address>`
+`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --mastercopy <mastercopy_address> --dao <safe_address>`
 
 This should return the address of the deployed delay-module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
