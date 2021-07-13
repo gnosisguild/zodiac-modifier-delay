@@ -4,7 +4,8 @@ import "@nomiclabs/hardhat-ethers";
 
 const ZERO_STATE =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const FIRST_ADDRESS = "0x0000000000000000000000000000000000000001";
 
 describe("DelayModule", async () => {
   const baseSetup = deployments.createFixture(async () => {
@@ -38,14 +39,44 @@ describe("DelayModule", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
       await Module.deploy(user1.address, 1, 0);
     });
+
+    it("throws if module has already been initialized", async () => {
+      const Module = await hre.ethers.getContractFactory("DelayModule");
+      const module = await Module.deploy(user1.address, 1, 0);
+      await expect(module.setUp(user1.address, 1, 0)).to.be.revertedWith(
+        "Module is already initialized"
+      );
+    });
   });
 
   describe("disableModule()", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
-      await expect(module.disableModule(user1.address)).to.be.revertedWith(
-        "Not authorized"
+      await expect(
+        module.disableModule(FIRST_ADDRESS, user1.address)
+      ).to.be.revertedWith("Not authorized");
+    });
+
+    it("throws if module is null or sentinel", async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const disable = await module.populateTransaction.disableModule(
+        FIRST_ADDRESS,
+        FIRST_ADDRESS
       );
+      await expect(
+        executor.exec(module.address, 0, disable.data)
+      ).to.be.revertedWith("Invalid module");
+    });
+
+    it("throws if module is not added ", async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const disable = await module.populateTransaction.disableModule(
+        ZERO_ADDRESS,
+        user1.address
+      );
+      await expect(
+        executor.exec(module.address, 0, disable.data)
+      ).to.be.revertedWith("Module already disabled");
     });
 
     it("disables a module()", async () => {
@@ -54,15 +85,16 @@ describe("DelayModule", async () => {
         user1.address
       );
       const disable = await module.populateTransaction.disableModule(
+        FIRST_ADDRESS,
         user1.address
       );
 
       await executor.exec(module.address, 0, enable.data);
-      await expect(await module.getModuleStatus(user1.address)).to.be.equals(
+      await expect(await module.isModuleEnabled(user1.address)).to.be.equals(
         true
       );
       await executor.exec(module.address, 0, disable.data);
-      await expect(await module.getModuleStatus(user1.address)).to.be.equals(
+      await expect(await module.isModuleEnabled(user1.address)).to.be.equals(
         false
       );
     });
@@ -76,6 +108,29 @@ describe("DelayModule", async () => {
       );
     });
 
+    it("throws because module is already enabled", async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const enable = await module.populateTransaction.enableModule(
+        user1.address
+      );
+
+      await executor.exec(module.address, 0, enable.data);
+      await expect(
+        executor.exec(module.address, 0, enable.data)
+      ).to.be.revertedWith("Module already enabled");
+    });
+
+    it("throws because module is invalid ", async () => {
+      const { executor, module } = await setupTestWithTestExecutor();
+      const enable = await module.populateTransaction.enableModule(
+        FIRST_ADDRESS
+      );
+
+      await expect(
+        executor.exec(module.address, 0, enable.data)
+      ).to.be.revertedWith("Invalid module");
+    });
+
     it("enables a module", async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const enable = await module.populateTransaction.enableModule(
@@ -83,9 +138,12 @@ describe("DelayModule", async () => {
       );
 
       await executor.exec(module.address, 0, enable.data);
-      await expect(await module.getModuleStatus(user1.address)).to.be.equals(
+      await expect(await module.isModuleEnabled(user1.address)).to.be.equals(
         true
       );
+      await expect(
+        await module.getModulesPaginated(FIRST_ADDRESS, 10)
+      ).to.be.deep.equal([[user1.address], FIRST_ADDRESS]);
     });
   });
 

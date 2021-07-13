@@ -2,7 +2,10 @@
 pragma solidity >=0.8.0;
 
 contract Enum {
-    enum Operation {Call, DelegateCall}
+    enum Operation {
+        Call,
+        DelegateCall
+    }
 }
 
 interface Executor {
@@ -33,6 +36,8 @@ contract DelayModule {
     event EnabledModule(address module);
     event DisabledModule(address module);
 
+    address internal constant SENTINEL_MODULES = address(0x1);
+
     Executor public executor;
     uint256 public txCooldown;
     uint256 public txExpiration;
@@ -42,11 +47,10 @@ contract DelayModule {
     mapping(uint256 => bytes32) public txHash;
     // Mapping of queue nonce to creation timestamp.
     mapping(uint256 => uint256) public txCreatedAt;
-    // Mapping of approved modules
-    mapping(address => bool) public modules;
+    // Mapping of modules
+    mapping(address => address) internal modules;
 
-
-    constructor(     
+    constructor(
         Executor _executor,
         uint256 cooldown,
         uint256 expiration
@@ -63,11 +67,16 @@ contract DelayModule {
         uint256 cooldown,
         uint256 expiration
     ) public {
-        require(address(executor) == address(0), "Module is already initialized");
+        require(
+            address(executor) == address(0),
+            "Module is already initialized"
+        );
         require(
             expiration == 0 || expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
         );
+        if (address(_executor) != address(0)) setupModules();
+
         executor = _executor;
         txExpiration = expiration;
         txCooldown = cooldown;
@@ -81,16 +90,33 @@ contract DelayModule {
     }
 
     modifier moduleOnly() {
-        require(modules[msg.sender], "Module not authorized");
+        require(modules[msg.sender] != address(0), "Module not authorized");
         _;
     }
 
+    function setupModules() internal {
+        require(
+            modules[SENTINEL_MODULES] == address(0),
+            "setUpModules has already been called"
+        );
+        modules[SENTINEL_MODULES] = SENTINEL_MODULES;
+    }
+
     /// @dev Disables a module that can add transactions to the queue
-    /// @param module Address of the module to be disabled
+    /// @param prevModule Module that pointed to the module to be removed in the linked list
+    /// @param module Module to be removed
     /// @notice This can only be called by the executor
-    function disableModule(address module) public executorOnly() {
-        require(modules[module] != false, "Module already disabled");
-        modules[module] = false;
+    function disableModule(address prevModule, address module)
+        public
+        executorOnly()
+    {
+        require(
+            module != address(0) && module != SENTINEL_MODULES,
+            "Invalid module"
+        );
+        require(modules[prevModule] == module, "Module already disabled");
+        modules[prevModule] = modules[module];
+        modules[module] = address(0);
         emit DisabledModule(module);
     }
 
@@ -98,8 +124,13 @@ contract DelayModule {
     /// @param module Address of the module to be enabled
     /// @notice This can only be called by the executor
     function enableModule(address module) public executorOnly() {
-        require(modules[module] != true, "Module already enabled");
-        modules[module] = true;
+        require(
+            module != address(0) && module != SENTINEL_MODULES,
+            "Invalid module"
+        );
+        require(modules[module] == address(0), "Module already enabled");
+        modules[module] = modules[SENTINEL_MODULES];
+        modules[SENTINEL_MODULES] = module;
         emit EnabledModule(module);
     }
 
@@ -219,7 +250,42 @@ contract DelayModule {
         return (txCreatedAt[_nonce]);
     }
 
-    function getModuleStatus(address _module) public view returns (bool) {
-        return (modules[_module]);
+    /// @dev Returns if an module is enabled
+    /// @return True if the module is enabled
+    function isModuleEnabled(address _module) public view returns (bool) {
+        return SENTINEL_MODULES != _module && modules[_module] != address(0);
+    }
+
+    /// @dev Returns array of modules.
+    /// @param start Start of the page.
+    /// @param pageSize Maximum number of modules that should be returned.
+    /// @return array Array of modules.
+    /// @return next Start of the next page.
+    function getModulesPaginated(address start, uint256 pageSize)
+        external
+        view
+        returns (address[] memory array, address next)
+    {
+        // Init array with max page size
+        array = new address[](pageSize);
+
+        // Populate return array
+        uint256 moduleCount = 0;
+        address currentModule = modules[start];
+        while (
+            currentModule != address(0x0) &&
+            currentModule != SENTINEL_MODULES &&
+            moduleCount < pageSize
+        ) {
+            array[moduleCount] = currentModule;
+            currentModule = modules[currentModule];
+            moduleCount++;
+        }
+        next = currentModule;
+        // Set correct size of returned array
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            mstore(array, moduleCount)
+        }
     }
 }
