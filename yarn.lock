@@ -468,6 +468,18 @@
   resolved "https://registry.yarnpkg.com/@gnosis.pm/mock-contract/-/mock-contract-4.0.0.tgz#eaf500fddcab81b5f6c22280a7b22ff891dd6f87"
   integrity sha512-SkRq2KwPx6vo0LAjSc8JhgQstrQFXRyn2yqquIfub7r2WHi5nUbF8beeSSXsd36hvBcQxQfmOIYNYRpj9JOhrQ==
 
+"@gnosis/zodiac@github:gnosis/zodiac#master":
+  version "0.0.0"
+  resolved "https://codeload.github.com/gnosis/zodiac/tar.gz/4cfa2f017b34be6673e6aafa24e8da01d4de6389"
+  dependencies:
+    "@gnosis.pm/mock-contract" "^4.0.0"
+    "@openzeppelin/contracts" "^4.2.0"
+    argv "^0.0.2"
+    dotenv "^8.0.0"
+    ethers "^5.0.19"
+    solc "^0.8.6"
+    yargs "^16.1.1"
+
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -535,6 +547,11 @@
   dependencies:
     "@types/sinon-chai" "^3.2.3"
     "@types/web3" "1.0.19"
+
+"@openzeppelin/contracts@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.2.0.tgz#260d921d99356e48013d9d760caaa6cea35dc642"
+  integrity sha512-LD4NnkKpHHSMo5z9MvFsG4g1xxZUDqV3A3Futu3nvyfs4wPwXxqOgMaxOoa2PeyGL2VNeSlbxT54enbQzGcgJQ==
 
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
@@ -7762,6 +7779,21 @@ solc@^0.6.3:
   dependencies:
     command-exists "^1.2.8"
     commander "3.0.2"
+    fs-extra "^0.30.0"
+    js-sha3 "0.8.0"
+    memorystream "^0.3.1"
+    require-from-string "^2.0.0"
+    semver "^5.5.0"
+    tmp "0.0.33"
+
+solc@^0.8.6:
+  version "0.8.6"
+  resolved "https://registry.yarnpkg.com/solc/-/solc-0.8.6.tgz#e4341fa6780137df97b94a0cfbd59b3f2037d0e0"
+  integrity sha512-miiDaWdaUnD7A6Cktb/2ug9f+ajcOCDYRr7vgbPEsMoutSlBtp5rca57oMg8iHSuM7jilwdxePujWI/+rbNftQ==
+  dependencies:
+    command-exists "^1.2.8"
+    commander "3.0.2"
+    follow-redirects "^1.12.1"
     fs-extra "^0.30.0"
     js-sha3 "0.8.0"
     memorystream "^0.3.1"
