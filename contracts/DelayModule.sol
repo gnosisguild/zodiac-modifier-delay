@@ -24,33 +24,40 @@ contract DelayModule is Modifier {
     mapping(uint256 => uint256) public txCreatedAt;
 
     constructor(
+        address _owner,
         address _executor,
-        uint256 cooldown,
-        uint256 expiration
+        uint256 _cooldown,
+        uint256 _expiration
     ) {
-        setUp(_executor, cooldown, expiration);
+        setUp(_owner, _executor, _cooldown, _expiration);
     }
 
+    /// @param _owner Address of the owner
     /// @param _executor Address of the executor (e.g. a Safe)
-    /// @param cooldown Cooldown in seconds that should be required after a transaction is proposed
-    /// @param expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
+    /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed
+    /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
     function setUp(
+        address _owner,
         address _executor,
-        uint256 cooldown,
-        uint256 expiration
+        uint256 _cooldown,
+        uint256 _expiration
     ) public {
         require(executor == address(0), "Module is already initialized");
         require(
-            expiration == 0 || expiration >= 60,
+            _expiration == 0 || _expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
         );
 
         executor = _executor;
-        txExpiration = expiration;
-        txCooldown = cooldown;
+        txExpiration = _expiration;
+        txCooldown = _cooldown;
 
-        if (_executor != address(0)) setupModules();
+        if (_executor != address(0)) {
+            transferOwnership(_owner);
+            setupModules();
+        }
+
         emit DelayModuleSetup(msg.sender, _executor);
     }
 
@@ -59,7 +66,6 @@ contract DelayModule is Modifier {
             modules[SENTINEL_MODULES] == address(0),
             "setUpModules has already been called"
         );
-        transferOwnership(executor);
         modules[SENTINEL_MODULES] = SENTINEL_MODULES;
     }
 
