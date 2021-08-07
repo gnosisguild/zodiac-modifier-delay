@@ -19,7 +19,7 @@ task("setup", "Deploys a SafeDelay module")
         console.log("Module deployed to:", module.address);
     });
 
-task("factory-setup", "Deploys a SafeDelay module through a proxy")
+task("factorySetup", "Deploys a SafeDelay module through a proxy")
     .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
     .addParam("mastercopy", "Address of the Delay Module Master Copy", undefined, types.string)
     .addParam("owner", "Address of the owner", undefined, types.string)
