@@ -78,9 +78,9 @@ task("deployMasterCopy", "deploy a master copy of Delay Module").setAction(
         await module.deployTransaction.wait(3);
     
         console.log("Module deployed to:", module.address);
-        await hardhatRuntime.run("verify:verify", {
+        await hardhatRuntime.run("verify", {
             address: module.address,
-            constructorArguments: [FirstAddress, FirstAddress, 0, 0]
+            constructorArguments: [FirstAddress, FirstAddress, "0", "0"]
         });
     }
 );

@@ -500,10 +500,10 @@
 
 "@gnosis/zodiac@github:gnosis/zodiac#master":
   version "0.0.0"
-  resolved "https://codeload.github.com/gnosis/zodiac/tar.gz/ab5b40752ce3b1548b4e41b66a37927c8f4c3b06"
+  resolved "https://codeload.github.com/gnosis/zodiac/tar.gz/03ebe5aced6744a8e1aad7ad71cd31989da5bb16"
   dependencies:
     "@gnosis.pm/mock-contract" "^4.0.0"
-    "@openzeppelin/contracts" "^4.2.0"
+    "@openzeppelin/contracts-upgradeable" "^4.2.0"
     argv "^0.0.2"
     dotenv "^8.0.0"
     ethers "^5.0.19"
@@ -577,10 +577,10 @@
     "@types/sinon-chai" "^3.2.3"
     "@types/web3" "1.0.19"
 
-"@openzeppelin/contracts@^4.2.0":
+"@openzeppelin/contracts-upgradeable@^4.2.0":
   version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.2.0.tgz#260d921d99356e48013d9d760caaa6cea35dc642"
-  integrity sha512-LD4NnkKpHHSMo5z9MvFsG4g1xxZUDqV3A3Futu3nvyfs4wPwXxqOgMaxOoa2PeyGL2VNeSlbxT54enbQzGcgJQ==
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.2.0.tgz#3b12d6fe9d51e563c8a6ae39c96c1d32c5d0fa4a"
+  integrity sha512-vn0hoUqQzgOLzLZwFgh+w/D5hzJHX8F7X/7t/gZdSQYIEXMyGpXUwkr5A3eoAeoc42f/n7yDhwusvBmNknM41Q==
 
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
