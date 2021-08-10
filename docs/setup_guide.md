@@ -14,24 +14,30 @@ The first step is to deploy the module. Every Safe will have their own module. T
 
 ### Deploying the module
 
+Hardhat tasks can be used to deploy a delay-module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factorySetup`) - In rinkeby the address of the Proxy Factory is: `0x569F2e024D0aD6bBfBd8135097DFa7D0641Ae79b` and the Master Copy of the Delay Module: `0xAe78DF7a4184917dA49f7fCA6139f924A79D0488`.
 
-Hardhat tasks can be used to deploy a delay-module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Delay Module: `0x3cc7aBD1908906e2102D302249c82d083975e1EF`.
+These setup tasks requires the following parameters:
 
- These setup tasks requires the following parameters: `dao` (the address of the Safe). There are also optional parameters (cooldown and expiration, by default they are set to 24 hours and 7 days, respectively), for more information run `yarn hardhat setup --help` or `yarn hardhat factory-setup --help`.
+- `executor` - the address of the executor.
+- `owner` - the address of the owner
+- `cooldown` - optional, by default is set to 24 hours
+- `expiration` - optional, by default is set to 7 days
+
+For more information run `yarn hardhat setup --help` or `yarn hardhat factorySetup --help`.
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby setup --dao <safe_address>`
+`yarn hardhat --network rinkeby setup --owner <owner_address> --executor <executor_address>`
 
 or
 
-`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --mastercopy <mastercopy_address> --dao <safe_address>`
+`yarn hardhat --network rinkeby factorySetup --factory <factory_address> --mastercopy <mastercopy_address> --owner <owner_address> --executor <executor_address>`
 
 This should return the address of the deployed delay-module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
 Once the module is deployed you should verify the source code (Note: If you used the factory deployment the contract should be already verified). If you use a network that is Etherscan compatible and you configure the `ETHERSCAN_API_KEY` in your environment you can use the provided hardhat task to do this.
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --dao <safe_address>`
+`yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --owner <owner_address> --executor <executor_address>`
 
 ### Enabling the module
 

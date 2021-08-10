@@ -1,11 +1,11 @@
 import { expect } from "chai";
-import hre, { deployments, ethers, waffle } from "hardhat";
+import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
 
-const ZERO_STATE =
+const ZeroState =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-const FIRST_ADDRESS = "0x0000000000000000000000000000000000000001";
+const ZeroAddress = "0x0000000000000000000000000000000000000000";
+const FirstAddress = "0x0000000000000000000000000000000000000001";
 
 describe("DelayModule", async () => {
   const baseSetup = deployments.createFixture(async () => {
@@ -20,8 +20,13 @@ describe("DelayModule", async () => {
   const setupTestWithTestExecutor = deployments.createFixture(async () => {
     const base = await baseSetup();
     const Module = await hre.ethers.getContractFactory("DelayModule");
-    const module = await Module.deploy(ZERO_ADDRESS, 0, "0x1337");
-    await module.setUp(base.executor.address, 0, "0x1337");
+    const module = await Module.deploy(ZeroAddress, ZeroAddress, 0, "0x1337");
+    await module.setUp(
+      base.executor.address,
+      base.executor.address,
+      0,
+      "0x1337"
+    );
     return { ...base, Module, module };
   });
 
@@ -30,22 +35,22 @@ describe("DelayModule", async () => {
   describe("setUp()", async () => {
     it("throws if not enough time between txCooldown and txExpiration", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
-      await expect(Module.deploy(ZERO_ADDRESS, 1, 59)).to.be.revertedWith(
-        "Expiratition must be 0 or at least 60 seconds"
-      );
+      await expect(
+        Module.deploy(ZeroAddress, ZeroAddress, 1, 59)
+      ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds");
     });
 
     it("txExpiration can be 0", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
-      await Module.deploy(user1.address, 1, 0);
+      await Module.deploy(user1.address, user1.address, 1, 0);
     });
 
     it("throws if module has already been initialized", async () => {
       const Module = await hre.ethers.getContractFactory("DelayModule");
-      const module = await Module.deploy(user1.address, 1, 0);
-      await expect(module.setUp(user1.address, 1, 0)).to.be.revertedWith(
-        "Module is already initialized"
-      );
+      const module = await Module.deploy(user1.address, user1.address, 1, 0);
+      await expect(
+        module.setUp(user1.address, user1.address, 1, 0)
+      ).to.be.revertedWith("Module is already initialized");
     });
   });
 
@@ -53,15 +58,15 @@ describe("DelayModule", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
       await expect(
-        module.disableModule(FIRST_ADDRESS, user1.address)
-      ).to.be.revertedWith("Not authorized");
+        module.disableModule(FirstAddress, user1.address)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
     it("throws if module is null or sentinel", async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const disable = await module.populateTransaction.disableModule(
-        FIRST_ADDRESS,
-        FIRST_ADDRESS
+        FirstAddress,
+        FirstAddress
       );
       await expect(
         executor.exec(module.address, 0, disable.data)
@@ -71,7 +76,7 @@ describe("DelayModule", async () => {
     it("throws if module is not added ", async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const disable = await module.populateTransaction.disableModule(
-        ZERO_ADDRESS,
+        ZeroAddress,
         user1.address
       );
       await expect(
@@ -85,7 +90,7 @@ describe("DelayModule", async () => {
         user1.address
       );
       const disable = await module.populateTransaction.disableModule(
-        FIRST_ADDRESS,
+        FirstAddress,
         user1.address
       );
 
@@ -104,7 +109,7 @@ describe("DelayModule", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
       await expect(module.enableModule(user1.address)).to.be.revertedWith(
-        "Not authorized"
+        "Ownable: caller is not the owner"
       );
     });
 
@@ -123,7 +128,7 @@ describe("DelayModule", async () => {
     it("throws because module is invalid ", async () => {
       const { executor, module } = await setupTestWithTestExecutor();
       const enable = await module.populateTransaction.enableModule(
-        FIRST_ADDRESS
+        FirstAddress
       );
 
       await expect(
@@ -142,8 +147,8 @@ describe("DelayModule", async () => {
         true
       );
       await expect(
-        await module.getModulesPaginated(FIRST_ADDRESS, 10)
-      ).to.be.deep.equal([[user1.address], FIRST_ADDRESS]);
+        await module.getModulesPaginated(FirstAddress, 10)
+      ).to.be.deep.equal([[user1.address], FirstAddress]);
     });
   });
 
@@ -151,7 +156,7 @@ describe("DelayModule", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
       await expect(module.setTxCooldown(42)).to.be.revertedWith(
-        "Not authorized"
+        "Ownable: caller is not the owner"
       );
     });
 
@@ -171,7 +176,7 @@ describe("DelayModule", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
       await expect(module.setTxExpiration(42)).to.be.revertedWith(
-        "Not authorized"
+        "Ownable: caller is not the owner"
       );
     });
 
@@ -199,7 +204,9 @@ describe("DelayModule", async () => {
   describe("setTxNonce()", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
-      await expect(module.setTxNonce(42)).to.be.revertedWith("Not authorized");
+      await expect(module.setTxNonce(42)).to.be.revertedWith(
+        "Ownable: caller is not the owner"
+      );
     });
 
     it("thows if nonce is less than current nonce.", async () => {
@@ -267,7 +274,7 @@ describe("DelayModule", async () => {
 
       let txHash = await module.getTransactionHash(user1.address, 0, "0x", 0);
 
-      await expect(await module.getTxHash(0)).to.be.equals(ZERO_STATE);
+      await expect(await module.getTxHash(0)).to.be.equals(ZeroState);
       await module.execTransactionFromModule(user1.address, 0, "0x", 0);
       await expect(await module.getTxHash(0)).to.be.equals(txHash);
     });

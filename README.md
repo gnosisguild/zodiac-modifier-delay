@@ -1,4 +1,4 @@
-# DAO Module
+# Delay Module
 [![Build Status](https://github.com/gnosis/SafeDelay/workflows/SafeDelay/badge.svg?branch=main)](https://github.com/gnosis/SafeDelay/actions)
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/SafeDelay/badge.svg?branch=main)](https://coveralls.io/github/gnosis/SafeDelay)
 
