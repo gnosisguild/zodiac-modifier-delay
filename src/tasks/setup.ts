@@ -2,10 +2,11 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { Contract } from "ethers";
+import { AbiCoder } from "ethers/lib/utils";
 
 const FirstAddress = "0x0000000000000000000000000000000000000001";
 
-task("setup", "Deploys a SafeDelay module")
+task("setup", "Deploys a SafeDelay modifier")
     .addParam("owner", "Address of the owner", undefined, types.string)
     .addParam("executor", "Address of the executor (e.g. Safe)", undefined, types.string)
     .addParam("cooldown", "Cooldown in seconds that should be required after a oracle provided answer", 24 * 3600, types.int, true)
@@ -13,15 +14,15 @@ task("setup", "Deploys a SafeDelay module")
     .setAction(async (taskArgs, hardhatRuntime) => {
         const [caller] = await hardhatRuntime.ethers.getSigners();
         console.log("Using the account:", caller.address);
-        const Module = await hardhatRuntime.ethers.getContractFactory("DelayModule");
-        const module = await Module.deploy(taskArgs.owner, taskArgs.executor, taskArgs.cooldown, taskArgs.expiration);
+        const Modifier = await hardhatRuntime.ethers.getContractFactory("Delay");
+        const modifier = await Modifier.deploy(taskArgs.owner, taskArgs.executor, taskArgs.cooldown, taskArgs.expiration);
 
-        console.log("Module deployed to:", module.address);
+        console.log("Modifier deployed to:", modifier.address);
     });
 
-task("factorySetup", "Deploys a SafeDelay module through a proxy")
+task("factorySetup", "Deploys a SafeDelay modifier through a proxy")
     .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
-    .addParam("mastercopy", "Address of the Delay Module Master Copy", undefined, types.string)
+    .addParam("mastercopy", "Address of the Delay Modifier Master Copy", undefined, types.string)
     .addParam("owner", "Address of the owner", undefined, types.string)
     .addParam("executor", "Address of the executor (e.g. Safe)", undefined, types.string)
     .addParam("cooldown", "Cooldown in seconds that should be required after a oracle provided answer", 24 * 3600, types.int, true)
@@ -38,29 +39,32 @@ task("factorySetup", "Deploys a SafeDelay module through a proxy")
          ];
          
          const Factory = new Contract(taskArgs.factory, FactoryAbi, caller)
-         const Module = await hardhatRuntime.ethers.getContractFactory("DelayModule");
+         const Modifier = await hardhatRuntime.ethers.getContractFactory("Delay");
          
-         const initParams = Module.interface.encodeFunctionData('setUp', [
-            taskArgs.owner,
-            taskArgs.executor, 
-            taskArgs.cooldown,
-            taskArgs.expiration,
-        ])
-
+         const encodedParams = new AbiCoder().encode(
+             ["address", "address", "uint256", "uint256"],
+             [
+                taskArgs.owner,
+                taskArgs.executor, 
+                taskArgs.cooldown,
+                taskArgs.expiration,
+             ]
+         )
+        const initParams = Modifier.interface.encodeFunctionData('setUp', [encodedParams])
         const receipt = await Factory.deployModule(taskArgs.mastercopy, initParams).then((tx: any) => tx.wait(3));
-        console.log("Module deployed to:", receipt.logs[1].address);
+        console.log("Modifier deployed to:", receipt.logs[1].address);
 
     });
 
 task("verifyEtherscan", "Verifies the contract on etherscan")
-    .addParam("module", "Address of the module", undefined, types.string)
+    .addParam("modifier", "Address of the modifier", undefined, types.string)
     .addParam("owner", "Address of the owner", undefined, types.string)
     .addParam("executor", "Address of the executor (e.g. Safe)", undefined, types.string)
     .addParam("cooldown", "Cooldown in seconds that should be required after a oracle provided answer", 24 * 3600, types.int, true)
     .addParam("expiration", "Time duration in seconds for which a positive answer is valid. After this time the answer is expired", 7 * 24 * 3600, types.int, true)
     .setAction(async (taskArgs, hardhatRuntime) => {
         await hardhatRuntime.run("verify", {
-            address: taskArgs.module,
+            address: taskArgs.modifier,
             constructorArgsParams: [
                 taskArgs.owner, taskArgs.executor, `${taskArgs.cooldown}`, `${taskArgs.expiration}`
             ]
@@ -68,18 +72,18 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
     });
 
 
-task("deployMasterCopy", "deploy a master copy of Delay Module").setAction(
+task("deployMasterCopy", "deploy a master copy of Delay Modifier").setAction(
     async (_, hardhatRuntime) => {
         const [caller] = await hardhatRuntime.ethers.getSigners();
         console.log("Using the account:", caller.address);
-        const Module = await hardhatRuntime.ethers.getContractFactory("DelayModule");
-        const module = await Module.deploy(FirstAddress, FirstAddress, 0, 0);
+        const Modifier = await hardhatRuntime.ethers.getContractFactory("Delay");
+        const modifier = await Modifier.deploy(FirstAddress, FirstAddress, 0, 0);
     
-        await module.deployTransaction.wait(3);
+        await modifier.deployTransaction.wait(3);
     
-        console.log("Module deployed to:", module.address);
+        console.log("Modifier deployed to:", modifier.address);
         await hardhatRuntime.run("verify", {
-            address: module.address,
+            address: modifier.address,
             constructorArguments: [FirstAddress, FirstAddress, "0", "0"]
         });
     }

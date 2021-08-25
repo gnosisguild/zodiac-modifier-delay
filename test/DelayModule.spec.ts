@@ -1,32 +1,36 @@
 import { expect } from "chai";
 import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
+import { AbiCoder } from "ethers/lib/utils";
 
 const ZeroState =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
 const FirstAddress = "0x0000000000000000000000000000000000000001";
 
-describe("DelayModule", async () => {
+describe("DelayModifier", async () => {
+  let initializeParams: string;
+
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
     const Executor = await hre.ethers.getContractFactory("TestExecutor");
     const executor = await Executor.deploy();
     const Mock = await hre.ethers.getContractFactory("MockContract");
     const mock = await Mock.deploy();
+
+    initializeParams = new AbiCoder().encode(
+      ["address", "address", "uint256", "uint256"],
+      [executor.address, executor.address, 0, "0x1337"]
+    );
+
     return { Executor, executor, module, mock };
   });
 
   const setupTestWithTestExecutor = deployments.createFixture(async () => {
     const base = await baseSetup();
-    const Module = await hre.ethers.getContractFactory("DelayModule");
+    const Module = await hre.ethers.getContractFactory("Delay");
     const module = await Module.deploy(ZeroAddress, ZeroAddress, 0, "0x1337");
-    await module.setUp(
-      base.executor.address,
-      base.executor.address,
-      0,
-      "0x1337"
-    );
+    await module.setUp(initializeParams);
     return { ...base, Module, module };
   });
 
@@ -34,23 +38,24 @@ describe("DelayModule", async () => {
 
   describe("setUp()", async () => {
     it("throws if not enough time between txCooldown and txExpiration", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule");
+      const Module = await hre.ethers.getContractFactory("Delay");
       await expect(
         Module.deploy(ZeroAddress, ZeroAddress, 1, 59)
       ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds");
     });
 
     it("txExpiration can be 0", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule");
+      const Module = await hre.ethers.getContractFactory("Delay");
       await Module.deploy(user1.address, user1.address, 1, 0);
     });
 
     it("throws if module has already been initialized", async () => {
-      const Module = await hre.ethers.getContractFactory("DelayModule");
+      await baseSetup()
+      const Module = await hre.ethers.getContractFactory("Delay");
       const module = await Module.deploy(user1.address, user1.address, 1, 0);
       await expect(
-        module.setUp(user1.address, user1.address, 1, 0)
-      ).to.be.revertedWith("Module is already initialized");
+        module.setUp(initializeParams)
+      ).to.be.revertedWith("Modifier is already initialized");
     });
   });
 

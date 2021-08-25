@@ -3,8 +3,8 @@ pragma solidity >=0.8.0;
 
 import "@gnosis/zodiac/contracts/core/Modifier.sol";
 
-contract DelayModule is Modifier {
-    event DelayModuleSetup(address indexed initiator, address indexed safe);
+contract Delay is Modifier {
+    event DelaySetup(address indexed initiator, address indexed safe);
     event TransactionAdded(
         uint256 indexed queueNonce,
         bytes32 indexed txHash,
@@ -23,27 +23,34 @@ contract DelayModule is Modifier {
     // Mapping of queue nonce to creation timestamp.
     mapping(uint256 => uint256) public txCreatedAt;
 
+    /// @param _owner Address of the owner
+    /// @param _executor Address of the executor (e.g. a Safe)
+    /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed
+    /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
+    /// @notice There need to be at least 60 seconds between end of cooldown and expiration
     constructor(
         address _owner,
         address _executor,
         uint256 _cooldown,
         uint256 _expiration
     ) {
-        setUp(_owner, _executor, _cooldown, _expiration);
+        bytes memory initParams = abi.encode(
+            _owner,
+            _executor,
+            _cooldown,
+            _expiration
+        );
+        setUp(initParams);
     }
 
-    /// @param _owner Address of the owner
-    /// @param _executor Address of the executor (e.g. a Safe)
-    /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed
-    /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
-    /// @notice There need to be at least 60 seconds between end of cooldown and expiration
-    function setUp(
-        address _owner,
-        address _executor,
-        uint256 _cooldown,
-        uint256 _expiration
-    ) public {
-        require(executor == address(0), "Module is already initialized");
+    function setUp(bytes memory initParams) public override {
+        (
+            address _owner,
+            address _executor,
+            uint256 _cooldown,
+            uint256 _expiration
+        ) = abi.decode(initParams, (address, address, uint256, uint256));
+        require(!initialized, "Modifier is already initialized");
         require(
             _expiration == 0 || _expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
@@ -57,9 +64,10 @@ contract DelayModule is Modifier {
             __Ownable_init();
             transferOwnership(_owner);
             setupModules();
+            initialized = true;
         }
 
-        emit DelayModuleSetup(msg.sender, _executor);
+        emit DelaySetup(msg.sender, _executor);
     }
 
     function setupModules() internal {
