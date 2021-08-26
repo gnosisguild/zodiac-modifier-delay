@@ -53,9 +53,9 @@ contract DelayModule is Modifier {
         txExpiration = _expiration;
         txCooldown = _cooldown;
 
-        if (_executor != address(0)) {
+        if (_owner != address(0)) {
             __Ownable_init();
-            transferOwnership(_executor);
+            transferOwnership(_owner);
             setupModules();
         }
 
