@@ -55,7 +55,7 @@ contract DelayModule is Modifier {
 
         if (_executor != address(0)) {
             __Ownable_init();
-            transferOwnership(_owner);
+            transferOwnership(_executor);
             setupModules();
         }
 
