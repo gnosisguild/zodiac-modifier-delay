@@ -29,8 +29,12 @@ describe("DelayModifier", async () => {
   const setupTestWithTestExecutor = deployments.createFixture(async () => {
     const base = await baseSetup();
     const Modifier = await hre.ethers.getContractFactory("Delay");
-    const modifier = await Modifier.deploy(ZeroAddress, ZeroAddress, 0, "0x1337");
-    await modifier.setUp(initializeParams);
+    const modifier = await Modifier.deploy(
+      base.executor.address,
+      base.executor.address,
+      0,
+      "0x1337"
+    );
     return { ...base, Modifier, modifier };
   });
 
@@ -40,8 +44,15 @@ describe("DelayModifier", async () => {
     it("throws if not enough time between txCooldown and txExpiration", async () => {
       const Module = await hre.ethers.getContractFactory("Delay");
       await expect(
-        Module.deploy(ZeroAddress, ZeroAddress, 1, 59)
+        Module.deploy(ZeroAddress, FirstAddress, 1, 59)
       ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds");
+    });
+
+    it("throws if executor is zero address", async () => {
+      const Module = await hre.ethers.getContractFactory("Delay");
+      await expect(
+        Module.deploy(ZeroAddress, ZeroAddress, 1, 0)
+      ).to.be.revertedWith("Executor can not be zero address");
     });
 
     it("txExpiration can be 0", async () => {
@@ -50,12 +61,12 @@ describe("DelayModifier", async () => {
     });
 
     it("throws if module has already been initialized", async () => {
-      await baseSetup()
+      await baseSetup();
       const Module = await hre.ethers.getContractFactory("Delay");
       const module = await Module.deploy(user1.address, user1.address, 1, 0);
-      await expect(
-        module.setUp(initializeParams)
-      ).to.be.revertedWith("Modifier is already initialized");
+      await expect(module.setUp(initializeParams)).to.be.revertedWith(
+        "Modifier is already initialized"
+      );
     });
   });
 
@@ -314,7 +325,9 @@ describe("DelayModifier", async () => {
       await executor.exec(modifier.address, 0, tx.data);
       const expectedQueueNonce = await modifier.queueNonce;
 
-      await expect(modifier.execTransactionFromModule(user1.address, 42, "0x", 0))
+      await expect(
+        modifier.execTransactionFromModule(user1.address, 42, "0x", 0)
+      )
         .to.emit(modifier, "TransactionAdded")
         .withArgs(
           expectedQueueNonce,

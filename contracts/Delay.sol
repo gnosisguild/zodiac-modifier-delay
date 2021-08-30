@@ -51,21 +51,20 @@ contract Delay is Modifier {
             uint256 _expiration
         ) = abi.decode(initParams, (address, address, uint256, uint256));
         require(!initialized, "Modifier is already initialized");
+        require(_executor != address(0), "Executor can not be zero address");
         require(
             _expiration == 0 || _expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
         );
 
-        executor = _executor;
+        avatar = _executor;
         txExpiration = _expiration;
         txCooldown = _cooldown;
 
-        if (_executor != address(0)) {
-            __Ownable_init();
-            transferOwnership(_owner);
-            setupModules();
-            initialized = true;
-        }
+        __Ownable_init();
+        transferOwnership(_owner);
+        setupModules();
+        initialized = true;
 
         emit DelaySetup(msg.sender, _executor);
     }
