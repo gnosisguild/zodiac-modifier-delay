@@ -24,19 +24,19 @@ contract Delay is Modifier {
     mapping(uint256 => uint256) public txCreatedAt;
 
     /// @param _owner Address of the owner
-    /// @param _executor Address of the executor (e.g. a Safe)
+    /// @param _avatar Address of the avatar (e.g. a Safe)
     /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed
     /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
     constructor(
         address _owner,
-        address _executor,
+        address _avatar,
         uint256 _cooldown,
         uint256 _expiration
     ) {
         bytes memory initParams = abi.encode(
             _owner,
-            _executor,
+            _avatar,
             _cooldown,
             _expiration
         );
@@ -46,18 +46,18 @@ contract Delay is Modifier {
     function setUp(bytes memory initParams) public override {
         (
             address _owner,
-            address _executor,
+            address _avatar,
             uint256 _cooldown,
             uint256 _expiration
         ) = abi.decode(initParams, (address, address, uint256, uint256));
         require(!initialized, "Modifier is already initialized");
-        require(_executor != address(0), "Executor can not be zero address");
+        require(_avatar != address(0), "Avatar can not be zero address");
         require(
             _expiration == 0 || _expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
         );
 
-        avatar = _executor;
+        avatar = _avatar;
         txExpiration = _expiration;
         txCooldown = _cooldown;
 
@@ -66,7 +66,7 @@ contract Delay is Modifier {
         setupModules();
         initialized = true;
 
-        emit DelaySetup(msg.sender, _executor);
+        emit DelaySetup(msg.sender, _avatar);
     }
 
     function setupModules() internal {
@@ -79,7 +79,7 @@ contract Delay is Modifier {
 
     /// @dev Sets the cooldown before a transaction can be executed.
     /// @param cooldown Cooldown in seconds that should be required before the transaction can be executed
-    /// @notice This can only be called by the executor
+    /// @notice This can only be called by the avatar
     function setTxCooldown(uint256 cooldown) public onlyOwner {
         txCooldown = cooldown;
     }
@@ -87,7 +87,7 @@ contract Delay is Modifier {
     /// @dev Sets the duration for which a transaction is valid.
     /// @param expiration Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
-    /// @notice This can only be called by the executor
+    /// @notice This can only be called by the avatar
     function setTxExpiration(uint256 expiration) public onlyOwner {
         require(
             expiration == 0 || expiration >= 60,
@@ -98,7 +98,7 @@ contract Delay is Modifier {
 
     /// @dev Sets transaction nonce. Used to invalidate or skip transactions in queue.
     /// @param _nonce New transaction nonce
-    /// @notice This can only be called by the executor
+    /// @notice This can only be called by the avatar
     function setTxNonce(uint256 _nonce) public onlyOwner {
         require(
             _nonce > txNonce,
@@ -108,7 +108,7 @@ contract Delay is Modifier {
         txNonce = _nonce;
     }
 
-    /// @dev Adds a transaction to the queue (same as executor interface so that this can be placed between other modules and the safe).
+    /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the safe).
     /// @param to Destination address of module transaction
     /// @param value Ether value of module transaction
     /// @param data Data payload of module transaction
