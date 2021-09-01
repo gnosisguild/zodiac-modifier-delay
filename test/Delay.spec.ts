@@ -68,6 +68,13 @@ describe("DelayModifier", async () => {
         "Modifier is already initialized"
       );
     });
+
+    it("should emit event because of successful set up", async () => {
+      const Module = await hre.ethers.getContractFactory("Delay");
+      const module = await Module.deploy(user1.address, user1.address, 1, 0);
+      await module.deployed();
+      await expect(module.deployTransaction).to.emit(module, "DelaySetup");
+    });
   });
 
   describe("disableModule()", async () => {
