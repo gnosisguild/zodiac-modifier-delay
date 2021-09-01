@@ -71,22 +71,4 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
         })
     });
 
-
-task("deployMasterCopy", "deploy a master copy of Delay Modifier").setAction(
-    async (_, hardhatRuntime) => {
-        const [caller] = await hardhatRuntime.ethers.getSigners();
-        console.log("Using the account:", caller.address);
-        const Modifier = await hardhatRuntime.ethers.getContractFactory("Delay");
-        const modifier = await Modifier.deploy(FirstAddress, FirstAddress, 0, 0);
-    
-        await modifier.deployTransaction.wait(3);
-    
-        console.log("Modifier deployed to:", modifier.address);
-        await hardhatRuntime.run("verify", {
-            address: modifier.address,
-            constructorArguments: [FirstAddress, FirstAddress, "0", "0"]
-        });
-    }
-);
-
 export { };
