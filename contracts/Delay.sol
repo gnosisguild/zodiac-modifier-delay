@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import "@gnosis/zodiac/contracts/core/Modifier.sol";
 
 contract Delay is Modifier {
-    event DelaySetup(address indexed initiator, address indexed safe);
+    event DelaySetup(address indexed initiator, address indexed avatar);
     event TransactionAdded(
         uint256 indexed queueNonce,
         bytes32 indexed txHash,
@@ -24,7 +24,7 @@ contract Delay is Modifier {
     mapping(uint256 => uint256) public txCreatedAt;
 
     /// @param _owner Address of the owner
-    /// @param _avatar Address of the avatar (e.g. a Safe)
+    /// @param _avatar Address of the avatar (e.g. a Gnosis Safe)
     /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed
     /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
@@ -34,12 +34,8 @@ contract Delay is Modifier {
         uint256 _cooldown,
         uint256 _expiration
     ) {
-        bytes memory initParams = abi.encode(
-            _owner,
-            _avatar,
-            _cooldown,
-            _expiration
-        );
+        bytes memory initParams =
+            abi.encode(_owner, _avatar, _cooldown, _expiration);
         setUp(initParams);
     }
 
@@ -108,7 +104,7 @@ contract Delay is Modifier {
         txNonce = _nonce;
     }
 
-    /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the safe).
+    /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).
     /// @param to Destination address of module transaction
     /// @param value Ether value of module transaction
     /// @param data Data payload of module transaction
