@@ -60,15 +60,6 @@ describe("DelayModifier", async () => {
       await Module.deploy(user1.address, user1.address, 1, 0);
     });
 
-    it("throws if module has already been initialized", async () => {
-      await baseSetup();
-      const Module = await hre.ethers.getContractFactory("Delay");
-      const module = await Module.deploy(user1.address, user1.address, 1, 0);
-      await expect(module.setUp(initializeParams)).to.be.revertedWith(
-        "Modifier is already initialized"
-      );
-    });
-
     it("should emit event because of successful set up", async () => {
       const Module = await hre.ethers.getContractFactory("Delay");
       const module = await Module.deploy(user1.address, user1.address, 1, 0);
