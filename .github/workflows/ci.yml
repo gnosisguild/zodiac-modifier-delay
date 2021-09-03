@@ -1,4 +1,4 @@
-name: SafeDelay
+name: Delay
 on: [push]
 
 jobs:

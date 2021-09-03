@@ -1,6 +1,7 @@
-# Delay Module
-[![Build Status](https://github.com/gnosis/SafeDelay/workflows/SafeDelay/badge.svg?branch=main)](https://github.com/gnosis/SafeDelay/actions)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/SafeDelay/badge.svg?branch=main)](https://coveralls.io/github/gnosis/SafeDelay)
+# Delay Modifier
+
+[![Build Status](https://github.com/gnosis/zodiac-modifier-delay/workflows/zodiac-modifier-delay/badge.svg?branch=main)](https://github.com/gnosis/zodiac-modifier-delay/actions)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/zodiac-modifier-delay/badge.svg?branch=main)](https://coveralls.io/github/gnosis/zodiac-modifier-delay)
 
 This module allows for execution of transactions created by an approved address, only after a cooldown period and, optionally, before an expiration time.
 
@@ -9,6 +10,7 @@ The interface mirrors the relevant parts of the Gnosis Safe's interface, so this
 Transactions are executed in order. The Safe can skip transactions by advancing the transaction nonce.
 
 ### Features
+
 - Enqueue transactions
 - Enable and disable modules
 - Public function to execute the next transaction in queue
@@ -16,6 +18,7 @@ Transactions are executed in order. The Safe can skip transactions by advancing 
 - Set cooldown and expiration periods
 
 ### Flow
+
 - Enqueue transactions by calling `execTransactionFromModule()`
 - Wait for cooldown ⏱️
 - Anyone can execute the next transaction by calling `executeNextTx`
@@ -26,4 +29,4 @@ The contracts have been developed with [Solidity 0.8.0](https://github.com/ether
 
 ### Setup Guide
 
-Follow our [SafeDelay Setup Guide](./docs/setup_guide.md) to setup and use a DelayModule.
+Follow our [Delay Modifier Setup Guide](./docs/setup_guide.md) to setup and use a DelayModule.
