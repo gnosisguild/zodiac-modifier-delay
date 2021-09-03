@@ -10,7 +10,7 @@ For the hardhat tasks to work the environment needs to be properly configured. S
 
 ## Setting up the modifier
 
-The first step is to deploy the modifier. Every Safe will have their own modifier. The modifier is linked to a Safe (called owner in the contract). Only the owner can change the state of the modifier. The modifier is linked to an executor which takes care of executing the transactions.
+The first step is to deploy the modifier. Every Safe will have their own modifier. The modifier is linked to a Safe (called owner in the contract). Only the owner can change the state of the modifier. The modifier is linked to an avatar which takes care of executing the transactions.
 
 ### Deploying the modifier
 
@@ -18,7 +18,7 @@ Hardhat tasks can be used to deploy a Delay Modifier instance. There are two dif
 
 These setup tasks requires the following parameters:
 
-- `executor` - the address of the executor.
+- `avatar` - the address of the avatar.
 - `owner` - the address of the owner
 - `cooldown` - optional, by default is set to 24 hours
 - `expiration` - optional, by default is set to 7 days
@@ -26,18 +26,18 @@ These setup tasks requires the following parameters:
 For more information run `yarn hardhat setup --help` or `yarn hardhat factorySetup --help`.
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby setup --owner <owner_address> --executor <executor_address>`
+`yarn hardhat --network rinkeby setup --owner <owner_address> --avatar <avatar_address>`
 
 or
 
-`yarn hardhat --network rinkeby factorySetup --factory <factory_address> --mastercopy <mastercopy_address> --owner <owner_address> --executor <executor_address>`
+`yarn hardhat --network rinkeby factorySetup --factory <factory_address> --mastercopy <mastercopy_address> --owner <owner_address> --avatar <avatar_address>`
 
 This should return the address of the deployed Delay modifier. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
 Once the modifier is deployed you should verify the source code (Note: If you used the factory deployment the contract should be already verified). If you use a network that is Etherscan compatible and you configure the `ETHERSCAN_API_KEY` in your environment you can use the provided hardhat task to do this.
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby verifyEtherscan --modifier 0x4242424242424242424242424242424242424242 --owner <owner_address> --executor <executor_address>`
+`yarn hardhat --network rinkeby verifyEtherscan --modifier 0x4242424242424242424242424242424242424242 --owner <owner_address> --avatar <avatar_address>`
 
 ### Enabling the modifier
 
