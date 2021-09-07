@@ -147,10 +147,13 @@ contract Delay is Modifier {
             block.timestamp - txCreatedAt[txNonce] >= txCooldown,
             "Transaction is still in cooldown"
         );
-        require(
-            txCreatedAt[txNonce] + txCooldown + txExpiration > block.timestamp,
-            "Transaction expired"
-        );
+        if (txExpiration != 0) {
+            require(
+                txCreatedAt[txNonce] + txCooldown + txExpiration >
+                    block.timestamp,
+                "Transaction expired"
+            );
+        }
         require(
             txHash[txNonce] == getTransactionHash(to, value, data, operation),
             "Transaction hashes do not match"
