@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "@gnosis/zodiac/contracts/core/Modifier.sol";
+import "@gnosis.pm/zodiac/contracts/core/Modifier.sol";
 
 contract Delay is Modifier {
-    event DelaySetup(address indexed initiator, address indexed avatar);
+    event DelaySetup(
+        address indexed initiator,
+        address indexed owner,
+        address indexed avatar,
+        address target
+    );
     event TransactionAdded(
         uint256 indexed queueNonce,
         bytes32 indexed txHash,
@@ -25,17 +30,24 @@ contract Delay is Modifier {
 
     /// @param _owner Address of the owner
     /// @param _avatar Address of the avatar (e.g. a Gnosis Safe)
+    /// @param _target Address of the contract that will call exec function
     /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed
     /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
     constructor(
         address _owner,
         address _avatar,
+        address _target,
         uint256 _cooldown,
         uint256 _expiration
     ) {
-        bytes memory initParams =
-            abi.encode(_owner, _avatar, _cooldown, _expiration);
+        bytes memory initParams = abi.encode(
+            _owner,
+            _avatar,
+            _target,
+            _cooldown,
+            _expiration
+        );
         setUp(initParams);
     }
 
@@ -43,26 +55,32 @@ contract Delay is Modifier {
         (
             address _owner,
             address _avatar,
+            address _target,
             uint256 _cooldown,
             uint256 _expiration
-        ) = abi.decode(initParams, (address, address, uint256, uint256));
+        ) = abi.decode(
+                initParams,
+                (address, address, address, uint256, uint256)
+            );
         require(!initialized, "Modifier is already initialized");
+        initialized = true;
         require(_avatar != address(0), "Avatar can not be zero address");
+        require(_target != address(0), "Target can not be zero address");
         require(
             _expiration == 0 || _expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
         );
 
         avatar = _avatar;
+        target = _target;
         txExpiration = _expiration;
         txCooldown = _cooldown;
 
         __Ownable_init();
         transferOwnership(_owner);
         setupModules();
-        initialized = true;
 
-        emit DelaySetup(msg.sender, _avatar);
+        emit DelaySetup(msg.sender, _owner, _avatar, _target);
     }
 
     function setupModules() internal {
