@@ -8,9 +8,9 @@ const FirstAddress = "0x0000000000000000000000000000000000000001";
 const saltNonce = "0xfa";
 
 describe("Module works with factory", () => {
-  const cooldown = 100
-  const expiration = 180
-  const paramsTypes = ["address", "address", "uint256", "uint256"];
+  const cooldown = 100;
+  const expiration = 180;
+  const paramsTypes = ["address", "address", "address", "uint256", "uint256"];
 
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
@@ -19,6 +19,7 @@ describe("Module works with factory", () => {
     const factory = await Factory.deploy();
 
     const masterCopy = await DelayModifier.deploy(
+      FirstAddress,
       FirstAddress,
       FirstAddress,
       0,
@@ -33,6 +34,7 @@ describe("Module works with factory", () => {
     const encodedParams = new AbiCoder().encode(paramsTypes, [
       AddressOne,
       AddressOne,
+      AddressOne,
       100,
       180,
     ]);
@@ -44,10 +46,11 @@ describe("Module works with factory", () => {
 
   it("should deploy new amb module proxy", async () => {
     const { factory, masterCopy } = await baseSetup();
-    const [executor, owner] = await ethers.getSigners();
+    const [avatar, owner, target] = await ethers.getSigners();
     const paramsValues = [
       owner.address,
-      executor.address,
+      avatar.address,
+      target.address,
       100,
       180,
     ];
@@ -67,10 +70,7 @@ describe("Module works with factory", () => {
       ({ event }: { event: string }) => event === "ModuleProxyCreation"
     );
 
-    const newProxy = await hre.ethers.getContractAt(
-      "Delay",
-      newProxyAddress
-    );
+    const newProxy = await hre.ethers.getContractAt("Delay", newProxyAddress);
     expect(await newProxy.txCooldown()).to.be.eq(cooldown);
     expect(await newProxy.txExpiration()).to.be.eq(expiration);
   });

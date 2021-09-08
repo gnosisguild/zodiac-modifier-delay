@@ -10,6 +10,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const args = [
     FirstAddress,
     FirstAddress,
+    FirstAddress,
     0,
     0
   ];

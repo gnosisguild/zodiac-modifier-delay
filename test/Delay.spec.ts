@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
-import { AbiCoder } from "ethers/lib/utils";
 
 const ZeroState =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -9,20 +8,12 @@ const ZeroAddress = "0x0000000000000000000000000000000000000000";
 const FirstAddress = "0x0000000000000000000000000000000000000001";
 
 describe("DelayModifier", async () => {
-  let initializeParams: string;
-
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
     const Avatar = await hre.ethers.getContractFactory("TestAvatar");
     const avatar = await Avatar.deploy();
     const Mock = await hre.ethers.getContractFactory("MockContract");
     const mock = await Mock.deploy();
-
-    initializeParams = new AbiCoder().encode(
-      ["address", "address", "uint256", "uint256"],
-      [avatar.address, avatar.address, 0, "0x1337"]
-    );
-
     return { Avatar, avatar, mock };
   });
 
@@ -30,6 +21,7 @@ describe("DelayModifier", async () => {
     const base = await baseSetup();
     const Modifier = await hre.ethers.getContractFactory("Delay");
     const modifier = await Modifier.deploy(
+      base.avatar.address,
       base.avatar.address,
       base.avatar.address,
       0,
@@ -44,27 +36,42 @@ describe("DelayModifier", async () => {
     it("throws if not enough time between txCooldown and txExpiration", async () => {
       const Module = await hre.ethers.getContractFactory("Delay");
       await expect(
-        Module.deploy(ZeroAddress, FirstAddress, 1, 59)
+        Module.deploy(ZeroAddress, FirstAddress, FirstAddress, 1, 59)
       ).to.be.revertedWith("Expiratition must be 0 or at least 60 seconds");
     });
 
     it("throws if avatar is zero address", async () => {
       const Module = await hre.ethers.getContractFactory("Delay");
       await expect(
-        Module.deploy(ZeroAddress, ZeroAddress, 1, 0)
+        Module.deploy(ZeroAddress, ZeroAddress, FirstAddress, 1, 0)
       ).to.be.revertedWith("Avatar can not be zero address");
+    });
+
+    it("throws if target is zero address", async () => {
+      const Module = await hre.ethers.getContractFactory("Delay");
+      await expect(
+        Module.deploy(ZeroAddress, FirstAddress, ZeroAddress, 1, 0)
+      ).to.be.revertedWith("Target can not be zero address");
     });
 
     it("txExpiration can be 0", async () => {
       const Module = await hre.ethers.getContractFactory("Delay");
-      await Module.deploy(user1.address, user1.address, 1, 0);
+      await Module.deploy(user1.address, user1.address, user1.address, 1, 0);
     });
 
     it("should emit event because of successful set up", async () => {
       const Module = await hre.ethers.getContractFactory("Delay");
-      const module = await Module.deploy(user1.address, user1.address, 1, 0);
+      const module = await Module.deploy(
+        user1.address,
+        user1.address,
+        user1.address,
+        1,
+        0
+      );
       await module.deployed();
-      await expect(module.deployTransaction).to.emit(module, "DelaySetup");
+      await expect(module.deployTransaction)
+        .to.emit(module, "DelaySetup")
+        .withArgs(user1.address, user1.address, user1.address, user1.address);
     });
   });
 
