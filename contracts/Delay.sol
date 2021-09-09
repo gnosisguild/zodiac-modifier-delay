@@ -172,8 +172,8 @@ contract Delay is Modifier {
             txHash[txNonce] == getTransactionHash(to, value, data, operation),
             "Transaction hashes do not match"
         );
-        require(exec(to, value, data, operation), "Module transaction failed");
         txNonce++;
+        require(exec(to, value, data, operation), "Module transaction failed");
     }
 
     function skipExpired() public {
