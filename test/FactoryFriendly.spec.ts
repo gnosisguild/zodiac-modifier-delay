@@ -40,7 +40,7 @@ describe("Module works with factory", () => {
     ]);
 
     await expect(masterCopy.setUp(encodedParams)).to.be.revertedWith(
-      "Modifier is already initialized"
+      "Initializable: contract is already initialized"
     );
   });
 

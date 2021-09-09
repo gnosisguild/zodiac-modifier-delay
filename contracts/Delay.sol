@@ -58,8 +58,7 @@ contract Delay is Modifier {
                 initParams,
                 (address, address, address, uint256, uint256)
             );
-        require(!initialized, "Modifier is already initialized");
-        initialized = true;
+        __Ownable_init();
         require(_avatar != address(0), "Avatar can not be zero address");
         require(_target != address(0), "Target can not be zero address");
         require(
@@ -72,7 +71,6 @@ contract Delay is Modifier {
         txExpiration = _expiration;
         txCooldown = _cooldown;
 
-        __Ownable_init();
         transferOwnership(_owner);
         setupModules();
 
