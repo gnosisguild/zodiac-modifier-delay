@@ -41,13 +41,8 @@ contract Delay is Modifier {
         uint256 _cooldown,
         uint256 _expiration
     ) {
-        bytes memory initParams = abi.encode(
-            _owner,
-            _avatar,
-            _target,
-            _cooldown,
-            _expiration
-        );
+        bytes memory initParams =
+            abi.encode(_owner, _avatar, _target, _cooldown, _expiration);
         setUp(initParams);
     }
 
@@ -58,7 +53,8 @@ contract Delay is Modifier {
             address _target,
             uint256 _cooldown,
             uint256 _expiration
-        ) = abi.decode(
+        ) =
+            abi.decode(
                 initParams,
                 (address, address, address, uint256, uint256)
             );
@@ -167,7 +163,7 @@ contract Delay is Modifier {
         );
         if (txExpiration != 0) {
             require(
-                txCreatedAt[txNonce] + txCooldown + txExpiration >
+                txCreatedAt[txNonce] + txCooldown + txExpiration >=
                     block.timestamp,
                 "Transaction expired"
             );
