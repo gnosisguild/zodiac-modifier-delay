@@ -179,7 +179,7 @@ contract Delay is Modifier {
             txExpiration != 0 &&
             txCreatedAt[txNonce] + txCooldown + txExpiration <
             block.timestamp &&
-            txNonce <= queueNonce
+            txNonce < queueNonce
         ) {
             txNonce++;
         }
