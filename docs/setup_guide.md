@@ -8,29 +8,33 @@ To start the process you need to create a Safe on the Rinkeby test network (e.g.
 
 For the hardhat tasks to work the environment needs to be properly configured. See the [sample env file](../.env.sample) for more information.
 
-## Setting up the modifier
+## Deploying the modifier
 
-The first step is to deploy the modifier. Every Safe will have their own modifier. The modifier is linked to a Safe (called owner in the contract). Only the owner can change the state of the modifier. The modifier is linked to an avatar which takes care of executing the transactions.
+The modifier has five attributes which are:
+- Owner: address that can call setter functions
+- Avatar: address of the DAO (e.g Safe)
+- Target: address that the module will call `execModuleTransaction()` on.
+- Cooldown: Amount in seconds of cooldown required before the transaction can be executed
+- Expiration: Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
 
-### Deploying the modifier
-
-Hardhat tasks can be used to deploy a Delay Modifier instance. There are two different tasks to deploy the modifier, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the modifier through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factorySetup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Delay Modifier: `0xb8215f0f08b204644507D706b544c541caD0ec16`.
+Hardhat tasks can be used to deploy a Delay Modifier instance. There are two different ways to deploy the modifier, the first one is through a normal deployment and passing arguments to the constructor (without the `proxied` flag), or, deploy the modifier through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the `proxied` flag) - The master copy and factory address can be found in the [zodiac repository](https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts) and these are the addresses that are going to be used when deploying the module through factory.
 
 These setup tasks requires the following parameters:
 
 - `avatar` - the address of the avatar.
 - `owner` - the address of the owner
+- `target` (the address of the target, this is the contract that execute the transactions)
 - `cooldown` - optional, by default is set to 24 hours
 - `expiration` - optional, by default is set to 7 days
 
-For more information run `yarn hardhat setup --help` or `yarn hardhat factorySetup --help`.
+For more information run `yarn hardhat setup --help`
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby setup --owner <owner_address> --avatar <avatar_address>`
+`yarn hardhat --network rinkeby setup --owner <owner_address> --avatar <avatar_address> --target <target_address> `
 
 or
 
-`yarn hardhat --network rinkeby factorySetup --factory <factory_address> --mastercopy <mastercopy_address> --owner <owner_address> --avatar <avatar_address>`
+`yarn hardhat --network rinkeby setup ---owner <owner_address> --avatar <avatar_address> --target <target_address> --proxied true`
 
 This should return the address of the deployed Delay modifier. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
@@ -39,11 +43,11 @@ Once the modifier is deployed you should verify the source code (Note: If you us
 An example for this on Rinkeby would be:
 `yarn hardhat --network rinkeby verifyEtherscan --modifier 0x4242424242424242424242424242424242424242 --owner <owner_address> --avatar <avatar_address>`
 
-### Enabling the modifier
+## Enabling the modifier
 
 To allow the Delay modifier to actually execute transaction it is required to enable it on the Safe that it is connected to. For this it is possible to use the Transaction Builder on https://rinkeby.gnosis-safe.io. For this you can follow our tutorial on [adding a module](https://help.gnosis-safe.io/en/articles/4934427-add-a-module).
 
-### Enabling modules on the Delay modifier
+## Enabling modules on the Delay modifier
 
 The Delay modifier implements the same interface as the Safe for enabling and disabling modules, along with enqueueing transactions.
 
@@ -66,5 +70,5 @@ event TransactionAdded(
 There are different services available for this such as the [OpenZepplin Defender Sentinel](https://docs.openzeppelin.com/defender/sentinel).
 
 
-### Deploy a caster copy
-The master copy contracts can be deployed through `yarn deploy` command. Note that this only should be done if the Delay Modifier contracts gets an update and the ones referred on the (zodiac repository)[https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts] should be used.
+## Deploy a master copy
+The master copy contracts can be deployed through `yarn deploy` command. Note that this only should be done if the Delay Modifier contracts gets an update and the ones referred on the [zodiac repository](https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts) should be used.
