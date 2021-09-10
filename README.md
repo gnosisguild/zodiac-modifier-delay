@@ -1,6 +1,6 @@
 # Delay Modifier
 
-[![Build Status](https://github.com/gnosis/zodiac-modifier-delay/workflows/zodiac-modifier-delay/badge.svg?branch=main)](https://github.com/gnosis/zodiac-modifier-delay/actions)
+[![Build Status](https://github.com/gnosis/zodiac-modifier-delay/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosis/zodiac-modifier-delay/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/zodiac-modifier-delay/badge.svg?branch=main)](https://coveralls.io/github/gnosis/zodiac-modifier-delay)
 
 This module allows for execution of transactions created by an approved address, only after a cooldown period and, optionally, before an expiration time.
