@@ -87,7 +87,7 @@ contract Delay is Modifier {
 
     /// @dev Sets the cooldown before a transaction can be executed.
     /// @param cooldown Cooldown in seconds that should be required before the transaction can be executed
-    /// @notice This can only be called by the avatar
+    /// @notice This can only be called by the owner
     function setTxCooldown(uint256 cooldown) public onlyOwner {
         txCooldown = cooldown;
     }
@@ -95,7 +95,7 @@ contract Delay is Modifier {
     /// @dev Sets the duration for which a transaction is valid.
     /// @param expiration Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
-    /// @notice This can only be called by the avatar
+    /// @notice This can only be called by the owner
     function setTxExpiration(uint256 expiration) public onlyOwner {
         require(
             expiration == 0 || expiration >= 60,
@@ -106,7 +106,7 @@ contract Delay is Modifier {
 
     /// @dev Sets transaction nonce. Used to invalidate or skip transactions in queue.
     /// @param _nonce New transaction nonce
-    /// @notice This can only be called by the avatar
+    /// @notice This can only be called by the owner
     function setTxNonce(uint256 _nonce) public onlyOwner {
         require(
             _nonce > txNonce,
