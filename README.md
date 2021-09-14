@@ -30,3 +30,11 @@ The contracts have been developed with [Solidity 0.8.0](https://github.com/ether
 ### Setup Guide
 
 Follow our [Delay Modifier Setup Guide](./docs/setup_guide.md) to setup and use a DelayModule.
+
+### Security and Liability
+
+All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+### License
+
+Created under the [LGPL-3.0+ license](LICENSE).
