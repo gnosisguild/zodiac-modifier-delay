@@ -25,6 +25,7 @@ const DEFAULT_MNEMONIC =
 
 const sharedNetworkConfig: HttpNetworkUserConfig = {};
 if (PK) {
+  console.log("yah")
   sharedNetworkConfig.accounts = [PK];
 } else {
   sharedNetworkConfig.accounts = {
@@ -64,6 +65,10 @@ export default {
       ...sharedNetworkConfig,
       url: "https://xdai.poanetwork.dev",
     },
+    matic: {
+      ...sharedNetworkConfig,
+      url: "https://rpc-mainnet.maticvigil.com"
+    }
   },
   namedAccounts: {
     deployer: 0,
