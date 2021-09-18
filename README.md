@@ -31,6 +31,14 @@ The contracts have been developed with [Solidity 0.8.0](https://github.com/ether
 
 Follow our [Delay Modifier Setup Guide](./docs/setup_guide.md) to setup and use a DelayModule.
 
+### Audits
+
+An audit has been performed by the [G0 group](https://github.com/g0-group).
+
+All issues and notes of the audit have been addressed in commit [95c75547edf075d3c7a0f23e93ff856dedd17507](https://github.com/gnosis/zodiac-modifier-delay/commit/95c75547edf075d3c7a0f23e93ff856dedd17507).
+
+The audit results are available as a pdf in [this repo](audits/ZodiacDelayModuleSep2021.pdf) or on the [g0-group repo](https://github.com/g0-group/Audits/blob/e11752abb010f74e32a6fc61142032a10deed578/ZodiacDelayModuleSep2021.pdf).
+
 ### Security and Liability
 
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
