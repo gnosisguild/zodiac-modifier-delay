@@ -1,13 +1,22 @@
-# Delay Modifier
+# Zodiac Delay Modifier
 
 [![Build Status](https://github.com/gnosis/zodiac-modifier-delay/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosis/zodiac-modifier-delay/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/zodiac-modifier-delay/badge.svg?branch=main)](https://coveralls.io/github/gnosis/zodiac-modifier-delay)
 
-This module allows for execution of transactions created by an approved address, only after a cooldown period and, optionally, before an expiration time.
 
-The interface mirrors the relevant parts of the Gnosis Safe's interface, so this contract can be placed between Gnosis Safe modules and a Gnosis Safe enforce a time delay between transaction creation and execution.
+The Delay Modifier belongs to the [Zodiac](https://github.com/gnosis/zodiac) collection of tools, which can be accessed through the Zodiac App available on [Gnosis Safe](https://gnosis-safe.io/), as well as in this repository. 
 
-Transactions are executed in order. The Safe can skip transactions by advancing the transaction nonce.
+If you have any questions about Zodiac, join the [Gnosis Guild Discord](https://discord.gg/wwmBWTgyEq). Follow [@GnosisGuild](https://twitter.com/gnosisguild) on Twitter for updates.
+
+### About the Delay Modifier
+
+This modifier allows avatars to enforce a time delay between when a module initiates a transaction and when it can be executed by an avatar.
+
+This means an pproved address can execute transactions only after a cooldown period and, optionally, before an expiration time.
+
+The interface mirrors the relevant parts of the Gnosis Safe's interface, so this contract can be placed between Gnosis Safe modules and a Gnosis Safe to enforce a time delay between transaction creation and execution.
+
+Transactions are executed in order. The Gnosis Safe can skip transactions by advancing the transaction nonce.
 
 ### Features
 
@@ -29,7 +38,7 @@ The contracts have been developed with [Solidity 0.8.0](https://github.com/ether
 
 ### Setup Guide
 
-Follow our [Delay Modifier Setup Guide](./docs/setup_guide.md) to setup and use a DelayModule.
+Follow our [Delay Modifier Setup Guide](./docs/setup_guide.md).
 
 ### Audits
 
