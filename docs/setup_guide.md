@@ -12,7 +12,7 @@ For the hardhat tasks to work the environment needs to be properly configured. S
 
 ## Deploying the modifier
 
-The modifier has five attributes which are:
+The modifier has five variables which must be set:
 
 - `Owner`: Address that can call setter functions
 - `Avatar`: Address of the DAO (e.g. a Gnosis Safe)
@@ -20,7 +20,7 @@ The modifier has five attributes which are:
 - `Cooldown`: Amount in seconds required before the transaction can be executed
 - `Expiration`: Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
 
-Hardhat tasks can be used to deploy a Delay Modifier instance. There are two different ways to deploy the modifier, the first one is through a normal deployment and passing arguments to the constructor (without the `proxied` flag), or, deploy the modifier through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the `proxied` flag) - The master copy and factory address can be found in the [zodiac repository](https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts) and these are the addresses that are going to be used when deploying the module through factory.
+Hardhat tasks can be used to deploy a Delay Modifier instance. There are two different ways to deploy the modifier, the first one is through a normal deployment, passing arguments to the constructor (without the `proxied` flag), or, deploy the modifier through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) to save on gas costs (with the `proxied` flag) - The master copy and factory address can be found in the [zodiac repository](https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts), these are the addresses that are going to be used when deploying the module through factory.
 
 These setup tasks require the following parameters (also mentioned above):
 
@@ -35,22 +35,20 @@ For more information run `yarn hardhat setup --help`.
 An example for this on Rinkeby would be:
 `yarn hardhat --network rinkeby setup --owner <owner_address> --avatar <avatar_address> --target <target_address> `
 
-or
+or this to deploy using the proxy factory:
 
 `yarn hardhat --network rinkeby setup ---owner <owner_address> --avatar <avatar_address> --target <target_address> --proxied true`
 
 This should return the address of the deployed Delay Modifier. For this guide we assume this to be `0x4242424242424242424242424242424242424242`.
 
-
 Once the modifier has been deployed, you should verify the source code. (Note: If you used the factory deployment, the contract should be already verified.) If you use a network that is Etherscan compatible, and you configure the `ETHERSCAN_API_KEY` in your environment, you can use the provided hardhat task to do this.
-
 
 An example for this on Rinkeby would be:
 `yarn hardhat --network rinkeby verifyEtherscan --modifier 0x4242424242424242424242424242424242424242 --owner <owner_address> --avatar <avatar_address>`
 
 ## Enabling the modifier
 
-To allow the Delay Modifier to actually execute transactions, you must enable it on the Gnosis Safe to which it is connected. For this, it is possible to use the Bundle Transactions tab on [https://rinkeby.gnosis-safe.io](https://rinkeby.gnosis-safe.io), which is accompanied by the tutorial on [adding a module](https://help.gnosis-safe.io/en/articles/4934427-add-a-module).
+To allow the Delay Modifier to actually execute transactions, you must enable it on the Gnosis Safe to which it is connected. For this, you can use the Zodiac Safe app in the [Gnosis Safe UI](https://gnosis-safe.io/app/) to add a "custom module".
 
 
 ## Enabling modules on the Delay Modifier
