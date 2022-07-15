@@ -13,11 +13,11 @@ If you have any questions about Zodiac, join the [Gnosis Guild Discord](https://
 
 This modifier allows avatars to enforce a time delay between when a module initiates a transaction and when it can be executed by an avatar.
 
-This means an pproved address can execute transactions only after a cooldown period and, optionally, before an expiration time.
+This means an approved address can execute transactions only after a cooldown period and, optionally, before an expiration time.
 
 The interface mirrors the relevant parts of the Gnosis Safe's interface, so this contract can be placed between Gnosis Safe modules and a Gnosis Safe to enforce a time delay between transaction creation and execution.
 
-Transactions are executed in order. The Gnosis Safe can skip transactions by advancing the transaction nonce.
+Transactions are executed in order. The owner of the `owner` can skip transactions by advancing the transaction nonce.
 
 ### Features
 
