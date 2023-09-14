@@ -98,6 +98,12 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
     types.string
   )
   .addParam(
+    "target",
+    "Address that this module will send to",
+    undefined,
+    types.string
+  )
+  .addParam(
     "cooldown",
     "Cooldown in seconds that should be required after a oracle provided answer",
     24 * 3600,
