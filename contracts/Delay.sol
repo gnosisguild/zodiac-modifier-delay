@@ -41,8 +41,13 @@ contract Delay is Modifier {
         uint256 _cooldown,
         uint256 _expiration
     ) {
-        bytes memory initParams =
-            abi.encode(_owner, _avatar, _target, _cooldown, _expiration);
+        bytes memory initParams = abi.encode(
+            _owner,
+            _avatar,
+            _target,
+            _cooldown,
+            _expiration
+        );
         setUp(initParams);
     }
 
@@ -53,8 +58,7 @@ contract Delay is Modifier {
             address _target,
             uint256 _cooldown,
             uint256 _expiration
-        ) =
-            abi.decode(
+        ) = abi.decode(
                 initParams,
                 (address, address, address, uint256, uint256)
             );
@@ -121,6 +125,7 @@ contract Delay is Modifier {
     /// @param value Ether value of module transaction
     /// @param data Data payload of module transaction
     /// @param operation Operation type of module transaction
+    /// @return success Whether or not the call was successfully queued for execution
     /// @notice Can only be called by enabled modules
     function execTransactionFromModule(
         address to,
@@ -128,18 +133,40 @@ contract Delay is Modifier {
         bytes calldata data,
         Enum.Operation operation
     ) public override moduleOnly returns (bool success) {
-        txHash[queueNonce] = getTransactionHash(to, value, data, operation);
+        bytes32 hash = getTransactionHash(to, value, data, operation);
+        txHash[queueNonce] = hash;
         txCreatedAt[queueNonce] = block.timestamp;
-        emit TransactionAdded(
-            queueNonce,
-            txHash[queueNonce],
-            to,
-            value,
-            data,
-            operation
-        );
+        emit TransactionAdded(queueNonce, hash, to, value, data, operation);
         queueNonce++;
         success = true;
+    }
+
+    /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).
+    /// @param to Destination address of module transaction
+    /// @param value Ether value of module transaction
+    /// @param data Data payload of module transaction
+    /// @param operation Operation type of module transaction
+    /// @return success Whether or not the call was successfully queued for execution
+    /// @return returnData ABI encoded queue nonce (uint256), transaction hash (bytes32), and block.timestamp (uint256)
+    /// @notice Can only be called by enabled modules
+    function execTransactionFromModuleReturnData(
+        address to,
+        uint256 value,
+        bytes calldata data,
+        Enum.Operation operation
+    )
+        public
+        override
+        moduleOnly
+        returns (bool success, bytes memory returnData)
+    {
+        bytes32 hash = getTransactionHash(to, value, data, operation);
+        txHash[queueNonce] = hash;
+        txCreatedAt[queueNonce] = block.timestamp;
+        emit TransactionAdded(queueNonce, hash, to, value, data, operation);
+        success = true;
+        returnData = abi.encode(queueNonce, hash, block.timestamp);
+        queueNonce++;
     }
 
     /// @dev Executes the next transaction only if the cooldown has passed and the transaction has not expired
@@ -155,13 +182,14 @@ contract Delay is Modifier {
         Enum.Operation operation
     ) public {
         require(txNonce < queueNonce, "Transaction queue is empty");
+        uint256 txCreationTimestamp = txCreatedAt[txNonce];
         require(
-            block.timestamp - txCreatedAt[txNonce] >= txCooldown,
+            block.timestamp - txCreationTimestamp >= txCooldown,
             "Transaction is still in cooldown"
         );
         if (txExpiration != 0) {
             require(
-                txCreatedAt[txNonce] + txCooldown + txExpiration >=
+                txCreationTimestamp + txCooldown + txExpiration >=
                     block.timestamp,
                 "Transaction expired"
             );
