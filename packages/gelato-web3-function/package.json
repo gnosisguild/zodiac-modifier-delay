@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "@gelatonetwork/relay-sdk": "^5.5.1",
-        "@gelatonetwork/web3-functions-sdk": "^2.1.2",
+        "@gelatonetwork/web3-functions-sdk": "^2.1.7",
         "dotenv": "^16.0.3",
         "ky": "^0.32.2",
         "octokit": "^2.0.19"

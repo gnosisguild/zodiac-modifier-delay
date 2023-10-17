@@ -21,6 +21,7 @@ export function handleTransactionAdded(event: TransactionAdded): void {
   transaction.value = event.params.value
   transaction.data = event.params.data
   transaction.operation = OperationKeys[event.params.operation]
+  transaction.delayModifier = delayModifierId
   delayModifier.save()
   log.error("Transaction {} added", [transactionId])
 }

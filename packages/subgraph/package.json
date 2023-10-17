@@ -8,7 +8,7 @@
     "format": "prettier '(test|src)/**/*.ts' -w",
     "deploy:mainnet": "yarn prepare:mainnet && bash -c 'source .env || true && graph deploy --studio $SUBGRAPH_MAINNET'",
     "deploy:goerli": "yarn prepare:goerli && bash -c 'source .env || true && graph deploy --studio $SUBGRAPH_GOERLI'",
-    "deploy:gnosis": "yarn prepare:gnosis && bash -c 'source .env || true && graph deploy --studio $SUBGRAPH_GNOSIS_CHAIN'",
+    "deploy:gnosis": "yarn prepare:gnosis && bash -c 'source .env || true && graph deploy --studio $SUBGRAPH_GNOSIS'",
     "deploy:arbitrum-one": "yarn prepare:arbitrum-one && bash -c 'source .env || true && graph deploy --studio $SUBGRAPH_ARBITRUM_ONE'",
     "deploy:avalanche": "yarn prepare:avalanche && bash -c 'source .env || true && graph deploy --node https://api.thegraph.com/deploy/ $SUBGRAPH_AVALANCHE'",
     "deploy:bsc": "yarn prepare:bsc && bash -c 'source .env || true && graph deploy --node https://api.thegraph.com/deploy/ $SUBGRAPH_BSC'",
@@ -26,7 +26,7 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.56.0",
+    "@graphprotocol/graph-cli": "^0.59.0",
     "@graphprotocol/graph-ts": "^0.31.0",
     "assemblyscript-json": "^1.1.0"
   }
