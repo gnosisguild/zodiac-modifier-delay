@@ -12,6 +12,7 @@ type Transaction @entity {
   value: BigInt!
   data: Bytes!
   operation: Operation!
+  createdAt: Int!
 }
 
 type DelayModifier @entity {

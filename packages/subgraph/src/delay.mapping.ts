@@ -22,8 +22,10 @@ export function handleTransactionAdded(event: TransactionAdded): void {
   transaction.data = event.params.data
   transaction.operation = OperationKeys[event.params.operation]
   transaction.delayModifier = delayModifierId
-  delayModifier.save()
-  log.error("Transaction {} added", [transactionId])
+  transaction.createdAt = event.block.timestamp.toU32()
+  transaction.save()
+
+  log.info("Transaction {} added", [transactionId])
 }
 
 export function handleDelaySetup(event: DelaySetup): void {
@@ -38,6 +40,8 @@ export function handleDelaySetup(event: DelaySetup): void {
     delayModifier.avatar = event.params.avatar
     delayModifier.target = event.params.target
     delayModifier.save()
+
+    log.info("DelayModifier {} added", [delayModifierId])
   } else {
     log.error("DelayModifier {} already exists", [delayModifierId])
     return
