@@ -211,13 +211,16 @@ interface Transaction {
 const SUBGRAPH = {
   [1]: "https://api.studio.thegraph.com/query/23167/zodiac-delay-mainnet/v0.0.4",
   [5]: "https://api.studio.thegraph.com/query/23167/zodiac-delay-goerli/v0.0.4",
-  [10]: "",
-  [56]: "",
+  // [10]: "https://api.studio.thegraph.com/query/23167/zodiac-delay-optimism/v0.0.4",
+  // [56]: "https://api.studio.thegraph.com/query/23167/zodiac-delay-bsc/v0.0.4",
   [100]:
     "https://api.studio.thegraph.com/query/23167/zodiac-delay-gnosis/v0.0.4",
-  [137]: "",
-  [42161]: "",
-  [43114]: "",
+  [137]:
+    "https://api.studio.thegraph.com/query/23167/zodiac-delay-polygon/v0.0.4",
+  [42161]:
+    "https://api.studio.thegraph.com/query/23167/zodiac-delay-arbitrum/v0.0.4",
+  [43114]:
+    "https://api.studio.thegraph.com/query/23167/zodiac-delay-avalanche/v0.0.4",
 };
 
 const fetchUpcomingTransactions = async ({

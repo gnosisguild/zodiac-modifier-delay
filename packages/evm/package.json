@@ -20,7 +20,7 @@
     "type": "git"
   },
   "author": "auryn.macmillan@gnosis.io",
-  "license": "MIT",
+  "license": "LGPL-3.0+",
   "devDependencies": {
     "@gnosis.pm/zodiac": "1.0.1",
     "@nomiclabs/hardhat-ethers": "2.0.0",
