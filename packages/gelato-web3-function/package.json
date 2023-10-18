@@ -6,7 +6,8 @@
     "author": "jan-felix.schwarz@gnosis.io",
     "license": "LGPL-3.0+",
     "scripts": {
-        "build": "rm -rf build && tsc",
+        "deploy": "ts-node deploy.ts",
+        "ts:check": "tsc",
         "format": "prettier --write '*/**/*.{js,json,md,ts}'",
         "format:check": "prettier --check '*/**/*.{js,json,md,ts}'",
         "test": "jest"

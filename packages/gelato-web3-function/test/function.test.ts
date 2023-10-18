@@ -34,6 +34,7 @@ describe("delay-dispatch web3 function", () => {
       userArgs: {
         delayMod: "0x0b7a9a6f1c4e739df11f55c6879d48c9851a2162",
         gasAllowance: 10_000_000,
+        allowanceInterval: 7150,
       },
     };
     // const relay = new GelatoRelay();

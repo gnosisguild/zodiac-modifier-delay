@@ -6,6 +6,6 @@
     "userArgs": {
         "delayMod": "string",
         "gasAllowance": "string",
-        "allowanceRefillInterval": "number"
+        "allowanceInterval": "number"
     }
 }

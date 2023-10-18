@@ -6,6 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
+    "noEmit": true,
     "moduleResolution": "node",
     "pretty": true,
     "resolveJsonModule": true,
@@ -14,6 +15,6 @@
     "declaration": true,
     "useUnknownInCatchVariables": false
   },
-  "include": ["index.ts", "jest.config.ts", "test"],
+  "include": ["delay-dispatch", "jest.config.ts", "test", "deploy"],
   "exclude": ["node_modules"]
 }

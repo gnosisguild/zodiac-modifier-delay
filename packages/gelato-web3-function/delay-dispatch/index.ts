@@ -24,12 +24,24 @@ Web3Function.onRun(async (context) => {
     throw new Error("Missing RELAY_API_KEY secret");
   }
 
-  const provider = multiChainProvider.default(); // this will be a provider for the chain this function is deployed for (gelatoArgs.chainId)
-
+  // parse user args
   const delayModAddress = userArgs.delayMod as string;
   if (!delayModAddress) {
     throw new Error("Missing delayMod userArg");
   }
+  const gasAllowanceString = userArgs.gasAllowance as string;
+  let allowanceInterval = userArgs.allowanceInterval as number;
+  let gasAllowance: BigNumber;
+  try {
+    gasAllowance = BigNumber.from(gasAllowanceString);
+  } catch (err) {
+    throw new Error(`Invalid gasAllowance userArg: ${gasAllowanceString}`);
+  }
+  if (typeof allowanceInterval !== "number" || allowanceInterval < 0) {
+    throw new Error(`Invalid allowanceInterval userArg: ${allowanceInterval}`);
+  }
+
+  const provider = multiChainProvider.default(); // this will be a provider for the chain this function is deployed for (gelatoArgs.chainId)
 
   if ((await provider.getCode(delayModAddress)) === "0x") {
     return {
@@ -66,16 +78,8 @@ Web3Function.onRun(async (context) => {
   );
 
   // Retrieve gas allowance balance and top up with accrued if needed
-  const gasAllowanceString = userArgs.gasAllowance as string;
-  const allowanceRefillInterval = userArgs.allowanceRefillInterval as number;
-  let gasAllowance: BigNumber;
-  try {
-    gasAllowance = BigNumber.from(gasAllowanceString);
-  } catch (err) {
-    throw new Error(`Invalid gasAllowance userArg: ${gasAllowanceString}`);
-  }
-  const accrued = allowanceRefillInterval
-    ? gasAllowance.mul(currentBlock - lastBlock).div(allowanceRefillInterval)
+  const accrued = allowanceInterval
+    ? gasAllowance.mul(currentBlock - lastBlock).div(allowanceInterval)
     : BigNumber.from(0);
   const previousGasBalance = BigNumber.from(
     (await storage.get("gasBalance")) || gasAllowance
