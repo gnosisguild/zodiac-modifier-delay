@@ -9,11 +9,11 @@
     "moduleResolution": "node",
     "pretty": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
+    "typeRoots": ["./node_modules/@types"],
     "outDir": "build",
     "declaration": true,
     "useUnknownInCatchVariables": false
   },
-  "include": ["scripts", "web3-functions", "jest.config.ts", "test"],
+  "include": ["index.ts", "jest.config.ts", "test"],
   "exclude": ["node_modules"]
 }

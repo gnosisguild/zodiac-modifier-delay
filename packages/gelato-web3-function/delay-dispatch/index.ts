@@ -19,12 +19,25 @@ Web3Function.onRun(async (context) => {
     gelatoArgs: { chainId },
   } = context;
 
+  const relayApiKey = await context.secrets.get("RELAY_API_KEY");
+  if (!relayApiKey) {
+    throw new Error("Missing RELAY_API_KEY secret");
+  }
+
   const provider = multiChainProvider.default(); // this will be a provider for the chain this function is deployed for (gelatoArgs.chainId)
 
   const delayModAddress = userArgs.delayMod as string;
   if (!delayModAddress) {
     throw new Error("Missing delayMod userArg");
   }
+
+  if ((await provider.getCode(delayModAddress)) === "0x") {
+    return {
+      canExec: false,
+      message: `Delay mod contract not deployed at ${delayModAddress}`,
+    };
+  }
+
   const delayMod = new Contract(delayModAddress, DELAY_ABI, provider);
 
   // Query Delay mod contract for current nonce, cooldown, expiration
@@ -75,10 +88,6 @@ Web3Function.onRun(async (context) => {
   );
 
   // Init Gelato relay
-  const relayApiKey = await context.secrets.get("RELAY_API_KEY");
-  if (!relayApiKey) {
-    return { canExec: false, message: `RELAY_API_KEY not set in secrets` };
-  }
   const gelatoRelay = new GelatoRelay();
   let callsMade = 0;
 
