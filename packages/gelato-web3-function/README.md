@@ -2,7 +2,7 @@
 
 This Gelato web3 function can be started for a Delay mod to automatically execute enqueued transactions as soon as the cooldown period has passed.
 
-The latest version is deployed at IPFS CID: `QmYpE74tFz59XLNLu9MSHJejsPHryZsUMcuDjBzfgz5WQk`
+The latest version is deployed at IPFS CID: `QmYcfTe7pMaSEHpVAUvTQp6BjofXc8rAz5mnvgUR9t2bkm`
 
 ## How to run
 
@@ -15,7 +15,7 @@ const automate = new AutomateSDK(chainId, wallet);
 
 const { taskId, tx } = await automate.createBatchExecTask({
   name: "Web3Function - Delay dispatch",
-  web3FunctionHash: "QmYpE74tFz59XLNLu9MSHJejsPHryZsUMcuDjBzfgz5WQk",
+  web3FunctionHash: "QmYcfTe7pMaSEHpVAUvTQp6BjofXc8rAz5mnvgUR9t2bkm",
   web3FunctionArgs: {
     delayMod: "0x...", // address of the Delay mod to watch
     gasAllowance: 1_000_000, // total gas that can be spent per interval
