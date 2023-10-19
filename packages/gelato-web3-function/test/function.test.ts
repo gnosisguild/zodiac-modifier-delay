@@ -103,7 +103,39 @@ describe("delay-dispatch web3 function", () => {
     });
   });
 
-  it.skip("respects the gas allowance", async () => {});
+  it("respects the gas allowance", async () => {
+    const timeFirstTxIsExpired = QUEUE[0].createdAt + COOLDOWN + EXPIRATION + 1;
+    jest
+      .spyOn(Date, "now")
+      .mockImplementation(() => timeFirstTxIsExpired * 1000);
+
+    const result = await runWeb3Function({
+      userArgs: { ...userArgs, gasAllowance: 300_000 }, // since we hard-code the gas to 123_000, this should only execute 2 txs, but not 3
+      provider,
+    });
+    expect(result).toEqual({ canExec: true, callData: [] });
+
+    expect(sponsoredCallSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it("returns `canExec: false` if nothing has been relayed", async () => {
+    const timeFirstTxIsExpired = QUEUE[0].createdAt + COOLDOWN + EXPIRATION + 1;
+    jest
+      .spyOn(Date, "now")
+      .mockImplementation(() => timeFirstTxIsExpired * 1000);
+
+    const result = await runWeb3Function({
+      userArgs: { ...userArgs, gasAllowance: 10 }, // not enough for making a single call
+      provider,
+    });
+    expect(result).toEqual({
+      canExec: false,
+      message:
+        "Gas allowance balance of 10 insufficient for executing next transaction from queue",
+    });
+
+    expect(sponsoredCallSpy).toHaveBeenCalledTimes(0);
+  });
 });
 
 // from query to goerli subgraph: delayModifier(id: "0x0b7a9a6f1c4e739df11f55c6879d48c9851a2162")

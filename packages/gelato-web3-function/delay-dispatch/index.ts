@@ -101,10 +101,16 @@ Web3Function.onRun(async (context) => {
       to: delayModAddress,
       data,
     });
-    gasBalance = gasBalance.sub(gasLimit);
-    if (gasBalance.lt(0)) {
-      throw new Error("Gas allowance exceeded");
+
+    if (gasLimit.gt(gasBalance)) {
+      console.log(
+        `Gas allowance insufficient: ${gasBalance.toString()}. Skipping call with gas limit ${gasLimit.toString()}`
+      );
+      return false;
     }
+
+    gasBalance = gasBalance.sub(gasLimit);
+
     const result = await gelatoRelay.sponsoredCall(
       { chainId: BigInt(chainId), target: delayModAddress, data },
       relayApiKey,
@@ -170,7 +176,7 @@ Web3Function.onRun(async (context) => {
   // Relay all executable transactions
   for (let tx of executableTransactions) {
     try {
-      await relay(
+      const result = await relay(
         delayMod.interface.encodeFunctionData("executeNextTx", [
           tx.to,
           tx.value,
@@ -178,6 +184,7 @@ Web3Function.onRun(async (context) => {
           tx.operation,
         ])
       );
+      if (result === false) break;
     } catch (e: any) {
       await updateStorage();
       return {
@@ -187,12 +194,18 @@ Web3Function.onRun(async (context) => {
     }
   }
 
-  // If we get here, some calls have been relayed and all of them were successful
-  await updateStorage();
-  return {
-    canExec: true,
-    callData: [],
-  };
+  if (callsMade > 0) {
+    await updateStorage();
+    return {
+      canExec: true,
+      callData: [],
+    };
+  } else {
+    return {
+      canExec: false,
+      message: `Gas allowance balance of ${gasBalance} insufficient for executing next transaction from queue`,
+    };
+  }
 });
 
 const QUERY = `
