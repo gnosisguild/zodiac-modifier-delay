@@ -30,7 +30,7 @@
         "@gelatonetwork/relay-sdk": "^5.5.1",
         "@gelatonetwork/web3-functions-sdk": "^2.1.7",
         "ethers": "^5.7.2",
-        "ky": "^0.32.2"
+        "ky": "^1.1.0"
     },
     "installConfig": {
         "hoistingLimits": "workspaces"

@@ -1,6 +1,7 @@
 {
   "name": "zodiac-delay-subgraph",
   "private": true,
+  "version": "0.0.1",
   "license": "LGPL-3.0+",
   "scripts": {
     "prepare": "yarn prepare:mainnet && graph codegen",

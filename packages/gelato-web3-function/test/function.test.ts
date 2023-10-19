@@ -1,83 +1,70 @@
 import path from "path";
+import { Web3Function } from "@gelatonetwork/web3-functions-sdk";
 import { Web3FunctionContextData } from "@gelatonetwork/web3-functions-sdk";
 import { Web3FunctionLoader } from "@gelatonetwork/web3-functions-sdk/loader";
 import { GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { runWeb3Function } from "./utils";
-import { providers } from "ethers";
+import { runWeb3Function } from "./run";
+import { BigNumber, providers } from "ethers";
 
-const w3fName = "delay-dispatch";
-const w3fRootDir = path.join(__dirname, "..");
-const w3fPath = path.join(w3fRootDir, w3fName, "index.ts");
+// Mock and spy on Relay SDK sponsoredCall method
+const mockImpl: typeof GelatoRelay.prototype.sponsoredCall = async () => {
+  return {
+    taskId: "123",
+  };
+};
+let sponsoredCallSpy = jest.fn(mockImpl);
+jest.mock("@gelatonetwork/relay-sdk", () => {
+  return {
+    GelatoRelay: jest.fn().mockImplementation(() => {
+      return {
+        sponsoredCall: sponsoredCallSpy,
+      };
+    }),
+  };
+});
 
-jest.useFakeTimers();
+let estimateGasSpy = jest.fn(async () => BigNumber.from(123_000));
+
+const provider = new providers.JsonRpcProvider(
+  "https://rpc.ankr.com/eth_goerli"
+);
+jest.spyOn(provider, "estimateGas").mockImplementation(estimateGasSpy);
 
 describe("delay-dispatch web3 function", () => {
-  let context: Web3FunctionContextData;
-  let sponsoredCallSpy: jest.SpyInstance;
-  const provider = new providers.JsonRpcProvider(
-    "https://rpc.ankr.com/eth_goerli"
-  );
+  // let context: Web3FunctionContextData;
+  // const provider = new providers.JsonRpcProvider(
+  //   "https://rpc.ankr.com/eth_goerli"
+  // );
 
-  beforeAll(async () => {
-    const { secrets } = Web3FunctionLoader.load(w3fName, w3fRootDir);
-    const { gasPrice } = await provider.getFeeData();
-
-    if (gasPrice === null) throw new Error("gasPrice is null");
-
-    context = {
-      secrets,
-      storage: {},
-      gelatoArgs: {
-        chainId: 5,
-        gasPrice: gasPrice.toString(),
-      },
-      userArgs: {
-        delayMod: "0x0b7a9a6f1c4e739df11f55c6879d48c9851a2162",
-        gasAllowance: 10_000_000,
-        allowanceInterval: 7150,
-      },
-    };
-    // const relay = new GelatoRelay();
-    // // console.log(GelatoRelay.prototype);
-    // sponsoredCallSpy = jest
-    //   .spyOn(relay, "sponsoredCall")
-    //   .mockImplementation(async (params, apiKey, options) => {
-    //     return { taskId: "123" };
-    //   });
-  });
+  let userArgs = {
+    delayMod: "0x0b7a9a6f1c4e739df11f55c6879d48c9851a2162",
+    gasAllowance: 10_000_000,
+    allowanceInterval: 7150,
+  };
 
   beforeEach(() => {
+    estimateGasSpy.mockClear();
     sponsoredCallSpy.mockClear();
   });
 
   it("throws if the secret or a userArg is not set", async () => {
     await expect(
-      runWeb3Function(w3fPath, { ...context, secrets: {} }, [provider])
-    ).rejects.toHaveProperty(
-      "message",
-      "Fail to run web3 function: Error: Missing RELAY_API_KEY secret"
-    );
+      runWeb3Function({ userArgs, secrets: {}, provider })
+    ).rejects.toHaveProperty("message", "Missing RELAY_API_KEY secret");
 
     await expect(
-      runWeb3Function(w3fPath, { ...context, userArgs: {} }, [provider])
-    ).rejects.toHaveProperty(
-      "message",
-      "Fail to run web3 function: Error: Missing delayMod userArg"
-    );
+      runWeb3Function({ userArgs: {}, provider })
+    ).rejects.toHaveProperty("message", "Missing delayMod userArg");
   });
 
   it("does nothing if the Delay mod does not yet exist", async () => {
-    const { result } = await runWeb3Function(
-      w3fPath,
-      {
-        ...context,
-        userArgs: {
-          ...context.userArgs,
-          delayMod: "0x0000000000000000000000000000000000000123",
-        },
+    const result = await runWeb3Function({
+      userArgs: {
+        ...userArgs,
+        delayMod: "0x0000000000000000000000000000000000000123",
       },
-      [provider]
-    );
+      provider,
+    });
     expect(result).toEqual({
       canExec: false,
       message:
@@ -86,34 +73,33 @@ describe("delay-dispatch web3 function", () => {
   });
 
   it("does nothing if the Delay mod's queue is empty", async () => {
-    const { result } = await runWeb3Function(
-      w3fPath,
-      {
-        ...context,
-        userArgs: {
-          ...context.userArgs,
-          delayMod: "0xeff5b8593076b69ff1a6c5d0e13c76c614738738",
-        },
+    const result = await runWeb3Function({
+      userArgs: {
+        ...userArgs,
+        delayMod: "0xeff5b8593076b69ff1a6c5d0e13c76c614738738",
       },
-      [provider]
-    );
+      provider,
+    });
     expect(result).toEqual({
       canExec: false,
       message: "No executable transactions found",
     });
   });
 
-  it.skip("skips over expired transactions to execute executable transactions", async () => {
+  it("skips over expired transactions to execute executable transactions", async () => {
     const timeFirstTxIsExpired = QUEUE[0].createdAt + COOLDOWN + EXPIRATION + 1;
-    jest.setSystemTime(timeFirstTxIsExpired * 1000);
+    jest
+      .spyOn(Date, "now")
+      .mockImplementation(() => timeFirstTxIsExpired * 1000);
 
-    const { result } = await runWeb3Function(w3fPath, context, [provider]);
+    const result = await runWeb3Function({ userArgs, provider });
+    expect(result).toEqual({ canExec: true, callData: [] });
 
     expect(sponsoredCallSpy).toHaveBeenCalledTimes(3);
 
     expect(result).toEqual({
       canExec: true,
-      calls: [],
+      callData: [],
     });
   });
 

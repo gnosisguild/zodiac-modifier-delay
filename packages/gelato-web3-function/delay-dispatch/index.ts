@@ -197,7 +197,7 @@ Web3Function.onRun(async (context) => {
 
 const QUERY = `
 query DelayTransactions($id: String, $nonce: Int) {
-  delayMod(id: $id) {
+  delayModifier(id: $id) {
     transactions(where: {nonce_gt: $nonce}) {
       nonce
       to
@@ -245,7 +245,7 @@ const fetchUpcomingTransactions = async ({
   address: string;
   currentNonce: number;
 }): Promise<Transaction[]> => {
-  const data = (await ky
+  const { data } = (await ky
     .post(SUBGRAPH[chainId as keyof typeof SUBGRAPH], {
       timeout: 5_000,
       retry: 1,
@@ -257,11 +257,11 @@ const fetchUpcomingTransactions = async ({
     })
     .json()) as any;
 
-  if (!data || !data.delayMod) {
+  if (!data || !data.delayModifier) {
     return [];
   }
 
-  const transactions = data.delayMod.transactions.map((tx: any) => ({
+  const transactions = data.delayModifier.transactions.map((tx: any) => ({
     ...tx,
     operation: tx.operation === "Call" ? 0 : 1,
   })) as Transaction[];
