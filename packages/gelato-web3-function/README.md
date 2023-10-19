@@ -22,6 +22,17 @@ const { taskId, tx } = await automate.createBatchExecTask({
     allowanceInterval: 7150, // unit is blocks (7150 blocks is roughly one day on mainnet)
   },
 });
+
+await web3Function.secrets.set(
+  {
+    RELAY_API_KEY: "<YOUR GELATO RELAY API KEY>",
+  },
+  taskId
+);
 ```
+
+### With Gelato app
+
+Go to https://beta.app.gelato.network/ and create a task in the desired interval and providing the IPFS CID `QmYcfTe7pMaSEHpVAUvTQp6BjofXc8rAz5mnvgUR9t2bkm`.
 
 More info: https://docs.gelato.network/developer-services/web3-functions/running-web3-functions
