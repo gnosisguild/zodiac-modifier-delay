@@ -1,0 +1,28 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "pretty": true,
+    "typeRoots": ["./node_modules/@types"],
+    "outDir": "build",
+    "declaration": true,
+    "allowJs": true,
+    "useUnknownInCatchVariables": false
+  },
+  "include": [
+    "delay-dispatch",
+    "jest.config.ts",
+    "test",
+    "delay-dispatch",
+    "deploy"
+  ],
+  "exclude": ["node_modules"]
+}

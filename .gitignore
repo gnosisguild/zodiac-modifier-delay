@@ -1,9 +1,13 @@
+.yarn/cache
+.yarn/install-state.gz
+
 build/
-artifacts/
 node_modules/
 .DS_Store
-env/
 .env
 .history
+.tmp
 coverage*
-deployments
+
+packages/subgraph/subgraph.yaml
+packages/subgraph/generated

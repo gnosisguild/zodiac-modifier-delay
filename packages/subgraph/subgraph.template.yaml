@@ -1,0 +1,28 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Delay
+    # prettier-ignore
+    network: {{network}}
+    source:
+      abi: Delay
+      # prettier-ignore
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DelayModifier
+        - Transaction
+      abis:
+        - name: Delay
+          file: ./abis/Delay.sol/Delay.json
+      eventHandlers:
+        - event: TransactionAdded(indexed uint256,indexed bytes32,address,uint256,bytes,uint8)
+          handler: handleTransactionAdded
+        - event: DelaySetup(indexed address,indexed address,indexed address,address)
+          handler: handleDelaySetup
+      file: ./src/delay.mapping.ts

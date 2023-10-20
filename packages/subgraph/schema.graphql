@@ -1,0 +1,25 @@
+enum Operation {
+  Call
+  DelegateCall
+}
+
+type Transaction @entity {
+  id: ID! # DelayModifier address + nonce
+  delayModifier: DelayModifier!
+  nonce: Int!
+  hash: Bytes!
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+  operation: Operation!
+  createdAt: Int!
+}
+
+type DelayModifier @entity {
+  id: ID!
+  address: Bytes!
+  owner: Bytes!
+  avatar: Bytes!
+  target: Bytes!
+  transactions: [Transaction!]! @derivedFrom(field: "delayModifier")
+}
