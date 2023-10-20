@@ -1,10 +1,6 @@
-import path from "path";
-import { Web3Function } from "@gelatonetwork/web3-functions-sdk";
-import { Web3FunctionContextData } from "@gelatonetwork/web3-functions-sdk";
-import { Web3FunctionLoader } from "@gelatonetwork/web3-functions-sdk/loader";
 import { GelatoRelay } from "@gelatonetwork/relay-sdk";
-import { runWeb3Function } from "./run";
 import { BigNumber, providers } from "ethers";
+import { runWeb3Function } from "./run";
 
 // Mock and spy on Relay SDK sponsoredCall method
 const mockImpl: typeof GelatoRelay.prototype.sponsoredCall = async () => {
@@ -45,6 +41,19 @@ describe("delay-dispatch web3 function", () => {
   beforeEach(() => {
     estimateGasSpy.mockClear();
     sponsoredCallSpy.mockClear();
+  });
+
+  let timeDelta = 0;
+  const now = Date.now;
+  const setTimeTo = (millis: number) => {
+    timeDelta = Date.now() - millis;
+  };
+
+  beforeAll(() => {
+    jest.spyOn(Date, "now").mockImplementation(() => now() - timeDelta);
+  });
+  afterEach(() => {
+    timeDelta = 0;
   });
 
   it("throws if the secret or a userArg is not set", async () => {
@@ -88,9 +97,7 @@ describe("delay-dispatch web3 function", () => {
 
   it("skips over expired transactions to execute executable transactions", async () => {
     const timeFirstTxIsExpired = QUEUE[0].createdAt + COOLDOWN + EXPIRATION + 1;
-    jest
-      .spyOn(Date, "now")
-      .mockImplementation(() => timeFirstTxIsExpired * 1000);
+    setTimeTo(timeFirstTxIsExpired * 1000);
 
     const result = await runWeb3Function({ userArgs, provider });
     expect(result).toEqual({ canExec: true, callData: [] });
@@ -105,9 +112,7 @@ describe("delay-dispatch web3 function", () => {
 
   it("respects the gas allowance", async () => {
     const timeFirstTxIsExpired = QUEUE[0].createdAt + COOLDOWN + EXPIRATION + 1;
-    jest
-      .spyOn(Date, "now")
-      .mockImplementation(() => timeFirstTxIsExpired * 1000);
+    setTimeTo(timeFirstTxIsExpired * 1000);
 
     const result = await runWeb3Function({
       userArgs: { ...userArgs, gasAllowance: 300_000 }, // since we hard-code the gas to 123_000, this should only execute 2 txs, but not 3
@@ -120,9 +125,7 @@ describe("delay-dispatch web3 function", () => {
 
   it("returns `canExec: false` if nothing has been relayed", async () => {
     const timeFirstTxIsExpired = QUEUE[0].createdAt + COOLDOWN + EXPIRATION + 1;
-    jest
-      .spyOn(Date, "now")
-      .mockImplementation(() => timeFirstTxIsExpired * 1000);
+    setTimeTo(timeFirstTxIsExpired * 1000);
 
     const result = await runWeb3Function({
       userArgs: { ...userArgs, gasAllowance: 10 }, // not enough for making a single call

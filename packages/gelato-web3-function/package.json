@@ -30,6 +30,7 @@
         "@gelatonetwork/relay-sdk": "^5.5.1",
         "@gelatonetwork/web3-functions-sdk": "^2.1.7",
         "ethers": "^5.7.2",
+        "ethers-multicall-provider": "3.1.2",
         "ky": "^1.1.0"
     },
     "installConfig": {

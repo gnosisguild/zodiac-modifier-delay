@@ -6041,6 +6041,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ethers-multicall-provider@npm:3.1.2":
+  version: 3.1.2
+  resolution: "ethers-multicall-provider@npm:3.1.2"
+  dependencies:
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    ethers: ^5.0.0
+    lodash: ^4.17.0
+  peerDependencies:
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    ethers: ^5.0.0
+    lodash: ^4.17.0
+  checksum: 06932858ff0c835d731081513338586d4e78a12568bf5c1ac4972b7c72ac2fe6223c8ba4a96b21757fe2ee9fb6465179e24bc799863eb507b0c7025527308c83
+  languageName: node
+  linkType: hard
+
 "ethers@npm:6.7.0":
   version: 6.7.0
   resolution: "ethers@npm:6.7.0"
@@ -6056,7 +6073,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.4.6, ethers@npm:^5.7.2":
+"ethers@npm:^5.0.0, ethers@npm:^5.4.6, ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -9332,7 +9349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.11, lodash@npm:^4.17.12, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.21":
+"lodash@npm:^4.17.0, lodash@npm:^4.17.11, lodash@npm:^4.17.12, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -13687,6 +13704,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.40.0
     "@typescript-eslint/parser": ^5.6.0
     ethers: ^5.7.2
+    ethers-multicall-provider: 3.1.2
     jest: ^29.4.2
     jest-environment-node: ^29.4.2
     ky: ^1.1.0

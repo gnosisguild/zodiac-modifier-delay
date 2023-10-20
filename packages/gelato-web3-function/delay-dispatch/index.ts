@@ -1,6 +1,7 @@
 import { Web3Function } from "@gelatonetwork/web3-functions-sdk";
 import { GelatoRelay } from "@gelatonetwork/relay-sdk";
 import { BigNumber, Contract } from "ethers";
+import { MulticallWrapper } from "ethers-multicall-provider";
 import ky from "ky"; // gelato recommends using ky as axios doesn't support fetch by default
 
 const DELAY_ABI = [
@@ -41,21 +42,28 @@ Web3Function.onRun(async (context) => {
     throw new Error(`Invalid allowanceInterval userArg: ${allowanceInterval}`);
   }
 
-  const provider = multiChainProvider.default(); // this will be a provider for the chain this function is deployed for (gelatoArgs.chainId)
+  // This will be a provider for the chain this function is deployed for (gelatoArgs.chainId)
+  // It will automatically batch calls via the Multicall3 contract
+  const provider = MulticallWrapper.wrap(multiChainProvider.default());
+  const delayMod = new Contract(delayModAddress, DELAY_ABI, provider);
 
-  if ((await provider.getCode(delayModAddress)) === "0x") {
+  // Query Delay mod contract for current nonce, cooldown, expiration
+  let nonce, cooldown, expiration: BigNumber;
+  let currentBlock: number;
+  try {
+    [nonce, cooldown, expiration, currentBlock] = await Promise.all([
+      delayMod.txNonce() as Promise<BigNumber>,
+      delayMod.txCooldown() as Promise<BigNumber>,
+      delayMod.txExpiration() as Promise<BigNumber>,
+      provider.getBlockNumber(),
+    ]);
+  } catch (e) {
+    console.error(e);
     return {
       canExec: false,
       message: `Delay mod contract not deployed at ${delayModAddress}`,
     };
   }
-
-  const delayMod = new Contract(delayModAddress, DELAY_ABI, provider);
-
-  // Query Delay mod contract for current nonce, cooldown, expiration
-  const nonce = (await delayMod.txNonce()) as BigNumber;
-  const cooldown = (await delayMod.txCooldown()) as BigNumber;
-  const expiration = (await delayMod.txExpiration()) as BigNumber;
 
   // Query subgraph for upcoming transactions
   let transactions: Transaction[] = [];
@@ -70,7 +78,7 @@ Web3Function.onRun(async (context) => {
   }
 
   // Retrieve current & last processed block number
-  const currentBlock = await provider.getBlockNumber();
+
   const lastBlockStr = await storage.get("lastBlockNumber");
   let lastBlock = lastBlockStr ? parseInt(lastBlockStr) : 0;
   console.log(
