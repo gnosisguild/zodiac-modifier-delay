@@ -51,7 +51,7 @@ contract Delay is Modifier {
         setUp(initParams);
     }
 
-    function setUp(bytes memory initParams) public override {
+    function setUp(bytes memory initParams) public override initializer {
         (
             address _owner,
             address _avatar,
@@ -61,33 +61,25 @@ contract Delay is Modifier {
         ) = abi.decode(
                 initParams,
                 (address, address, address, uint256, uint256)
-            );
-        __Ownable_init();
-        require(_avatar != address(0), "Avatar can not be zero address");
+            );        
+         require(_avatar != address(0), "Avatar can not be zero address");
         require(_target != address(0), "Target can not be zero address");
         require(
             _expiration == 0 || _expiration >= 60,
             "Expiratition must be 0 or at least 60 seconds"
         );
 
+        _transferOwnership(_owner);
         avatar = _avatar;
         target = _target;
         txExpiration = _expiration;
         txCooldown = _cooldown;
-
-        transferOwnership(_owner);
+        
         setupModules();
 
         emit DelaySetup(msg.sender, _owner, _avatar, _target);
     }
 
-    function setupModules() internal {
-        require(
-            modules[SENTINEL_MODULES] == address(0),
-            "setUpModules has already been called"
-        );
-        modules[SENTINEL_MODULES] = SENTINEL_MODULES;
-    }
 
     /// @dev Sets the cooldown before a transaction can be executed.
     /// @param cooldown Cooldown in seconds that should be required before the transaction can be executed
