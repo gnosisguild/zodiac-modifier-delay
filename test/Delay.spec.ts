@@ -8,7 +8,7 @@ const ZeroState =
 const ZeroAddress = '0x0000000000000000000000000000000000000000'
 const FirstAddress = '0x0000000000000000000000000000000000000001'
 
-describe.only('DelayModifier', async () => {
+describe('DelayModifier', async () => {
   const cooldown = 180
   const expiration = 180 * 1000
 
@@ -199,6 +199,19 @@ describe.only('DelayModifier', async () => {
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
       expect(await modifier.txCooldown()).to.equal(nextCooldown)
     })
+
+    it('emits event SetTxCooldown', async () => {
+      const { avatar, modifier } = await loadFixture(setup)
+
+      const nextCooldown = 43
+      const tx = await modifier.setTxCooldown.populateTransaction(
+        BigInt(nextCooldown)
+      )
+
+      await expect(await avatar.exec(await modifier.getAddress(), 0, tx.data))
+        .to.emit(modifier, 'TxCooldownSet')
+        .withArgs(nextCooldown)
+    })
   })
 
   describe('setTxExpiration()', async () => {
@@ -230,6 +243,18 @@ describe.only('DelayModifier', async () => {
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
       await expect(await modifier.txExpiration()).to.be.equals(nextExpiration)
+    })
+
+    it('it emits event TxExpirationSet', async () => {
+      const { avatar, modifier } = await loadFixture(setup)
+
+      const nextExpiration = 180000
+      const tx =
+        await modifier.setTxExpiration.populateTransaction(nextExpiration)
+
+      await expect(await avatar.exec(await modifier.getAddress(), 0, tx.data))
+        .to.emit(modifier, 'TxExpirationSet')
+        .withArgs(nextExpiration)
     })
   })
 
@@ -278,6 +303,22 @@ describe.only('DelayModifier', async () => {
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
       expect(await avatar.exec(await modifier.getAddress(), 0, tx2.data))
       expect(await modifier.txNonce()).to.be.equals(1)
+    })
+
+    it('it emits TxNonceSet', async () => {
+      const [user1] = await hre.ethers.getSigners()
+      const { avatar, modifier } = await loadFixture(setup)
+
+      const tx1 = await modifier.enableModule.populateTransaction(user1.address)
+      const tx2 = await modifier.setTxNonce.populateTransaction(1)
+
+      expect(await modifier.txNonce()).to.be.equals(0)
+      await avatar.exec(await modifier.getAddress(), 0, tx1.data)
+      await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
+
+      await expect(await avatar.exec(await modifier.getAddress(), 0, tx2.data))
+        .to.emit(modifier, 'TxNonceSet')
+        .withArgs(1)
     })
   })
 

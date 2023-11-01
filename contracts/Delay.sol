@@ -11,6 +11,9 @@ contract Delay is Modifier {
         address indexed avatar,
         address target
     );
+    event TxCooldownSet(uint256 cooldown);
+    event TxExpirationSet(uint256 expiration);
+    event TxNonceSet(uint256 nonce);
     event TransactionAdded(
         uint256 indexed queueNonce,
         bytes32 indexed txHash,
@@ -75,10 +78,11 @@ contract Delay is Modifier {
         target = _target;
         txExpiration = _expiration;
         txCooldown = _cooldown;
-
         setupModules();
 
         emit DelaySetup(msg.sender, _owner, _avatar, _target);
+        emit AvatarSet(address(0), _avatar);
+        emit TargetSet(address(0), _target);
     }
 
     /// @dev Sets the cooldown before a transaction can be executed.
@@ -86,6 +90,7 @@ contract Delay is Modifier {
     /// @notice This can only be called by the owner
     function setTxCooldown(uint256 cooldown) public onlyOwner {
         txCooldown = cooldown;
+        emit TxCooldownSet(cooldown);
     }
 
     /// @dev Sets the duration for which a transaction is valid.
@@ -98,18 +103,20 @@ contract Delay is Modifier {
             "Expiration must be 0 or at least 60 seconds"
         );
         txExpiration = expiration;
+        emit TxExpirationSet(expiration);
     }
 
     /// @dev Sets transaction nonce. Used to invalidate or skip transactions in queue.
-    /// @param _nonce New transaction nonce
+    /// @param nonce New transaction nonce
     /// @notice This can only be called by the owner
-    function setTxNonce(uint256 _nonce) public onlyOwner {
+    function setTxNonce(uint256 nonce) public onlyOwner {
         require(
-            _nonce > txNonce,
+            nonce > txNonce,
             "New nonce must be higher than current txNonce"
         );
-        require(_nonce <= queueNonce, "Cannot be higher than queueNonce");
-        txNonce = _nonce;
+        require(nonce <= queueNonce, "Cannot be higher than queueNonce");
+        txNonce = nonce;
+        emit TxNonceSet(nonce);
     }
 
     /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).
