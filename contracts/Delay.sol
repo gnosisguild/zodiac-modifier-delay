@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "@gnosis.pm/zodiac/contracts/core/Modifier.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import {Modifier} from "@gnosis.pm/zodiac/contracts/core/Modifier.sol";
 
 contract Delay is Modifier {
     event DelaySetup(
