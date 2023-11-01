@@ -9,9 +9,11 @@
         "ignoreConstructors": true
       }
     ],
-    "not-rely-on-time": "off",
-    "reason-string": "off",
+    "avoid-low-level-calls": "off",
+    "custom-errors": "off",
     "no-empty-blocks": "off",
-    "avoid-low-level-calls": "off"
+    "no-inline-assembly": "off",
+    "not-rely-on-time": "off",
+    "reason-string": "off"
   }
 }
