@@ -66,7 +66,7 @@ contract Delay is Modifier {
         require(_target != address(0), "Target can not be zero address");
         require(
             _expiration == 0 || _expiration >= 60,
-            "Expiratition must be 0 or at least 60 seconds"
+            "Expiration must be 0 or at least 60 seconds"
         );
 
         _transferOwnership(_owner);
@@ -95,7 +95,7 @@ contract Delay is Modifier {
     function setTxExpiration(uint256 expiration) public onlyOwner {
         require(
             expiration == 0 || expiration >= 60,
-            "Expiratition must be 0 or at least 60 seconds"
+            "Expiration must be 0 or at least 60 seconds"
         );
         txExpiration = expiration;
     }
