@@ -1,8 +1,7 @@
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
-import { KeyObject } from 'crypto'
 import { AbiCoder } from 'ethers'
-import hre, { deployments, ethers } from 'hardhat'
+import hre from 'hardhat'
 
 const ZeroState =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -151,7 +150,6 @@ describe.only('DelayModifier', async () => {
     })
 
     it('throws because module is invalid ', async () => {
-      const [user1] = await hre.ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const enable =
         await modifier.enableModule.populateTransaction(FirstAddress)
@@ -309,7 +307,12 @@ describe.only('DelayModifier', async () => {
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
-      let txHash = await modifier.getTransactionHash(user1.address, 0, '0x', 0)
+      const txHash = await modifier.getTransactionHash(
+        user1.address,
+        0,
+        '0x',
+        0
+      )
 
       await expect(await modifier.getTxHash(0)).to.be.equals(ZeroState)
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
@@ -326,7 +329,7 @@ describe.only('DelayModifier', async () => {
       await expect(await modifier.getTxCreatedAt(0)).to.be.equals(0)
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
 
-      let block = await hre.network.provider.send('eth_getBlockByNumber', [
+      const block = await hre.network.provider.send('eth_getBlockByNumber', [
         'latest',
         false,
       ])
@@ -390,7 +393,12 @@ describe.only('DelayModifier', async () => {
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
-      let txHash = await modifier.getTransactionHash(user1.address, 0, '0x', 0)
+      const txHash = await modifier.getTransactionHash(
+        user1.address,
+        0,
+        '0x',
+        0
+      )
 
       await expect(await modifier.getTxHash(0)).to.be.equals(ZeroState)
       await modifier.execTransactionFromModuleReturnData(
@@ -465,15 +473,6 @@ describe.only('DelayModifier', async () => {
         0
       )
 
-      const result = await hre.ethers.provider.call(
-        await modifier.execTransactionFromModuleReturnData.populateTransaction(
-          user1.address,
-          42,
-          '0xbadfed',
-          0
-        )
-      )
-
       const { returnData } =
         await modifier.execTransactionFromModuleReturnData.staticCall(
           user1.address,
@@ -526,7 +525,6 @@ describe.only('DelayModifier', async () => {
 
       await avatar.setModule(await modifier.getAddress())
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
-      let expiry = await modifier.txCreatedAt(0)
       await hre.network.provider.send('evm_setNextBlockTimestamp', [4242424242])
       await expect(
         modifier.executeNextTx(user1.address, 0, '0x', 0)
@@ -582,11 +580,11 @@ describe.only('DelayModifier', async () => {
 
       await avatar.setModule(await modifier.getAddress())
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
-      let block = await hre.network.provider.send('eth_getBlockByNumber', [
+      const block = await hre.network.provider.send('eth_getBlockByNumber', [
         'latest',
         false,
       ])
-      let timestamp = parseInt(block.timestamp) + 100
+      const timestamp = parseInt(block.timestamp) + 100
       await hre.network.provider.send('evm_setNextBlockTimestamp', [timestamp])
       await expect(modifier.executeNextTx(user1.address, 0, '0x', 0))
     })
@@ -607,7 +605,7 @@ describe.only('DelayModifier', async () => {
         'latest',
         false,
       ])
-      let timestamp = parseInt(block.timestamp) + 424242
+      const timestamp = parseInt(block.timestamp) + 424242
       await hre.network.provider.send('evm_setNextBlockTimestamp', [timestamp])
 
       await expect(
