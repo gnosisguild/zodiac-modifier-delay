@@ -1,6 +1,6 @@
 {
   "name": "zodiac-delay-modifier",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Modifier for delayed transactions in the Gnosis Safe",
   "directories": {
     "test": "test"
