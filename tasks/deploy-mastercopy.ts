@@ -1,7 +1,7 @@
 import { AbiCoder, ZeroHash } from 'ethers'
 import { task } from 'hardhat/config'
 
-import { deployViaFactory } from './EIP2470'
+import { deployViaFactory } from './eip2470'
 
 const AddressOne = '0x0000000000000000000000000000000000000001'
 
