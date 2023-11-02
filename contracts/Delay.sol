@@ -86,37 +86,37 @@ contract Delay is Modifier {
     }
 
     /// @dev Sets the cooldown before a transaction can be executed.
-    /// @param cooldown Cooldown in seconds that should be required before the transaction can be executed
+    /// @param _txCooldown Cooldown in seconds that should be required before the transaction can be executed
     /// @notice This can only be called by the owner
-    function setTxCooldown(uint256 cooldown) public onlyOwner {
-        txCooldown = cooldown;
-        emit TxCooldownSet(cooldown);
+    function setTxCooldown(uint256 _txCooldown) public onlyOwner {
+        txCooldown = _txCooldown;
+        emit TxCooldownSet(_txCooldown);
     }
 
     /// @dev Sets the duration for which a transaction is valid.
-    /// @param expiration Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
+    /// @param _txExpiration Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown
     /// @notice There need to be at least 60 seconds between end of cooldown and expiration
     /// @notice This can only be called by the owner
-    function setTxExpiration(uint256 expiration) public onlyOwner {
+    function setTxExpiration(uint256 _txExpiration) public onlyOwner {
         require(
-            expiration == 0 || expiration >= 60,
+            _txExpiration == 0 || _txExpiration >= 60,
             "Expiration must be 0 or at least 60 seconds"
         );
-        txExpiration = expiration;
-        emit TxExpirationSet(expiration);
+        txExpiration = _txExpiration;
+        emit TxExpirationSet(_txExpiration);
     }
 
     /// @dev Sets transaction nonce. Used to invalidate or skip transactions in queue.
-    /// @param nonce New transaction nonce
+    /// @param _txNonce New transaction nonce
     /// @notice This can only be called by the owner
-    function setTxNonce(uint256 nonce) public onlyOwner {
+    function setTxNonce(uint256 _txNonce) public onlyOwner {
         require(
-            nonce > txNonce,
+            _txNonce > txNonce,
             "New nonce must be higher than current txNonce"
         );
-        require(nonce <= queueNonce, "Cannot be higher than queueNonce");
-        txNonce = nonce;
-        emit TxNonceSet(nonce);
+        require(_txNonce <= queueNonce, "Cannot be higher than queueNonce");
+        txNonce = _txNonce;
+        emit TxNonceSet(_txNonce);
     }
 
     /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).
