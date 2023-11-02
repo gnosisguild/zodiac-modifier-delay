@@ -1,13 +1,12 @@
 import '@nomicfoundation/hardhat-toolbox'
+import '@nomicfoundation/hardhat-verify'
 import 'hardhat-gas-reporter'
-import 'hardhat-deploy'
-
-import './src/deploy/verify'
 
 import dotenv from 'dotenv'
 import { HttpNetworkUserConfig } from 'hardhat/types'
-import { DeterministicDeploymentInfo } from 'hardhat-deploy/dist/types'
-import { getSingletonFactoryInfo } from '@safe-global/safe-singleton-factory'
+
+import './tasks/deploy-instance'
+import './tasks/deploy-mastercopy'
 
 dotenv.config()
 
@@ -25,11 +24,16 @@ export default {
   paths: {
     artifacts: 'build/artifacts',
     cache: 'build/cache',
-    deploy: 'src/deploy',
     sources: 'contracts',
   },
   solidity: {
     compilers: [{ version: '0.8.20' }],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 100,
+      },
+    },
   },
   defaultNetwork: 'hardhat',
   networks: {
@@ -45,10 +49,6 @@ export default {
     gnosis: {
       ...sharedNetworkConfig,
       url: 'https://rpc.gnosischain.com',
-    },
-    ewc: {
-      ...sharedNetworkConfig,
-      url: `https://rpc.energyweb.org`,
     },
     goerli: {
       ...sharedNetworkConfig,
@@ -74,10 +74,6 @@ export default {
       ...sharedNetworkConfig,
       url: `https://arb1.arbitrum.io/rpc`,
     },
-    fantomTestnet: {
-      ...sharedNetworkConfig,
-      url: `https://rpc.testnet.fantom.network/`,
-    },
     avalanche: {
       ...sharedNetworkConfig,
       url: `https://api.avax.network/ext/bc/C/rpc`,
@@ -91,34 +87,10 @@ export default {
       url: 'https://rpc-mainnet.maticvigil.com',
     },
   },
-  deterministicDeployment,
-  namedAccounts: {
-    deployer: 0,
-  },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
   },
   gasReporter: {
     enabled: true,
   },
-}
-
-function deterministicDeployment(network: string): DeterministicDeploymentInfo {
-  const info = getSingletonFactoryInfo(parseInt(network))
-  if (!info) {
-    throw new Error(`
-      Safe factory not found for network ${network}. You can request a new deployment at https://github.com/safe-global/safe-singleton-factory.
-      For more information, see https://github.com/safe-global/safe-contracts#replay-protection-eip-155
-    `)
-  }
-
-  const gasLimit = BigInt(info.gasLimit)
-  const gasPrice = BigInt(info.gasPrice)
-
-  return {
-    factory: info.address,
-    deployer: info.signerAddress,
-    funding: String(gasLimit * gasPrice),
-    signedTx: info.transaction,
-  }
 }

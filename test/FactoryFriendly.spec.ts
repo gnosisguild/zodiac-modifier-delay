@@ -1,4 +1,3 @@
-import { AddressOne } from '@gnosis.pm/safe-contracts'
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import { AbiCoder, keccak256, toUtf8Bytes } from 'ethers'
@@ -6,7 +5,7 @@ import hre, { ethers } from 'hardhat'
 
 import { Delay__factory } from '../typechain-types'
 
-const FirstAddress = '0x0000000000000000000000000000000000000001'
+const AddressOne = '0x0000000000000000000000000000000000000001'
 
 describe('Module works with factory', () => {
   const cooldown = 100
@@ -20,9 +19,9 @@ describe('Module works with factory', () => {
     const Delay = await hre.ethers.getContractFactory('Delay')
 
     const masterCopy = await Delay.deploy(
-      FirstAddress,
-      FirstAddress,
-      FirstAddress,
+      AddressOne,
+      AddressOne,
+      AddressOne,
       0,
       0
     )
