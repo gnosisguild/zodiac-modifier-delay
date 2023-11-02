@@ -1,6 +1,6 @@
 import { task, types } from 'hardhat/config'
 
-task('deploy:instance', 'Deploys a Delay modifier')
+task('deploy', 'Deploys a Delay modifier')
   .addParam('owner', 'Address of the owner', undefined, types.string)
   .addParam(
     'avatar',
@@ -40,6 +40,10 @@ task('deploy:instance', 'Deploys a Delay modifier')
     const address = await delay.getAddress()
 
     console.log(`\x1B[32m✔ Instance deployed to: ${address} 🎉\x1B[0m `)
+
+    if (hre.network.name == 'hardhat') {
+      return
+    }
 
     console.log('Waiting 1 minute before etherscan verification start...')
     // Etherscan needs some time to process before trying to verify.
