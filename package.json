@@ -18,7 +18,7 @@
     "lint:ts": "eslint 'tasks/**/*.ts' 'test/**/*.ts' --max-warnings 0 --fix",
     "fmt": "yarn fmt:sol && yarn fmt:ts",
     "fmt:sol": "prettier 'contracts/**/*.sol' -w",
-    "fmt:ts": "prettier 'src/**/*.ts' 'test/**/*.ts' -w"
+    "fmt:ts": "prettier 'tasks/**/*.ts' 'test/**/*.ts' -w"
   },
   "repository": {
     "type": "git"
