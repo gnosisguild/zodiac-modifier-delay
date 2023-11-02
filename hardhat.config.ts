@@ -5,7 +5,7 @@ import 'hardhat-gas-reporter'
 import dotenv from 'dotenv'
 import { HttpNetworkUserConfig } from 'hardhat/types'
 
-import './tasks/deploy-instance'
+import './tasks/deploy'
 import './tasks/deploy-mastercopy'
 
 dotenv.config()
