@@ -50,9 +50,9 @@ export default {
       ...sharedNetworkConfig,
       url: 'https://rpc.gnosischain.com',
     },
-    goerli: {
+    sepolia: {
       ...sharedNetworkConfig,
-      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+      url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
     },
     mumbai: {
       ...sharedNetworkConfig,
