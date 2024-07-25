@@ -1,15 +1,15 @@
 import path from 'path'
 import { cwd } from 'process'
 import { readFileSync } from 'fs'
+import { Signer } from 'ethers'
 import { task } from 'hardhat/config'
+import { EthereumProvider } from 'hardhat/types'
 
 import {
   deployMastercopy,
   EIP1193Provider,
   MastercopyArtifact,
 } from 'zodiac-core'
-
-import createEIP1193 from './createEIP1193'
 
 task(
   'mastercopy:deploy',
@@ -42,5 +42,21 @@ async function deploy(
     console.log(`version ${version}: Mastercopy already deployed at ${address}`)
   } else {
     console.log(`version ${version}: Deployed Mastercopy at at ${address}`)
+  }
+}
+
+function createEIP1193(
+  provider: EthereumProvider,
+  signer: Signer
+): EIP1193Provider {
+  return {
+    request: async ({ method, params }) => {
+      if (method == 'eth_sendTransaction') {
+        const { hash } = await signer.sendTransaction((params as any[])[0])
+        return hash
+      }
+
+      return provider.request({ method, params })
+    },
   }
 }
