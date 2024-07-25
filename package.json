@@ -11,7 +11,9 @@
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "deploy": "yarn hardhat deploy",
-    "deploy:mastercopy": "yarn hardhat deploy:mastercopy --network",
+    "mastercopy:extract": "yarn hardhat mastercopy:extract --network",
+    "mastercopy:deploy": "yarn hardhat mastercopy:deploy --network",
+    "mastercopy:verify": "yarn hardhat mastercopy:verify --network",
     "prepack": "yarn run clean && yarn run build",
     "prepare": "yarn run clean && yarn run build",
     "lint": "yarn lint:sol && yarn lint:ts",
@@ -34,7 +36,8 @@
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@nomicfoundation/hardhat-toolbox": "3.0.0",
     "@nomicfoundation/hardhat-verify": "2.0.0",
-    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts": "5.0.2",
+    "@openzeppelin/contracts-upgradeable": "5.0.2",
     "@safe-global/safe-singleton-factory": "^1.0.15",
     "@typechain/ethers-v6": "^0.5.0",
     "@typechain/hardhat": "^9.0.0",
@@ -60,6 +63,7 @@
     "solidity-coverage": "^0.8.2",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.1",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "zodiac-core": "file:../zodiac-core"
   }
 }

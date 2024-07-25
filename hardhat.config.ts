@@ -5,10 +5,12 @@ import 'hardhat-gas-reporter'
 import dotenv from 'dotenv'
 import { HttpNetworkUserConfig } from 'hardhat/types'
 
-import './tasks/deploy'
-import './tasks/deploy-mastercopy'
-
 dotenv.config()
+
+import './tasks/deploy'
+import './tasks/mastercopy-deploy'
+import './tasks/mastercopy-extract'
+import './tasks/mastercopy-verify'
 
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
 
@@ -35,7 +37,6 @@ export default {
       },
     },
   },
-  defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
