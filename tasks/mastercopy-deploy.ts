@@ -1,15 +1,8 @@
-import path from 'path'
-import { cwd } from 'process'
-import { readFileSync } from 'fs'
 import { Signer } from 'ethers'
 import { task } from 'hardhat/config'
 import { EthereumProvider } from 'hardhat/types'
 
-import {
-  deployMastercopy,
-  EIP1193Provider,
-  MastercopyArtifact,
-} from 'zodiac-core'
+import { EIP1193Provider, mastercopiesDeploy } from 'zodiac-core'
 
 task(
   'mastercopy:deploy',
@@ -18,32 +11,8 @@ task(
   const [signer] = await hre.ethers.getSigners()
   const provider = createEIP1193(hre.network.provider, signer)
 
-  const mastercopies = JSON.parse(
-    readFileSync(path.join(cwd(), 'mastercopies.json'), 'utf8')
-  )
-
-  for (const [version, artifact] of Object.entries(mastercopies)) {
-    await deploy(version, artifact as MastercopyArtifact, provider)
-  }
+  await mastercopiesDeploy({ provider })
 })
-
-async function deploy(
-  version: string,
-  artifact: MastercopyArtifact,
-  provider: EIP1193Provider
-) {
-  const { bytecode, constructorArgs, salt } = artifact
-
-  const { address, noop } = await deployMastercopy(
-    { bytecode, constructorArgs, salt },
-    provider
-  )
-  if (noop) {
-    console.log(`version ${version}: Mastercopy already deployed at ${address}`)
-  } else {
-    console.log(`version ${version}: Deployed Mastercopy at at ${address}`)
-  }
-}
 
 function createEIP1193(
   provider: EthereumProvider,
