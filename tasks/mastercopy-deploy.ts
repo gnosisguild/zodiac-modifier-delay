@@ -2,7 +2,7 @@ import { Signer } from 'ethers'
 import { task } from 'hardhat/config'
 import { EthereumProvider } from 'hardhat/types'
 
-import { EIP1193Provider, mastercopiesDeploy } from 'zodiac-core'
+import { EIP1193Provider, deployMastercopies } from 'zodiac-core'
 
 task(
   'mastercopy:deploy',
@@ -11,7 +11,7 @@ task(
   const [signer] = await hre.ethers.getSigners()
   const provider = createEIP1193(hre.network.provider, signer)
 
-  await mastercopiesDeploy({ provider })
+  await deployMastercopies({ provider })
 })
 
 function createEIP1193(

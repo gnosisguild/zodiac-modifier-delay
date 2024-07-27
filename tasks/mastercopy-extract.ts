@@ -1,6 +1,6 @@
 import { task, types } from 'hardhat/config'
 
-import { mastercopiesExtract } from 'zodiac-core'
+import { extractMastercopyArtifact } from 'zodiac-core'
 
 import packageJson from '../package.json'
 
@@ -20,7 +20,7 @@ task(
   .setAction(async (params) => {
     const version = params.mastercopyVersion || packageJson.version
 
-    mastercopiesExtract({
+    extractMastercopyArtifact({
       version,
       contractName: 'Delay',
       constructorArgs: {

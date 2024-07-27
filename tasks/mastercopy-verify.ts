@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { mastercopiesVerify } from 'zodiac-core'
+import { verifyMastercopies } from 'zodiac-core'
 
 const { ETHERSCAN_API_KEY } = process.env
 
@@ -11,7 +11,7 @@ task(
     throw new Error('Missing ENV ETHERSCAN_API_KEY')
   }
 
-  await mastercopiesVerify({
+  await verifyMastercopies({
     apiUrl: String(hre.network.config.chainId),
     apiKey: ETHERSCAN_API_KEY,
   })
