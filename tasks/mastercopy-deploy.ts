@@ -9,9 +9,9 @@ task(
   'For every version entry on the artifacts file, deploys a mastercopy into the current network'
 ).setAction(async (_, hre) => {
   const [signer] = await hre.ethers.getSigners()
-  const provider = createEIP1193(hre.network.provider, signer)
-
-  await deployMastercopies({ provider })
+  await deployMastercopies({
+    provider: createEIP1193(hre.network.provider, signer),
+  })
 })
 
 function createEIP1193(
