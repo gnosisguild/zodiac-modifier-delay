@@ -11,7 +11,7 @@
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "deploy": "yarn hardhat deploy",
-    "mastercopy:extract": "yarn hardhat mastercopy:extract --network",
+    "mastercopy:extract": "yarn hardhat mastercopy:extract",
     "mastercopy:deploy": "yarn hardhat mastercopy:deploy --network",
     "mastercopy:verify": "yarn hardhat mastercopy:verify --network",
     "prepack": "yarn run clean && yarn run build",

@@ -12,7 +12,7 @@ task(
 )
   .addParam(
     'mastercopyVersion',
-    'The version used to insert into the Artifacts object',
+    'The extracted artifact version',
     undefined,
     types.string,
     true

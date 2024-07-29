@@ -8,8 +8,8 @@ import { HttpNetworkUserConfig } from 'hardhat/types'
 dotenv.config()
 
 import './tasks/deploy'
-import './tasks/mastercopy-deploy'
 import './tasks/mastercopy-extract'
+import './tasks/mastercopy-deploy'
 import './tasks/mastercopy-verify'
 
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
@@ -86,6 +86,10 @@ export default {
     matic: {
       ...sharedNetworkConfig,
       url: 'https://rpc-mainnet.maticvigil.com',
+    },
+    sepolia: {
+      ...sharedNetworkConfig,
+      url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
     },
   },
   etherscan: {
