@@ -1,6 +1,6 @@
 import { task } from 'hardhat/config'
 
-import { extractMastercopyArtifact } from 'zodiac-core'
+import { extractMastercopy } from 'zodiac-core'
 
 import packageJson from '../package.json'
 
@@ -17,7 +17,7 @@ task(
     sourceName: contractSource,
   })
 
-  extractMastercopyArtifact({
+  extractMastercopy({
     contractVersion,
     contractName,
     compilerInput,
