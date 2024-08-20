@@ -10,7 +10,6 @@
     "build": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "yarn hardhat deploy",
     "extract:mastercopy": "yarn run build && yarn hardhat extract:mastercopy",
     "deploy:mastercopies": "yarn hardhat deploy:mastercopies --network",
     "deploy:mastercopy": "yarn hardhat deploy:mastercopy --network",
