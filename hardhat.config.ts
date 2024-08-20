@@ -7,10 +7,11 @@ import { HttpNetworkUserConfig } from 'hardhat/types'
 
 dotenv.config()
 
-import './tasks/deploy'
-import './tasks/mastercopy-extract'
-import './tasks/mastercopy-deploy'
-import './tasks/mastercopy-verify'
+import "./tasks/deploy-mastercopies";
+import "./tasks/deploy-mastercopy";
+import "./tasks/extract-mastercopy";
+import "./tasks/verify-mastercopies";
+import "./tasks/verify-mastercopy";
 
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
 
