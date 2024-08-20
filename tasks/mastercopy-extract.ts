@@ -1,6 +1,6 @@
 import { task } from 'hardhat/config'
 
-import { storeMastercopyArtifact } from 'zodiac-core'
+import { storeMastercopyArtifact } from '@gnosis-guild/zodiac-core'
 
 import packageJson from '../package.json'
 

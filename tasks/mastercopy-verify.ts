@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { verifyMastercopiesFromArtifact } from 'zodiac-core'
+import { verifyMastercopiesFromArtifact } from '@gnosis-guild/zodiac-core'
 
 const { ETHERSCAN_API_KEY } = process.env
 
