@@ -1,10 +1,6 @@
 import { task, types } from 'hardhat/config'
 
-import {
-  EIP1193Provider,
-  deployMastercopy,
-  readMastercopy,
-} from '@gnosis-guild/zodiac-core'
+import { deployMastercopy, readMastercopies } from '@gnosis-guild/zodiac-core'
 import { createEIP1193 } from './create-EIP1193'
 
 task(
@@ -21,39 +17,31 @@ task(
     const [signer] = await hre.ethers.getSigners()
     const provider = createEIP1193(hre.network.provider, signer)
 
-    // Deploy the contracts based on the provided version
-    await deployLatestMastercopyFromDisk(provider, contractVersion)
-  })
-
-async function deployLatestMastercopyFromDisk(
-  provider: EIP1193Provider,
-  version?: string
-) {
-  const contract = 'Delay'
-  try {
-    // Read the artifact for the specific contract and version
-    const artifact = readMastercopy({
-      contractName: contract,
-      contractVersion: version === 'latest' ? undefined : version,
-    })
-
-    const { address, noop } = await deployMastercopy({
-      ...artifact,
-      provider,
-    })
-
-    if (noop) {
-      console.log(
-        `🔄 ${artifact.contractName}@${version}: Already deployed at ${address}`
-      )
-    } else {
-      console.log(
-        `🚀 ${artifact.contractName}@${version}: Successfully deployed at ${address}`
-      )
+    for (const mastercopy of readMastercopies({ contractVersion })) {
+      const {
+        contractName,
+        contractVersion,
+        factory,
+        bytecode,
+        constructorArgs,
+        salt,
+      } = mastercopy
+      const { address, noop } = await deployMastercopy({
+        factory,
+        bytecode,
+        constructorArgs,
+        salt,
+        provider,
+        onStart: () => {
+          console.log(
+            `⏳ ${contractName}@${contractVersion}: Deployment starting...`
+          )
+        },
+      })
+      if (noop) {
+        console.log(
+          `🔄 ${contractName}@${contractVersion}: Already deployed at ${address}`
+        )
+      }
     }
-  } catch (error) {
-    console.error(
-      `⏭️ Skipping deployment of ${contract}@${version}: Version not found.`
-    )
-  }
-}
+  })
