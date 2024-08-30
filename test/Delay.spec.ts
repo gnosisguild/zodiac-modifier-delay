@@ -385,20 +385,20 @@ describe('DelayModifier', async () => {
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
-      const expectedQueueNonce = await modifier.queueNonce
+      const expectedQueueNonce = (await modifier.queueNonce()).toString()
+
+      const txHash = await modifier.getTransactionHash(
+        user1.address,
+        42,
+        '0x',
+        0
+      )
 
       await expect(
         modifier.execTransactionFromModule(user1.address, 42, '0x', 0)
       )
         .to.emit(modifier, 'TransactionAdded')
-        .withArgs(
-          expectedQueueNonce,
-          await modifier.getTransactionHash(user1.address, 42, '0x', 0),
-          user1.address,
-          42,
-          '0x',
-          0
-        )
+        .withArgs(expectedQueueNonce, txHash, user1.address, 42, '0x', 0)
     })
   })
 
@@ -480,20 +480,22 @@ describe('DelayModifier', async () => {
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
-      const expectedQueueNonce = await modifier.queueNonce()
 
-      expect(
-        await modifier.execTransactionFromModuleReturnData(
-          user1.address,
-          42,
-          '0x',
-          0
-        )
+      const expectedQueueNonce = await modifier.queueNonce()
+      const transactionHash = await modifier.getTransactionHash(
+        user1.address,
+        42,
+        '0x',
+        0
+      )
+
+      await expect(
+        modifier.execTransactionFromModule(user1.address, 42, '0x', 0)
       )
         .to.emit(modifier, 'TransactionAdded')
         .withArgs(
           expectedQueueNonce,
-          await modifier.getTransactionHash(user1.address, 42, '0x', 0),
+          transactionHash,
           user1.address,
           42,
           '0x',

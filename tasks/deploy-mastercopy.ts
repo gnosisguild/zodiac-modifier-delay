@@ -1,38 +1,47 @@
-import { AbiCoder, ZeroHash } from 'ethers'
-import { task } from 'hardhat/config'
+import { task, types } from 'hardhat/config'
 
-import { deployViaFactory } from './eip2470'
+import { deployMastercopy, readMastercopies } from '@gnosis-guild/zodiac-core'
+import { createEIP1193 } from './create-EIP1193'
 
-const AddressOne = '0x0000000000000000000000000000000000000001'
-
-task('deploy:mastercopy', 'Deploys and verifies Delay mastercopy').setAction(
-  async (_, hre) => {
-    const [deployer] = await hre.ethers.getSigners()
-
-    const Delay = await hre.ethers.getContractFactory('Delay')
-
-    const args = AbiCoder.defaultAbiCoder().encode(
-      ['address', 'address', 'address', 'uint256', 'uint256'],
-      [AddressOne, AddressOne, AddressOne, 0, 0]
-    )
-
-    const creationBytecode = `${Delay.bytecode}${args.substring(2)}`
-    const salt = ZeroHash
-    const address = await deployViaFactory(creationBytecode, salt, deployer)
-
-    if (hre.network.name == 'hardhat') {
-      return
-    }
-
-    console.log('Waiting 1 minute before etherscan verification start...')
-    // Etherscan needs some time to process before trying to verify.
-    await new Promise((resolve) => setTimeout(resolve, 60000))
-
-    await hre.run('verify:verify', {
-      address,
-      constructorArguments: [AddressOne, AddressOne, AddressOne, 0, 0],
-    })
-  }
+task(
+  'deploy:mastercopy',
+  'For every version entry on the artifacts file, deploys a mastercopy into the current network'
 )
+  .addOptionalParam(
+    'contractVersion',
+    'The specific version of the contract to deploy',
+    'latest', // Default value
+    types.string
+  )
+  .setAction(async ({ contractVersion }, hre) => {
+    const [signer] = await hre.ethers.getSigners()
+    const provider = createEIP1193(hre.network.provider, signer)
 
-export {}
+    for (const mastercopy of readMastercopies({ contractVersion })) {
+      const {
+        contractName,
+        contractVersion,
+        factory,
+        bytecode,
+        constructorArgs,
+        salt,
+      } = mastercopy
+      const { address, noop } = await deployMastercopy({
+        factory,
+        bytecode,
+        constructorArgs,
+        salt,
+        provider,
+        onStart: () => {
+          console.log(
+            `⏳ ${contractName}@${contractVersion}: Deployment starting...`
+          )
+        },
+      })
+      if (noop) {
+        console.log(
+          `🔄 ${contractName}@${contractVersion}: Already deployed at ${address}`
+        )
+      }
+    }
+  })

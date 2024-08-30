@@ -5,10 +5,13 @@ import 'hardhat-gas-reporter'
 import dotenv from 'dotenv'
 import { HttpNetworkUserConfig } from 'hardhat/types'
 
-import './tasks/deploy'
-import './tasks/deploy-mastercopy'
-
 dotenv.config()
+
+import "./tasks/deploy-mastercopies";
+import "./tasks/deploy-mastercopy";
+import "./tasks/extract-mastercopy";
+import "./tasks/verify-mastercopies";
+import "./tasks/verify-mastercopy";
 
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
 
@@ -35,7 +38,6 @@ export default {
       },
     },
   },
-  defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
@@ -85,6 +87,10 @@ export default {
     matic: {
       ...sharedNetworkConfig,
       url: 'https://rpc-mainnet.maticvigil.com',
+    },
+    sepolia: {
+      ...sharedNetworkConfig,
+      url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
     },
   },
   etherscan: {
