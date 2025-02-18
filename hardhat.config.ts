@@ -7,20 +7,23 @@ import { HttpNetworkUserConfig } from 'hardhat/types'
 
 dotenv.config()
 
-import "./tasks/deploy-mastercopies";
-import "./tasks/deploy-mastercopy";
-import "./tasks/extract-mastercopy";
-import "./tasks/verify-mastercopies";
-import "./tasks/verify-mastercopy";
+import './tasks/deploy-mastercopies'
+import './tasks/deploy-mastercopy'
+import './tasks/extract-mastercopy'
+import './tasks/verify-mastercopies'
+import './tasks/verify-mastercopy'
 
-const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
+const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PK } = process.env
 
-const sharedNetworkConfig: HttpNetworkUserConfig = {
-  accounts: {
+const sharedNetworkConfig: HttpNetworkUserConfig = {}
+if (PK) {
+  sharedNetworkConfig.accounts = [PK]
+} else {
+  sharedNetworkConfig.accounts = {
     mnemonic:
       MNEMONIC ||
       'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat',
-  },
+  }
 }
 
 export default {
@@ -52,10 +55,6 @@ export default {
       ...sharedNetworkConfig,
       url: 'https://rpc.gnosischain.com',
     },
-    goerli: {
-      ...sharedNetworkConfig,
-      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
-    },
     mumbai: {
       ...sharedNetworkConfig,
       url: `https://polygon-mumbai.infura.io/v3/${INFURA_KEY}`,
@@ -80,10 +79,6 @@ export default {
       ...sharedNetworkConfig,
       url: `https://api.avax.network/ext/bc/C/rpc`,
     },
-    rinkeby: {
-      ...sharedNetworkConfig,
-      url: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
-    },
     matic: {
       ...sharedNetworkConfig,
       url: 'https://rpc-mainnet.maticvigil.com',
@@ -92,9 +87,28 @@ export default {
       ...sharedNetworkConfig,
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
     },
+    'lisk-sepolia': {
+      ...sharedNetworkConfig,
+      chainId: 4202,
+      url: 'https://rpc.sepolia-api.lisk.com',
+      gasPrice: 1000000000,
+    },
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: 'lisk-sepolia',
+        chainId: 4202,
+        urls: {
+          apiURL: 'https://sepolia-blockscout.lisk.com/api',
+          browserURL: 'https://sepolia-blockscout.lisk.com',
+        },
+      },
+    ],
+  },
+  sourcify: {
+    enabled: false,
   },
   gasReporter: {
     enabled: true,
