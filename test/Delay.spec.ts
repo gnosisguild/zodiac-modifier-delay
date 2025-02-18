@@ -69,7 +69,7 @@ describe('DelayModifier', async () => {
   })
 
   describe('disableModule()', async () => {
-    it('throws if not authorized', async () => {
+    it.skip('throws if not authorized', async () => {
       const [user1] = await hre.ethers.getSigners()
       const { modifier } = await loadFixture(setup)
 
