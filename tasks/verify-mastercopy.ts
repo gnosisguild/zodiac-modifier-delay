@@ -12,24 +12,13 @@ task(
     types.string
   )
   .setAction(async ({ contractVersion }, hre) => {
-    const apiKey = (hre.config.etherscan.apiKey as any)[hre.network.name] as
-      | string
-      | undefined
-    if (!apiKey) {
-      throw new Error(
-        'Missing etherscan api key for network ' + hre.network.name
-      )
-    }
+    const apiKey = hre.config.etherscan.apiKey as string
 
     const chainId = String((await hre.ethers.provider.getNetwork()).chainId)
-
     for (const artifact of readMastercopies({ contractVersion })) {
       const { noop } = await verifyMastercopy({
         artifact,
-        customChainConfig: hre.config.etherscan.customChains.find(
-          (chain: any) => chain.network === hre.network.name
-        ),
-        apiUrlOrChainId: chainId,
+        chainId: Number(chainId),
         apiKey,
       })
 

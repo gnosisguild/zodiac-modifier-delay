@@ -309,12 +309,11 @@
   resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.1.tgz#b9da6a878a371829a0502c9b6c1c143ef6663f4d"
   integrity sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==
 
-"@gnosis-guild/zodiac-core@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@gnosis-guild/zodiac-core/-/zodiac-core-2.1.2.tgz#10697f9ae8ae0d2aee1a3df93b125aab6dc4dde3"
-  integrity sha512-QAN2Q+fgqle06E4zEHZwyVzXyJgPSk71SOWY24BFJ5pQyOTseDoq+YqwODlMr4z5NtsApnzltjWRRhI38JgvgQ==
+"@gnosis-guild/zodiac-core@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@gnosis-guild/zodiac-core/-/zodiac-core-3.0.0.tgz#e7b1cab55a26e9eb44342a14e0373d9d7cb490ff"
+  integrity sha512-l1SFl2iwGFUm9wRbOWNn1Udnxs6U1iVIDkVI1TLGvWi0MdxGz9y748PoTb/AaRAAY6cbHR4UN8+Ew+0oTWKQiw==
   dependencies:
-    "@gnosis.pm/safe-contracts" "1.3.0"
     "@openzeppelin/contracts" "5.0.2"
     "@openzeppelin/contracts-upgradeable" "5.0.2"
     ethers "^6.13.2"
