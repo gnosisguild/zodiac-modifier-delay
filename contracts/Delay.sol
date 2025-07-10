@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import {Operation, Modifier} from "@gnosis-guild/zodiac-core/contracts/core/Modifier.sol";
+import {
+    Operation,
+    Modifier
+} from "@gnosis-guild/zodiac-core/contracts/core/Modifier.sol";
 
 contract Delay is Modifier {
     event DelaySetup(
@@ -204,7 +207,7 @@ contract Delay is Modifier {
         while (
             txExpiration != 0 &&
             txCreatedAt[txNonce] + txCooldown + txExpiration <
-            block.timestamp &&
+                block.timestamp &&
             txNonce < queueNonce
         ) {
             txNonce++;
