@@ -106,7 +106,7 @@ export default {
     avalanche: {
       ...sharedNetworkConfig,
       chainId: 43114,
-      url: 'https://avalanche.drpc.org',
+      url: 'https://rpc.ankr.com/avalanche',
     },
     zkevm: {
       ...sharedNetworkConfig,
@@ -165,10 +165,30 @@ export default {
       chainId: 80094,
       url: 'https://rpc.berachain.com',
     },
-    bob: {
+    hyperevm: {
       ...sharedNetworkConfig,
-      chainId: 60808,
-      url: 'https://rpc.gobob.xyz',
+      chainId: 999,
+      url: 'https://rpc.hyperliquid.xyz/evm',
+    },
+    worldchain: {
+      ...sharedNetworkConfig,
+      chainId: 480,
+      url: 'https://worldchain-mainnet.g.alchemy.com/public',
+    },
+    flare: {
+      ...sharedNetworkConfig,
+      chainId: 14,
+      url: 'https://flare-api.flare.network/ext/C/rpc',
+    },
+    ink: {
+      ...sharedNetworkConfig,
+      chainId: 57073,
+      url: 'https://rpc-qnd.inkonchain.com',
+    },
+    linea: {
+      ...sharedNetworkConfig,
+      chainId: 59144,
+      url: 'https://linea-rpc.publicnode.com',
     },
   },
   etherscan: {
@@ -271,11 +291,11 @@ export default {
         },
       },
       {
-        network: 'bob',
-        chainId: 60808,
+        network: 'hyperevm',
+        chainId: 999,
         urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=60808',
-          browserURL: 'https://explorer.gobob.xyz',
+          apiURL: 'https://www.hyperscan.com/api',
+          browserURL: 'https://www.hyperscan.com',
         },
       },
       {
@@ -292,6 +312,39 @@ export default {
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=808813',
           browserURL: 'https://bob-sepolia.explorer.gobob.xyz',
+        },
+      },
+      {
+        network: 'worldchain',
+        chainId: 480,
+        urls: {
+          apiURL: 'https://api.worldscan.org/api',
+          browserURL: 'https://worldscan.org',
+        },
+      },
+      {
+        network: 'flare',
+        chainId: 14,
+        urls: {
+          apiURL:
+            'https://api.routescan.io/v2/network/mainnet/evm/14/etherscan/api',
+          browserURL: 'https://flarescan.com',
+        },
+      },
+      {
+        network: 'ink',
+        chainId: 57073,
+        urls: {
+          apiURL: 'https://explorer.inkonchain.com/api',
+          browserURL: 'https://explorer.inkonchain.com',
+        },
+      },
+      {
+        network: 'linea',
+        chainId: 59144,
+        urls: {
+          apiURL: 'https://api.lineascan.build/api',
+          browserURL: 'https://lineascan.build',
         },
       },
     ],
