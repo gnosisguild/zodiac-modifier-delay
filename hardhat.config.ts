@@ -116,7 +116,7 @@ export default {
     bsc: {
       ...sharedNetworkConfig,
       chainId: 56,
-      url: 'https://bscrpc.com',
+      url: 'https://bsc-rpc.publicnode.com',
     },
     celo: {
       ...sharedNetworkConfig,
@@ -172,32 +172,13 @@ export default {
     },
   },
   etherscan: {
-    apiKey: {
-      mainnet: ETHERSCAN_API_KEY,
-      sepolia: ETHERSCAN_API_KEY,
-      optimism: OPTIMISTIC_ETHERSCAN_API_KEY,
-      gnosis: GNOSISSCAN_API_KEY,
-      matic: POLYGONSCAN_API_KEY,
-      arbitrum: ARBISCAN_API_KEY,
-      avalanche: SNOWTRACE_API_KEY,
-      zkevm: ZKEVM_POLYGONSCAN_API_KEY,
-      base: BASESCAN_API_KEY,
-      baseSepolia: BASESCAN_API_KEY,
-      bsc: BSCSCAN_API_KEY,
-      celo: CELOSCAN_API_KEY,
-      mantle: MANTLESCAN_API_KEY,
-      unichain: UNISCAN_API_KEY,
-      sonic: SONICSCAN_API_KEY,
-      berachain: BERASCAN_API_KEY,
-      'lisk-sepolia': 'not-required',
-      'bob-sepolia': ETHERSCAN_API_KEY,
-    } as Record<string, string>,
+    apiKey: ETHERSCAN_API_KEY,
     customChains: [
       {
         network: 'optimism',
         chainId: 10,
         urls: {
-          apiURL: 'https://api-optimistic.etherscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=10',
           browserURL: 'https://optimistic.etherscan.io',
         },
       },
@@ -205,7 +186,7 @@ export default {
         network: 'gnosis',
         chainId: 100,
         urls: {
-          apiURL: 'https://api.gnosisscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=100',
           browserURL: 'https://www.gnosisscan.io',
         },
       },
@@ -213,7 +194,7 @@ export default {
         network: 'matic',
         chainId: 137,
         urls: {
-          apiURL: 'https://api.polygonscan.com/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=137',
           browserURL: 'https://www.polygonscan.com',
         },
       },
@@ -221,7 +202,7 @@ export default {
         network: 'arbitrum',
         chainId: 42161,
         urls: {
-          apiURL: 'https://api.arbiscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=42161',
           browserURL: 'https://www.arbiscan.io',
         },
       },
@@ -229,7 +210,7 @@ export default {
         network: 'avalanche',
         chainId: 43114,
         urls: {
-          apiURL: 'https://api.snowtrace.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=43114',
           browserURL: 'https://www.snowtrace.io',
         },
       },
@@ -237,7 +218,7 @@ export default {
         network: 'zkevm',
         chainId: 1101,
         urls: {
-          apiURL: 'https://api-zkevm.polygonscan.com/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=1101',
           browserURL: 'https://zkevm.polygonscan.com',
         },
       },
@@ -245,7 +226,7 @@ export default {
         network: 'bsc',
         chainId: 56,
         urls: {
-          apiURL: 'https://api.bscscan.com/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=56',
           browserURL: 'https://bscscan.com',
         },
       },
@@ -253,7 +234,7 @@ export default {
         network: 'celo',
         chainId: 42220,
         urls: {
-          apiURL: 'https://api.celoscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=42220',
           browserURL: 'https://celoscan.io',
         },
       },
@@ -261,7 +242,7 @@ export default {
         network: 'mantle',
         chainId: 5000,
         urls: {
-          apiURL: 'https://api.mantlescan.xyz/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=5000',
           browserURL: 'https://mantlescan.xyz',
         },
       },
@@ -269,7 +250,7 @@ export default {
         network: 'unichain',
         chainId: 130,
         urls: {
-          apiURL: 'https://api.uniscan.xyz/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=130',
           browserURL: 'https://uniscan.xyz',
         },
       },
@@ -277,7 +258,7 @@ export default {
         network: 'sonic',
         chainId: 146,
         urls: {
-          apiURL: 'https://api.sonicscan.org/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=146',
           browserURL: 'https://sonicscan.org',
         },
       },
@@ -285,7 +266,7 @@ export default {
         network: 'berachain',
         chainId: 80094,
         urls: {
-          apiURL: 'https://api.berascan.com/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=80094',
           browserURL: 'https://berascan.com',
         },
       },
@@ -293,7 +274,7 @@ export default {
         network: 'bob',
         chainId: 60808,
         urls: {
-          apiURL: 'https://explorer.gobob.xyz/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=60808',
           browserURL: 'https://explorer.gobob.xyz',
         },
       },
@@ -301,7 +282,7 @@ export default {
         network: 'lisk-sepolia',
         chainId: 4202,
         urls: {
-          apiURL: 'https://sepolia-blockscout.lisk.com/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=4202',
           browserURL: 'https://sepolia-blockscout.lisk.com',
         },
       },
@@ -309,7 +290,7 @@ export default {
         network: 'bob-sepolia',
         chainId: 808813,
         urls: {
-          apiURL: 'https://bob-sepolia.explorer.gobob.xyz/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=808813',
           browserURL: 'https://bob-sepolia.explorer.gobob.xyz',
         },
       },

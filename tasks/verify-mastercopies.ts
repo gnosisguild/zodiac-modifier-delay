@@ -17,10 +17,7 @@ task(
   for (const artifact of readMastercopies()) {
     const { noop } = await verifyMastercopy({
       artifact,
-      customChainConfig: hre.config.etherscan.customChains.find(
-        (chain: any) => chain.network === hre.network.name
-      ),
-      apiUrlOrChainId: chainId,
+      chainId: Number(chainId),
       apiKey,
     })
 

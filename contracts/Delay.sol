@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import {Enum, Modifier} from "@gnosis-guild/zodiac-core/contracts/core/Modifier.sol";
+import {
+    Operation,
+    Modifier
+} from "@gnosis-guild/zodiac-core/contracts/core/Modifier.sol";
 
 contract Delay is Modifier {
     event DelaySetup(
@@ -19,7 +22,7 @@ contract Delay is Modifier {
         address to,
         uint256 value,
         bytes data,
-        Enum.Operation operation
+        Operation operation
     );
 
     uint256 public txCooldown;
@@ -129,7 +132,7 @@ contract Delay is Modifier {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation
+        Operation operation
     ) public override moduleOnly returns (bool success) {
         bytes32 hash = getTransactionHash(to, value, data, operation);
         txHash[queueNonce] = hash;
@@ -151,7 +154,7 @@ contract Delay is Modifier {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation
+        Operation operation
     )
         public
         override
@@ -177,7 +180,7 @@ contract Delay is Modifier {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation
+        Operation operation
     ) public {
         require(txNonce < queueNonce, "Transaction queue is empty");
         uint256 txCreationTimestamp = txCreatedAt[txNonce];
@@ -204,7 +207,7 @@ contract Delay is Modifier {
         while (
             txExpiration != 0 &&
             txCreatedAt[txNonce] + txCooldown + txExpiration <
-            block.timestamp &&
+                block.timestamp &&
             txNonce < queueNonce
         ) {
             txNonce++;
@@ -215,7 +218,7 @@ contract Delay is Modifier {
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation
+        Operation operation
     ) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(to, value, data, operation));
     }
