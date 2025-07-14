@@ -13,13 +13,15 @@ task(
   )
   .setAction(async ({ contractVersion }, hre) => {
     const apiKey = hre.config.etherscan.apiKey as string
-
     const chainId = String((await hre.ethers.provider.getNetwork()).chainId)
     for (const artifact of readMastercopies({ contractVersion })) {
       const { noop } = await verifyMastercopy({
         artifact,
         chainId: Number(chainId),
         apiKey,
+        apiUrl: hre.config.etherscan.customChains.find(
+          (chain: any) => chain.network === hre.network.name
+        )?.urls.apiURL,
       })
 
       const { contractName, contractVersion, address } = artifact
