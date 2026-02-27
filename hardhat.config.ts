@@ -96,7 +96,7 @@ export default {
     matic: {
       ...sharedNetworkConfig,
       chainId: 137,
-      url: 'https://rpc-mainnet.maticvigil.com',
+      url: 'https://polygon-rpc.com',
     },
     arbitrum: {
       ...sharedNetworkConfig,
@@ -106,7 +106,7 @@ export default {
     avalanche: {
       ...sharedNetworkConfig,
       chainId: 43114,
-      url: 'https://rpc.ankr.com/avalanche',
+      url: 'https://avalanche-c-chain-rpc.publicnode.com',
     },
     zkevm: {
       ...sharedNetworkConfig,
@@ -189,6 +189,26 @@ export default {
       ...sharedNetworkConfig,
       chainId: 59144,
       url: 'https://linea-rpc.publicnode.com',
+    },
+    katana: {
+      ...sharedNetworkConfig,
+      chainId: 747474,
+      url: 'https://rpc.katana.network',
+    },
+    plasma: {
+      ...sharedNetworkConfig,
+      chainId: 9745,
+      url: 'https://rpc.plasma.to',
+    },
+    scroll: {
+      ...sharedNetworkConfig,
+      chainId: 534352,
+      url: 'https://rpc.scroll.io',
+    },
+    megaeth: {
+      ...sharedNetworkConfig,
+      chainId: 4326,
+      url: 'https://mainnet.megaeth.com/rpc',
     },
   },
   etherscan: {
@@ -294,8 +314,8 @@ export default {
         network: 'hyperevm',
         chainId: 999,
         urls: {
-          apiURL: 'https://www.hyperscan.com/api',
-          browserURL: 'https://www.hyperscan.com',
+          apiURL: 'https://api.hyperevmscan.io/api',
+          browserURL: 'https://hyperevmscan.io',
         },
       },
       {
@@ -312,14 +332,6 @@ export default {
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=808813',
           browserURL: 'https://bob-sepolia.explorer.gobob.xyz',
-        },
-      },
-      {
-        network: 'worldchain',
-        chainId: 480,
-        urls: {
-          apiURL: 'https://api.worldscan.org/api',
-          browserURL: 'https://worldscan.org',
         },
       },
       {
@@ -345,6 +357,22 @@ export default {
         urls: {
           apiURL: 'https://api.lineascan.build/api',
           browserURL: 'https://lineascan.build',
+        },
+      },
+      {
+        network: 'katana',
+        chainId: 747474,
+        urls: {
+          apiURL: 'https://api.katanascan.com/api',
+          browserURL: 'https://katanascan.com',
+        },
+      },
+      {
+        network: 'megaeth',
+        chainId: 4326,
+        urls: {
+          apiURL: 'https://api-mega.etherscan.io/api',
+          browserURL: 'https://mega.etherscan.io',
         },
       },
     ],
