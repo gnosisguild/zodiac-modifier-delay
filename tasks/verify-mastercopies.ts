@@ -1,23 +1,24 @@
-import { task } from 'hardhat/config'
-import { loadZodiacCore } from './zodiac-core'
+import type { HardhatRuntimeEnvironment } from 'hardhat/types/hre'
+import type { TaskArguments } from 'hardhat/types/tasks'
 
-task(
-  'verify:mastercopies',
-  'Verifies all mastercopies from the artifacts file, in the block explorer corresponding to the current network'
-).setAction(async (_, hre) => {
-  const { readMastercopies, verifyMastercopy } = await loadZodiacCore()
-  const apiKey = hre.config.etherscan.apiKey as string
+import { readMastercopies, verifyMastercopy } from '@gnosis-guild/zodiac-core'
 
-  const chainId = String((await hre.ethers.provider.getNetwork()).chainId)
+import { getBlockExplorerApiUrl } from './block-explorers.js'
+
+export default async function (
+  _args: TaskArguments,
+  hre: HardhatRuntimeEnvironment
+) {
+  const apiKey = process.env.ETHERSCAN_API_KEY ?? ''
+  const { ethers, networkName } = await hre.network.create()
+  const { chainId } = await ethers.provider.getNetwork()
 
   for (const artifact of readMastercopies()) {
     const { noop } = await verifyMastercopy({
       artifact,
       chainId: Number(chainId),
       apiKey,
-      apiUrl: hre.config.etherscan.customChains.find(
-        (chain: any) => chain.network === hre.network.name
-      )?.urls.apiURL,
+      apiUrl: getBlockExplorerApiUrl(networkName),
     })
 
     const { contractName, contractVersion, address } = artifact
@@ -32,4 +33,4 @@ task(
       )
     }
   }
-})
+}

@@ -1,54 +1,112 @@
-import '@nomicfoundation/hardhat-toolbox'
-import '@nomicfoundation/hardhat-verify'
-import 'hardhat-gas-reporter'
-
+import hardhatToolboxMochaEthers from '@nomicfoundation/hardhat-toolbox-mocha-ethers'
 import dotenv from 'dotenv'
-import { HttpNetworkUserConfig } from 'hardhat/types'
+import { ArgumentType } from 'hardhat/types/arguments'
+import { defineConfig, task } from 'hardhat/config'
+
+import { chainDescriptors } from './tasks/block-explorers.js'
 
 dotenv.config()
-
-import './tasks/deploy-mastercopies'
-import './tasks/deploy-mastercopy'
-import './tasks/extract-mastercopy'
-import './tasks/verify-mastercopies'
-import './tasks/verify-mastercopy'
 
 const {
   INFURA_KEY,
   MNEMONIC,
   ETHERSCAN_API_KEY,
   PK,
-  OPTIMISTIC_ETHERSCAN_API_KEY,
-  GNOSISSCAN_API_KEY,
-  POLYGONSCAN_API_KEY,
-  ARBISCAN_API_KEY,
-  SNOWTRACE_API_KEY,
-  ZKEVM_POLYGONSCAN_API_KEY,
-  BASESCAN_API_KEY,
-  BSCSCAN_API_KEY,
-  CELOSCAN_API_KEY,
-  SONICSCAN_API_KEY,
-  BERASCAN_API_KEY,
-  MANTLESCAN_API_KEY,
-  UNISCAN_API_KEY,
 } = process.env
 
-const sharedNetworkConfig: HttpNetworkUserConfig = {}
-if (PK) {
-  sharedNetworkConfig.accounts = [PK]
-} else {
-  sharedNetworkConfig.accounts = {
-    mnemonic:
-      MNEMONIC ||
-      'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat',
+const deployMastercopiesTask = task(
+  'deploy:mastercopies',
+  'For every version entry on the artifacts file, deploys a mastercopy into the current network'
+)
+  .setAction(() => import('./tasks/deploy-mastercopies.js'))
+  .build()
+
+const deployMastercopyTask = task(
+  'deploy:mastercopy',
+  'Deploys one mastercopy version into the current network'
+)
+  .addOption({
+    name: 'contractVersion',
+    description: 'The specific version of the contract to deploy',
+    defaultValue: 'latest',
+    type: ArgumentType.STRING,
+  })
+  .setAction(() => import('./tasks/deploy-mastercopy.js'))
+  .build()
+
+const extractMastercopyTask = task(
+  'extract:mastercopy',
+  'Extracts and persists current mastercopy build artifacts'
+)
+  .setAction(() => import('./tasks/extract-mastercopy.js'))
+  .build()
+
+const verifyMastercopiesTask = task(
+  'verify:mastercopies',
+  'Verifies all mastercopies from the artifacts file in the current network block explorer'
+)
+  .setAction(() => import('./tasks/verify-mastercopies.js'))
+  .build()
+
+const verifyMastercopyTask = task(
+  'verify:mastercopy',
+  'Verifies one mastercopy version in the current network block explorer'
+)
+  .addOption({
+    name: 'contractVersion',
+    description: 'Filters by a specific version or latest',
+    defaultValue: 'latest',
+    type: ArgumentType.STRING,
+  })
+  .setAction(() => import('./tasks/verify-mastercopy.js'))
+  .build()
+
+const sharedNetworkConfig = PK
+  ? { accounts: [PK] }
+  : {
+      accounts: {
+        mnemonic:
+          MNEMONIC ||
+          'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat',
+      },
+    }
+
+const simulatedNetworkConfig = {
+  type: 'edr-simulated' as const,
+  chainType: 'l1' as const,
+  allowUnlimitedContractSize: true,
+}
+
+function httpNetwork(config: {
+  chainId: number
+  url: string
+  chainType?: 'generic' | 'l1' | 'op'
+  gasPrice?: number
+}) {
+  return {
+    type: 'http' as const,
+    chainType: config.chainType ?? ('generic' as const),
+    ...sharedNetworkConfig,
+    ...config,
   }
 }
 
-export default {
+export default defineConfig({
+  plugins: [hardhatToolboxMochaEthers],
+  tasks: [
+    deployMastercopiesTask,
+    deployMastercopyTask,
+    extractMastercopyTask,
+    verifyMastercopiesTask,
+    verifyMastercopyTask,
+  ],
   paths: {
     artifacts: 'build/artifacts',
     cache: 'build/cache',
     sources: 'contracts',
+    tests: {
+      mocha: 'test',
+    },
   },
   solidity: {
     compilers: [
@@ -65,300 +123,130 @@ export default {
       },
     ],
   },
+  typechain: {
+    outDir: 'typechain-types',
+  },
   networks: {
-    hardhat: {
-      allowUnlimitedContractSize: true,
-    },
-    mainnet: {
-      ...sharedNetworkConfig,
+    default: simulatedNetworkConfig,
+    hardhat: simulatedNetworkConfig,
+    mainnet: httpNetwork({
+      chainType: 'l1',
       chainId: 1,
       url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-    },
-    sepolia: {
-      ...sharedNetworkConfig,
+    }),
+    sepolia: httpNetwork({
+      chainType: 'l1',
       chainId: 11155111,
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
-    },
-    optimism: {
-      ...sharedNetworkConfig,
+    }),
+    optimism: httpNetwork({
+      chainType: 'op',
       chainId: 10,
       url: 'https://mainnet.optimism.io',
-    },
-    gnosis: {
-      ...sharedNetworkConfig,
+    }),
+    gnosis: httpNetwork({
       chainId: 100,
       url: 'https://rpc.gnosischain.com',
-    },
-    base: {
-      ...sharedNetworkConfig,
+    }),
+    base: httpNetwork({
+      chainType: 'op',
       chainId: 8453,
       url: 'https://mainnet.base.org',
-    },
-    baseSepolia: {
-      ...sharedNetworkConfig,
+    }),
+    baseSepolia: httpNetwork({
+      chainType: 'op',
       chainId: 84532,
       url: 'https://sepolia.base.org',
-    },
-    matic: {
-      ...sharedNetworkConfig,
+    }),
+    matic: httpNetwork({
       chainId: 137,
       url: 'https://rpc-mainnet.maticvigil.com',
-    },
-    arbitrum: {
-      ...sharedNetworkConfig,
+    }),
+    arbitrum: httpNetwork({
       chainId: 42161,
       url: 'https://arb1.arbitrum.io/rpc',
-    },
-    avalanche: {
-      ...sharedNetworkConfig,
+    }),
+    avalanche: httpNetwork({
       chainId: 43114,
       url: 'https://rpc.ankr.com/avalanche',
-    },
-    zkevm: {
-      ...sharedNetworkConfig,
+    }),
+    zkevm: httpNetwork({
       chainId: 1101,
       url: 'https://zkevm-rpc.com',
-    },
-    bsc: {
-      ...sharedNetworkConfig,
+    }),
+    bsc: httpNetwork({
       chainId: 56,
       url: 'https://bsc-rpc.publicnode.com',
-    },
-    celo: {
-      ...sharedNetworkConfig,
+    }),
+    celo: httpNetwork({
       chainId: 42220,
       url: 'https://celo.drpc.org',
-    },
-    lisk: {
-      ...sharedNetworkConfig,
+    }),
+    lisk: httpNetwork({
       chainId: 1135,
       url: 'https://rpc.api.lisk.com',
-    },
-    'lisk-sepolia': {
-      ...sharedNetworkConfig,
+    }),
+    'lisk-sepolia': httpNetwork({
       chainId: 4202,
       url: 'https://rpc.sepolia-api.lisk.com',
       gasPrice: 1000000000,
-    },
-    liskSepolia: {
-      ...sharedNetworkConfig,
+    }),
+    liskSepolia: httpNetwork({
       chainId: 4202,
       url: 'https://rpc.sepolia-api.lisk.com',
-    },
-    'bob-sepolia': {
-      ...sharedNetworkConfig,
+    }),
+    'bob-sepolia': httpNetwork({
       chainId: 808813,
       url: 'https://bob-sepolia.rpc.gobob.xyz/',
       gasPrice: 1000000000,
-    },
-    unichain: {
-      ...sharedNetworkConfig,
+    }),
+    unichain: httpNetwork({
+      chainType: 'op',
       chainId: 130,
       url: 'https://mainnet.unichain.org',
-    },
-    mantle: {
-      ...sharedNetworkConfig,
+    }),
+    mantle: httpNetwork({
       chainId: 5000,
       url: 'https://rpc.mantle.xyz',
-    },
-    sonic: {
-      ...sharedNetworkConfig,
+    }),
+    sonic: httpNetwork({
       chainId: 146,
       url: 'https://rpc.soniclabs.com',
-    },
-    berachain: {
-      ...sharedNetworkConfig,
+    }),
+    berachain: httpNetwork({
       chainId: 80094,
       url: 'https://rpc.berachain.com',
-    },
-    hyperevm: {
-      ...sharedNetworkConfig,
+    }),
+    hyperevm: httpNetwork({
       chainId: 999,
       url: 'https://rpc.hyperliquid.xyz/evm',
-    },
-    worldchain: {
-      ...sharedNetworkConfig,
+    }),
+    worldchain: httpNetwork({
+      chainType: 'op',
       chainId: 480,
       url: 'https://worldchain-mainnet.g.alchemy.com/public',
-    },
-    flare: {
-      ...sharedNetworkConfig,
+    }),
+    flare: httpNetwork({
       chainId: 14,
       url: 'https://flare-api.flare.network/ext/C/rpc',
-    },
-    ink: {
-      ...sharedNetworkConfig,
+    }),
+    ink: httpNetwork({
+      chainType: 'op',
       chainId: 57073,
       url: 'https://rpc-qnd.inkonchain.com',
-    },
-    linea: {
-      ...sharedNetworkConfig,
+    }),
+    linea: httpNetwork({
       chainId: 59144,
       url: 'https://linea-rpc.publicnode.com',
+    }),
+  },
+  chainDescriptors,
+  verify: {
+    etherscan: {
+      apiKey: ETHERSCAN_API_KEY ?? '',
+    },
+    sourcify: {
+      enabled: false,
     },
   },
-  etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
-    customChains: [
-      {
-        network: 'optimism',
-        chainId: 10,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=10',
-          browserURL: 'https://optimistic.etherscan.io',
-        },
-      },
-      {
-        network: 'gnosis',
-        chainId: 100,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=100',
-          browserURL: 'https://www.gnosisscan.io',
-        },
-      },
-      {
-        network: 'matic',
-        chainId: 137,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=137',
-          browserURL: 'https://www.polygonscan.com',
-        },
-      },
-      {
-        network: 'arbitrum',
-        chainId: 42161,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=42161',
-          browserURL: 'https://www.arbiscan.io',
-        },
-      },
-      {
-        network: 'avalanche',
-        chainId: 43114,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=43114',
-          browserURL: 'https://www.snowtrace.io',
-        },
-      },
-      {
-        network: 'zkevm',
-        chainId: 1101,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=1101',
-          browserURL: 'https://zkevm.polygonscan.com',
-        },
-      },
-      {
-        network: 'bsc',
-        chainId: 56,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=56',
-          browserURL: 'https://bscscan.com',
-        },
-      },
-      {
-        network: 'celo',
-        chainId: 42220,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=42220',
-          browserURL: 'https://celoscan.io',
-        },
-      },
-      {
-        network: 'mantle',
-        chainId: 5000,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=5000',
-          browserURL: 'https://mantlescan.xyz',
-        },
-      },
-      {
-        network: 'unichain',
-        chainId: 130,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=130',
-          browserURL: 'https://uniscan.xyz',
-        },
-      },
-      {
-        network: 'sonic',
-        chainId: 146,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=146',
-          browserURL: 'https://sonicscan.org',
-        },
-      },
-      {
-        network: 'berachain',
-        chainId: 80094,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=80094',
-          browserURL: 'https://berascan.com',
-        },
-      },
-      {
-        network: 'hyperevm',
-        chainId: 999,
-        urls: {
-          apiURL: 'https://www.hyperscan.com/api',
-          browserURL: 'https://www.hyperscan.com',
-        },
-      },
-      {
-        network: 'lisk-sepolia',
-        chainId: 4202,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=4202',
-          browserURL: 'https://sepolia-blockscout.lisk.com',
-        },
-      },
-      {
-        network: 'bob-sepolia',
-        chainId: 808813,
-        urls: {
-          apiURL: 'https://api.etherscan.io/v2/api?chainid=808813',
-          browserURL: 'https://bob-sepolia.explorer.gobob.xyz',
-        },
-      },
-      {
-        network: 'worldchain',
-        chainId: 480,
-        urls: {
-          apiURL: 'https://api.worldscan.org/api',
-          browserURL: 'https://worldscan.org',
-        },
-      },
-      {
-        network: 'flare',
-        chainId: 14,
-        urls: {
-          apiURL:
-            'https://api.routescan.io/v2/network/mainnet/evm/14/etherscan/api',
-          browserURL: 'https://flarescan.com',
-        },
-      },
-      {
-        network: 'ink',
-        chainId: 57073,
-        urls: {
-          apiURL: 'https://explorer.inkonchain.com/api',
-          browserURL: 'https://explorer.inkonchain.com',
-        },
-      },
-      {
-        network: 'linea',
-        chainId: 59144,
-        urls: {
-          apiURL: 'https://api.lineascan.build/api',
-          browserURL: 'https://lineascan.build',
-        },
-      },
-    ],
-  },
-  sourcify: {
-    enabled: false,
-  },
-  gasReporter: {
-    enabled: true,
-  },
-}
+})

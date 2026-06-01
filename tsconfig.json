@@ -2,17 +2,13 @@
   "compilerOptions": {
     "declaration": true,
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2020",
-    "typeRoots": [
-      "node_modules/@types",
-      "typings",
-      "typechain-types/hardhat.d.ts"
-    ]
+    "target": "es2022",
+    "typeRoots": ["node_modules/@types", "typings"]
   },
-  "include": ["test", "tasks", "./typechain-types", "./hardhat.config.ts"]
+  "include": ["test", "tasks", "./hardhat.config.ts"]
 }
