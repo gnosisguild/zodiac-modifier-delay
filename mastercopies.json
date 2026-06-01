@@ -2665,6 +2665,1065 @@
           }
         }
       }
+    },
+    "2.0.0": {
+      "contractName": "Delay",
+      "sourceName": "contracts/Delay.sol",
+      "contractVersion": "2.0.0",
+      "compilerVersion": "v0.8.28+commit.7893614a",
+      "factory": "0xce0042b868300000d44a59004da54a005ffdcf9f",
+      "address": "0x4840832Ab5Ff1EB440290E26921c07036f642D8a",
+      "bytecode": "0x608080604052346103675760a0816123b5803803809161001f8285610379565b83398101031261036757610032816103b0565b61003e602083016103b0565b9061004b604084016103b0565b6080606085015194015160405192602084019060018060a01b03168152604084019460018060a01b03168552606084019260018060a01b031683526080840195865260a0840191825260a084526100a360c085610379565b5f549360ff851661036b578060a0915181010312610367576100d06100ca6100d6926103b0565b956103b0565b926103b0565b945190516001600160a01b03928316958316949283169286156103225785156102dd57811580156102d2575b15610279576001600160a81b03198516600891821b610100600160a81b03161760019081175f90815560405196869360ff1990911690921790911c6001600160a01b0316907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09080a3600180546001600160a01b03199081168817825560028054909116871790556006919091556005919091555f5260046020525f5160206123955f395f51905f52546001600160a01b031661026a5760015f819052600460209081525f5160206123955f395f51905f5280546001600160a01b031916909217909155838352849233917ffd805e12a6d02f83d7029c03fdfcf3f226ebcd409af51b3095237015eae5030091a4604051915f7f52ae88b092de36f87fb43fe794eb1381023b9c1bce563a871154022c63dce3428180a35f7f90cc2f570a6eb594b1580ea3e41247d2d73a55281889e86bd4ec2fc29c7e62d68180a3611fd090816103c58239f35b63dfd49ebd60e01b5f5260045ffd5b60405162461bcd60e51b815260206004820152602b60248201527f45787069726174696f6e206d7573742062652030206f72206174206c6561737460448201526a203630207365636f6e647360a81b6064820152608490fd5b50603c821015610102565b60405162461bcd60e51b815260206004820152601e60248201527f5461726765742063616e206e6f74206265207a65726f206164647265737300006044820152606490fd5b60405162461bcd60e51b815260206004820152601e60248201527f4176617461722063616e206e6f74206265207a65726f206164647265737300006044820152606490fd5b5f80fd5b62dc149f60e41b5f5260045ffd5b601f909101601f19168101906001600160401b0382119082101761039c57604052565b634e487b7160e01b5f52604160045260245ffd5b51906001600160a01b03821682036103675756fe60806040526004361015610011575f80fd5b5f3560e01c8063086cfca8146101fa5780630930fb3f146101f5578063258148cc146101e65780632d9ad53d146101f0578063300c661f146101eb5780633aa76906146101e6578063427e232f146101be578063468721a7146101e157806346ba2307146101dc5780635229073f146101d75780635aef7de6146101d2578063605df59c146101cd578063610b5925146101c857806369ecc3cf146101c35780636b0a4cf6146101be578063776d1a01146101b95780638da5cb5b146101b45780639b56d5be146101af578063a4f9edbf146101aa578063b19d4758146101a5578063c66323e5146101a0578063cc2f84521461019b578063ced405c914610196578063d4b8399214610191578063dcafac091461018c578063de8dd91d14610187578063e009cfde14610182578063e29dfba81461017d578063ebb2b4a214610178578063ee072baf146101735763f2fde38b1461016e575f80fd5b6113a4565b61128a565b611230565b6111e2565b6110b0565b611093565b611076565b61104e565b610fbf565b610e48565b610dd4565b610d4f565b610bc4565b610b4e565b610b23565b610aaa565b6104fd565b610a4b565b6108d5565b6108b8565b610890565b610781565b610637565b6105a0565b610444565b61049f565b61046e565b610391565b610214565b6001600160a01b0381160361021057565b5f80fd5b3461021057602036600319011261021057600435610231816101ff565b5f5460081c6001600160a01b0316330361028d57600180546001600160a01b039283166001600160a01b0319821681179092559091167f52ae88b092de36f87fb43fe794eb1381023b9c1bce563a871154022c63dce3425f80a3005b63118cdaa760e01b5f523360045260245ffd5b634e487b7160e01b5f52604160045260245ffd5b608081019081106001600160401b038211176102cf57604052565b6102a0565b90601f801991011681019081106001600160401b038211176102cf57604052565b604051906103046080836102d4565b565b6001600160401b0381116102cf57601f01601f191660200190565b92919261032d82610306565b9161033b60405193846102d4565b829481845281830111610210578281602093845f960137010152565b9080601f830112156102105781602061037293359101610321565b90565b60643590600282101561021057565b3590600282101561021057565b34610210576040366003190112610210576004356001600160401b0381116102105760806003198236030112610210576040516103cd816102b4565b81600401356103db816101ff565b8152602482013560208201526044820135906001600160401b038211610210576104226064610440946104176104309560043691840101610357565b604085015201610384565b606082015260243590611461565b6040519081529081906020820190565b0390f35b34610210576020366003190112610210576004355f52600a602052602060405f2054604051908152f35b34610210576020366003190112610210576020610495600435610490816101ff565b611545565b6040519015158152f35b34610210576080366003190112610210576004356104bc816101ff565b60243590604435906001600160401b038211610210576020926104e66104f5933690600401610357565b906104ef610375565b9261157b565b604051908152f35b34610210576020366003190112610210576004355f526009602052602060405f2054604051908152f35b9181601f84011215610210578235916001600160401b038311610210576020838186019501011161021057565b60806003198201126102105760043561056c816101ff565b9160243591604435906001600160401b0382116102105761058f91600401610527565b909160643560028110156102105790565b34610210576105ae36610554565b929392915f5c6001600160a01b031661062857335f908152600460205260409020546001600160a01b03161561061557610440946105f4946105ef336115e0565b61168a565b5f805c6001600160a01b031916905d60405190151581529081906020820190565b634a0bfec160e01b5f523360045260245ffd5b6310d64d2760e21b5f5260045ffd5b34610210576020366003190112610210576004355f5460081c6001600160a01b0316330361028d576007548111156106e95760085481116106a5576106a0816104307fb80aa44b2e3f25cf4fbdf2a6c561d9a3d961528ccfc2097da3741fdf941d6d1393600755565b0390a1005b606460405162461bcd60e51b815260206004820152602060248201527f43616e6e6f7420626520686967686572207468616e2071756575654e6f6e63656044820152fd5b60405162461bcd60e51b815260206004820152602d60248201527f4e6577206e6f6e6365206d75737420626520686967686572207468616e20637560448201526c7272656e742074784e6f6e636560981b6064820152608490fd5b805180835260209291819084018484015e5f828201840152601f01601f1916010190565b6040906103729392151581528160208201520190610744565b346102105761078f36610554565b939192905f5c6001600160a01b031661062857335f908152600460205260409020546001600160a01b0316156106155761044094610844947f4c8a9c748e976c17c2eb2c2bc50da76eac9cd90ff529f0fe900e0c10a179f0316108759461087a966107f9336115e0565b61080f85610808368988610321565b848461157b565b9889956008545f5260096020528660405f20556008545f52600a6020524260405f205560085497889660405195869586611632565b0390a36040805160208101839052908101949094524260608086019190915284526108706080856102d4565b61167c565b600855565b610882611601565b604051918291600183610768565b34610210575f366003190112610210576001546040516001600160a01b039091168152602090f35b34610210575f366003190112610210576020600654604051908152f35b34610210576020366003190112610210576004356108f2816101ff565b5f5460081c6001600160a01b0316330361028d576001600160a01b03811680158015610a41575b610a2f57506001600160a01b0381165f9081526004602052604090206109579061094b905b546001600160a01b031690565b6001600160a01b031690565b610a145760015f5260046020527fecdf3a3effea5783a3c4c2140e677577666428d44ed9d474a0b3a4c9943f8440906106a0906109da6109a35f516020611f7b5f395f51905f5261093e565b6001600160a01b0383165f9081526004602052604090205b80546001600160a01b0319166001600160a01b03909216919091179055565b60015f5260046020526109fa815f516020611f7b5f395f51905f526109bb565b6040516001600160a01b0390911681529081906020820190565b632061897360e01b5f526001600160a01b031660045260245ffd5b635c93ff2f60e11b5f5260045260245ffd5b5060018114610919565b34610210576020366003190112610210577f89a77869d7b8125ba16e08a92ddc8cc26fb1fa47241971167954489a5e66c2556020600435335f526003825260405f20815f52825260405f20600160ff19825416179055604051908152a1005b3461021057602036600319011261021057600435610ac7816101ff565b5f5460081c6001600160a01b0316330361028d57600280546001600160a01b039283166001600160a01b0319821681179092559091167f90cc2f570a6eb594b1580ea3e41247d2d73a55281889e86bd4ec2fc29c7e62d65f80a3005b34610210575f366003190112610210575f5460405160089190911c6001600160a01b03168152602090f35b34610210576020366003190112610210576004355f5460081c6001600160a01b0316330361028d576020817f3dc4b742ac9e7885cc04b3b050add4727dd89dec6825e39fb55265a5a3be39f692158015610bb9575b610bac9061170e565b80600655604051908152a1005b50603c811015610ba3565b34610210576020366003190112610210576004356001600160401b03811161021057610bf4903690600401610357565b5f549060ff8216610d4157610c22610ca6916001610cab9460ff1916175f556020808251830101910161176e565b6001600160a01b0392831696938316958695909316939290610c458615156117b0565b610c508815156117fc565b80158015610d36575b610c629061170e565b610c6b85611b7a565b600180546001600160a01b0319166001600160a01b038816179055600280546001600160a01b0319166001600160a01b038a16179055600655565b600555565b610cb3611bd5565b6040516001600160a01b038516815233907ffd805e12a6d02f83d7029c03fdfcf3f226ebcd409af51b3095237015eae5030090602090a45f7f52ae88b092de36f87fb43fe794eb1381023b9c1bce563a871154022c63dce3428180a35f7f90cc2f570a6eb594b1580ea3e41247d2d73a55281889e86bd4ec2fc29c7e62d68180a3005b50603c811015610c59565b62dc149f60e41b5f5260045ffd5b34610210575f366003190112610210575b6006548015159081610da0575b5080610d93575b15610d9157610d8c610d8760075461167c565b600755565b610d60565b005b5060075460085411610d74565b90506007545f52600a60205260405f2054906005548201809211610dcf57610dc791611848565b42115f610d6d565b611668565b34610210575f366003190112610210576020600754604051908152f35b9092919260408201906040835280518092526020606084019101915f5b818110610e29575050602091509360018060a01b0316910152565b83516001600160a01b0316835260209384019390920191600101610e0e565b3461021057604036600319011261021057600435610e65816101ff565b602435906001600160a01b0381166001141580610fa9575b610f8e578115610f7f5790610e918161186c565b610eaf61093e5f9460018060a01b03165f52600460205260405f2090565b6001600160a01b0381168015159081610f73575b5080610f6a575b15610f1b57610f0f61093e82610ef6610f1594610ee789886118b2565b6001600160a01b039091169052565b6001600160a01b03165f90815260046020526040902090565b9361167c565b92610eaf565b90835f196001600160a01b03841601610f40575b815261044060405192839283610df1565b9150610f64610f57610f51846118cb565b836118b2565b516001600160a01b031690565b91610f2f565b50828410610eca565b6001915014155f610ec3565b6372dbed9760e11b5f5260045ffd5b635c93ff2f60e11b5f526001600160a01b031660045260245ffd5b50610fba610fb682611545565b1590565b610e7d565b346102105760c036600319011261021057600435610fdc816101ff565b6024356044356001600160401b03811161021057610ffe903690600401610527565b919092611009610375565b6084359060a435946001600160401b038611610210576104409661103461103c973690600401610527565b9690956118f2565b60405190151581529081906020820190565b34610210575f366003190112610210576002546040516001600160a01b039091168152602090f35b34610210575f366003190112610210576020600554604051908152f35b34610210575f366003190112610210576020600854604051908152f35b34610210576040366003190112610210576004356110cd816101ff565b602435906110da826101ff565b5f5460081c6001600160a01b0316330361028d576001600160a01b038216801580156111d8575b610a2f576001600160a01b0382165f9081526004602052604090206111299061094b9061093e565b036111bc57816111926106a0926109bb61117761093e7faab4fa2b463f581b2b32cb3b7e3b704b9ce37cc209b5fb4d77e593ace40542769760018060a01b03165f52600460205260405f2090565b6001600160a01b039092165f90815260046020526040902090565b6001600160a01b0381165f90815260046020526040902080546001600160a01b03191690556109fa565b638b4189ff60e01b5f526001600160a01b03821660045260245ffd5b5060018114611101565b34610210576040366003190112610210576004356111ff816101ff565b6024359060018060a01b03165f52600360205260405f20905f52602052602060ff60405f2054166040519015158152f35b34610210576020366003190112610210575f546004359060081c6001600160a01b0316330361028d576020817f3239d60f6914d8c19e95a27197b95d16742b9dc4470c79a1001412607f1ea4ae92600555604051908152a1005b346102105761129836610554565b9193909260075460085481101561135f57610d919561133495611327610d87846112cd61132e965f52600a60205260405f2090565b546112d881426118d9565b906112e860055480931015611a59565b6006549182611339575b50505061087061130a825f52600960205260405f2090565b546113218b61131a36898b610321565b8b8d61157b565b14611ae6565b3691610321565b91611dfb565b611b32565b6113579261134b611350924294611848565b611848565b1015611aa4565b5f80806112f2565b60405162461bcd60e51b815260206004820152601a60248201527f5472616e73616374696f6e20717565756520697320656d7074790000000000006044820152606490fd5b34610210576020366003190112610210576004356113c1816101ff565b5f5460081c6001600160a01b0316330361028d57610d9190611b7a565b600211156113e857565b634e487b7160e01b5f52602160045260245ffd5b9060028210156113e85752565b919360a09361145d9297969560c08501987f73d8543ad6d885f580270da0b8273accec78d8732db45947d0dd843b1f4d07e78652600180881b031660208601526040850152606084015260808301906113fc565b0152565b604080517f47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a7946921860208201908152469282019290925230606082015291926114b19261153f92906114bf816080810187565b03601f1981018352826102d4565b5190208451909490611509906001600160a01b0316926114b160208401519160606040860151602081519101209501516114f8816113de565b604051958694602086019889611409565b519020604051601960f81b60208201908152600160f81b6021830152602282019590955260428101919091529182906062820190565b51902090565b6001600160a01b03166001811415908161155d575090565b5f908152600460205260409020546001600160a01b03161515919050565b92909160209060405193828501956bffffffffffffffffffffffff199060601b1686526034850152805191829101605485015e8201605481015f815260028310156113e8578360019260549261153f9560f81b90520301601e198101845201826102d4565b5f805c6001600160a01b0319166001600160a01b039290921691909117905d565b5f805c6001600160a01b031916905d565b908060209392818452848401375f828201840152601f01601f1916010190565b959492610304946060936116609360018060a01b031689526020890152608060408901526080880191611612565b9401906113fc565b634e487b7160e01b5f52601160045260245ffd5b5f198114610dcf5760010190565b6117069492917f4c8a9c748e976c17c2eb2c2bc50da76eac9cd90ff529f0fe900e0c10a179f031916116fe6116cb866116c4368a89610321565b858561157b565b956008545f5260096020528660405f20556008545f52600a6020524260405f205560085497889660405195869586611632565b0390a361167c565b600855600190565b1561171557565b60405162461bcd60e51b815260206004820152602b60248201527f45787069726174696f6e206d7573742062652030206f72206174206c6561737460448201526a203630207365636f6e647360a81b6064820152608490fd5b908160a0910312610210578051611784816101ff565b916020820151611793816101ff565b9160408101516117a2816101ff565b916080606083015192015190565b156117b757565b60405162461bcd60e51b815260206004820152601e60248201527f4176617461722063616e206e6f74206265207a65726f206164647265737300006044820152606490fd5b1561180357565b60405162461bcd60e51b815260206004820152601e60248201527f5461726765742063616e206e6f74206265207a65726f206164647265737300006044820152606490fd5b91908201809211610dcf57565b6001600160401b0381116102cf5760051b60200190565b9061187682611855565b61188360405191826102d4565b8281528092611894601f1991611855565b0190602036910137565b634e487b7160e01b5f52603260045260245ffd5b80518210156118c65760209160051b010190565b61189e565b5f19810191908211610dcf57565b91908203918211610dcf57565b60028210156113e85752565b97969092949193956119026102f5565b6001600160a01b038a16815292846020850152611920368888610321565b604085015261193288606086016118e6565b5f5c6001600160a01b03166106285761194a93611cdd565b96906001600160a01b038116158015611a2e575b611a1b57611997611990896119838460018060a01b03165f52600360205260405f2090565b905f5260205260405f2090565b5460ff1690565b611a0757807f8c8e19e7e8e193118a05465d7676e82215052d3cb150628fbf598105dc2bb6ab6119f68a6104306119e96119fe9c9d6119836105ef9860018060a01b03165f52600360205260405f2090565b805460ff19166001179055565b0390a16115e0565b90610304611601565b639e1dc0c560e01b5f52600488905260245ffd5b634a0bfec160e01b5f523360045260245ffd5b506001600160a01b0381165f908152600460205260409020611a539061094b9061093e565b1561195e565b15611a6057565b606460405162461bcd60e51b815260206004820152602060248201527f5472616e73616374696f6e206973207374696c6c20696e20636f6f6c646f776e6044820152fd5b15611aab57565b60405162461bcd60e51b8152602060048201526013602482015272151c985b9cd858dd1a5bdb88195e1c1a5c9959606a1b6044820152606490fd5b15611aed57565b60405162461bcd60e51b815260206004820152601f60248201527f5472616e73616374696f6e2068617368657320646f206e6f74206d61746368006044820152606490fd5b15611b3957565b60405162461bcd60e51b8152602060048201526019602482015278135bd91d5b19481d1c985b9cd858dd1a5bdb8819985a5b1959603a1b6044820152606490fd5b5f8054610100600160a81b03198116600884811b610100600160a81b03169190911783556001600160a01b039384169391901c16907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09080a3565b60015f5260046020525f516020611f7b5f395f51905f52546001600160a01b0316611c265760015f81905260046020525f516020611f7b5f395f51905f5280546001600160a01b0319169091179055565b63dfd49ebd60e01b5f5260045ffd5b906020116102105790602090565b906040116102105760200190602090565b909291928360141161021057831161021057601401916013190190565b359060208110611c7f575090565b5f199060200360031b1b1690565b90604010156118c65760400190565b6040513d5f823e3d90fd5b356001600160601b0319811692919060148210611cc2575050565b6001600160601b031960149290920360031b82901b16169150565b93929360148510611dd85790611cf291611461565b9260418114611d36575b611d1d8180611d17611d11611d259587611ca7565b60601c90565b94611c54565b908584611ed4565b15611d2e579190565b505f91508190565b60205f611d4c611d468486611c35565b90611c71565b611d59611d468587611c43565b611da8611d80611d7a611d6c888a611c8d565b356001600160f81b03191690565b60f81c90565b916040519384938b859094939260ff6060936080840197845216602083015260408201520152565b838052039060015afa15611dd3575f516001600160a01b038116611dcc5750611cfc565b9150509190565b611c9c565b50505090505f905f90565b90816020910312610210575180151581036102105790565b60025460405163468721a760e01b81526001600160a01b039283166004820152602481019390935260806044840152919360209385939092169183915f91839190611e5990611e4e906084850190610744565b9160648401906113fc565b03925af1908115611dd3575f91611e6e575090565b610372915060203d602011611e90575b611e8881836102d4565b810190611de3565b503d611e7e565b80516020909101516001600160e01b0319811692919060048210611eb9575050565b6001600160e01b031960049290920360031b82901b16169150565b90929192813b15611f72575f93611f1485946114b16040519384926020840196630b135d3f60e11b88526024850152604060448501526064840191611612565b51915afa3d15611f6b573d611f2881610306565b90611f3660405192836102d4565b81523d5f602083013e5b81611f49575090565b630b135d3f60e11b91506001600160e01b031990611f6690611e97565b161490565b6060611f40565b505050505f9056feabd6e7cb50984ff9c2f3e18a2660c3353dadf4e3291deeb275dae2cd1e44fe05a2646970667358221220ad2174db332bd51a23b00f64329f8bc341ed3feb9ab1abbd2eae08782fc9f8d664736f6c634300081c0033abd6e7cb50984ff9c2f3e18a2660c3353dadf4e3291deeb275dae2cd1e44fe05",
+      "constructorArgs": {
+        "types": [
+          "address",
+          "address",
+          "address",
+          "uint256",
+          "uint256"
+        ],
+        "values": [
+          "0x0000000000000000000000000000000000000001",
+          "0x0000000000000000000000000000000000000001",
+          "0x0000000000000000000000000000000000000001",
+          0,
+          0
+        ]
+      },
+      "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_owner",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_avatar",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_target",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_cooldown",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_expiration",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [],
+          "name": "AlreadyAuthenticated",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "AlreadyDisabledModule",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "AlreadyEnabledModule",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "AlreadyInitialized",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "name": "HashAlreadyConsumed",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "InvalidModule",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "InvalidPageSize",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "NotAuthorized",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "OwnableUnauthorizedAccount",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "SetupModulesAlreadyCalled",
+          "type": "error"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousAvatar",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newAvatar",
+              "type": "address"
+            }
+          ],
+          "name": "AvatarSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "initiator",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "avatar",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            }
+          ],
+          "name": "DelaySetup",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "DisabledModule",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "EnabledModule",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "ExecutionFromModuleFailure",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "ExecutionFromModuleSuccess",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "name": "HashExecuted",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "name": "HashInvalidated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousTarget",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newTarget",
+              "type": "address"
+            }
+          ],
+          "name": "TargetSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "queueNonce",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "txHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "indexed": false,
+              "internalType": "enum Operation",
+              "name": "operation",
+              "type": "uint8"
+            }
+          ],
+          "name": "TransactionAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "cooldown",
+              "type": "uint256"
+            }
+          ],
+          "name": "TxCooldownSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "expiration",
+              "type": "uint256"
+            }
+          ],
+          "name": "TxExpirationSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            }
+          ],
+          "name": "TxNonceSet",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "avatar",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "name": "consumed",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "prevModule",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "disableModule",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "module",
+              "type": "address"
+            }
+          ],
+          "name": "enableModule",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "enum Operation",
+              "name": "operation",
+              "type": "uint8"
+            }
+          ],
+          "name": "execTransactionFromModule",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "enum Operation",
+              "name": "operation",
+              "type": "uint8"
+            }
+          ],
+          "name": "execTransactionFromModuleReturnData",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
+            },
+            {
+              "internalType": "bytes",
+              "name": "returnData",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "enum Operation",
+              "name": "operation",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "salt",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "name": "execTransactionWithSignature",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "enum Operation",
+              "name": "operation",
+              "type": "uint8"
+            }
+          ],
+          "name": "executeNextTx",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "start",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "pageSize",
+              "type": "uint256"
+            }
+          ],
+          "name": "getModulesPaginated",
+          "outputs": [
+            {
+              "internalType": "address[]",
+              "name": "array",
+              "type": "address[]"
+            },
+            {
+              "internalType": "address",
+              "name": "next",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "enum Operation",
+              "name": "operation",
+              "type": "uint8"
+            }
+          ],
+          "name": "getTransactionHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_nonce",
+              "type": "uint256"
+            }
+          ],
+          "name": "getTxCreatedAt",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_nonce",
+              "type": "uint256"
+            }
+          ],
+          "name": "getTxHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "hash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "invalidate",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_module",
+              "type": "address"
+            }
+          ],
+          "name": "isModuleEnabled",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "value",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "enum Operation",
+                  "name": "operation",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct SignatureChecker.ModuleTx",
+              "name": "moduleTx",
+              "type": "tuple"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "salt",
+              "type": "bytes32"
+            }
+          ],
+          "name": "moduleTxHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "queueNonce",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_avatar",
+              "type": "address"
+            }
+          ],
+          "name": "setAvatar",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_target",
+              "type": "address"
+            }
+          ],
+          "name": "setTarget",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_txCooldown",
+              "type": "uint256"
+            }
+          ],
+          "name": "setTxCooldown",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_txExpiration",
+              "type": "uint256"
+            }
+          ],
+          "name": "setTxExpiration",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_txNonce",
+              "type": "uint256"
+            }
+          ],
+          "name": "setTxNonce",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "initParams",
+              "type": "bytes"
+            }
+          ],
+          "name": "setUp",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "skipExpired",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "target",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "txCooldown",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "txCreatedAt",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "txExpiration",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "txHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "txNonce",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ],
+      "compilerInput": {
+        "language": "Solidity",
+        "sources": {
+          "@gnosis-guild/zodiac-core/contracts/core/Modifier.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.7.0 <0.9.0;\n\nimport {ExecutionTracker} from \"../signature/ExecutionTracker.sol\";\nimport {IAvatar} from \"../interfaces/IAvatar.sol\";\nimport {Module} from \"./Module.sol\";\nimport {SignatureChecker} from \"../signature/SignatureChecker.sol\";\n\nimport \"./Operation.sol\";\n\n/// @title Modifier Interface - A contract that sits between a Module and an Avatar and enforce some additional logic.\nabstract contract Modifier is\n  Module,\n  ExecutionTracker,\n  SignatureChecker,\n  IAvatar\n{\n  address internal constant SENTINEL_MODULES = address(0x1);\n  /// Mapping of modules.\n  mapping(address => address) internal modules;\n  /// Authenticated module for the current moduleOnly call.\n  address private transient _authenticatedModule;\n\n  /// `sender` is not an authorized module.\n  /// @param sender The address of the sender.\n  error NotAuthorized(address sender);\n\n  /// `module` is invalid.\n  error InvalidModule(address module);\n\n  /// `pageSize` is invalid.\n  error InvalidPageSize();\n\n  /// `module` is already disabled.\n  error AlreadyDisabledModule(address module);\n\n  /// `module` is already enabled.\n  error AlreadyEnabledModule(address module);\n\n  /// @dev `setModules()` was already called.\n  error SetupModulesAlreadyCalled();\n\n  /// @dev A module authentication context is already active.\n  error AlreadyAuthenticated();\n\n  /*\n    --------------------------------------------------\n    You must override both of the following virtual functions,\n    execTransactionFromModule() and execTransactionFromModuleReturnData().\n    It is recommended that implementations of both functions use the\n    parameterless moduleOnly() modifier.\n    */\n\n  /// @dev Passes a transaction to the modifier.\n  /// @notice Can only be called by enabled modules.\n  /// @param to Destination address of module transaction.\n  /// @param value Ether value of module transaction.\n  /// @param data Data payload of module transaction.\n  /// @param operation Operation type of module transaction.\n  function execTransactionFromModule(\n    address to,\n    uint256 value,\n    bytes calldata data,\n    Operation operation\n  ) public virtual returns (bool success);\n\n  /// @dev Passes a transaction to the modifier, expects return data.\n  /// @notice Can only be called by enabled modules.\n  /// @param to Destination address of module transaction.\n  /// @param value Ether value of module transaction.\n  /// @param data Data payload of module transaction.\n  /// @param operation Operation type of module transaction.\n  function execTransactionFromModuleReturnData(\n    address to,\n    uint256 value,\n    bytes calldata data,\n    Operation operation\n  ) public virtual returns (bool success, bytes memory returnData);\n\n  /// @dev Authenticates a direct call from an enabled module.\n  /// @notice Can only be called by enabled modules.\n  modifier moduleOnly() {\n    if (_authenticatedModule != address(0)) {\n      revert AlreadyAuthenticated();\n    }\n\n    if (modules[msg.sender] == address(0)) {\n      revert NotAuthorized(msg.sender);\n    }\n\n    _authenticatedModule = msg.sender;\n    _;\n    _authenticatedModule = address(0);\n  }\n\n  /// @dev Authenticates a relayed call signed by an enabled module.\n  ///      The signed message is the EIP-712 ModuleTx struct over the call's\n  ///      (to, value, data, operation, salt). See SignatureChecker.\n  /// @param moduleTx Module transaction that was signed.\n  /// @param salt Salt value included in the signed ModuleTx.\n  /// @param signature Signature over the ModuleTx.\n  modifier moduleOnlySigned(\n    ModuleTx memory moduleTx,\n    bytes32 salt,\n    bytes calldata signature\n  ) {\n    if (_authenticatedModule != address(0)) {\n      revert AlreadyAuthenticated();\n    }\n\n    (address signer, bytes32 hash) = moduleTxSignedBy(\n      moduleTx,\n      salt,\n      signature\n    );\n    if (signer == address(0) || modules[signer] == address(0)) {\n      revert NotAuthorized(msg.sender);\n    }\n\n    if (consumed[signer][hash]) {\n      revert HashAlreadyConsumed(hash);\n    }\n\n    consumed[signer][hash] = true;\n    emit HashExecuted(hash);\n\n    _authenticatedModule = signer;\n    _;\n    _authenticatedModule = address(0);\n  }\n\n  /// @dev Returns the module authenticated for the current execution context.\n  /// @return The module that directly called or signed the current execution.\n  function sentOrSignedByModule() internal view returns (address) {\n    return _authenticatedModule;\n  }\n\n  /// @dev Disables a module on the modifier.\n  /// @notice This can only be called by the owner.\n  /// @param prevModule Module that pointed to the module to be removed in the linked list.\n  /// @param module Module to be removed.\n  function disableModule(\n    address prevModule,\n    address module\n  ) public override onlyOwner {\n    if (module == address(0) || module == SENTINEL_MODULES)\n      revert InvalidModule(module);\n    if (modules[prevModule] != module) revert AlreadyDisabledModule(module);\n    modules[prevModule] = modules[module];\n    modules[module] = address(0);\n    emit DisabledModule(module);\n  }\n\n  /// @dev Enables a module that can add transactions to the queue\n  /// @param module Address of the module to be enabled\n  /// @notice This can only be called by the owner\n  function enableModule(address module) public override onlyOwner {\n    if (module == address(0) || module == SENTINEL_MODULES)\n      revert InvalidModule(module);\n    if (modules[module] != address(0)) revert AlreadyEnabledModule(module);\n    modules[module] = modules[SENTINEL_MODULES];\n    modules[SENTINEL_MODULES] = module;\n    emit EnabledModule(module);\n  }\n\n  /// @dev Returns if an module is enabled\n  /// @return True if the module is enabled\n  function isModuleEnabled(\n    address _module\n  ) public view override returns (bool) {\n    return SENTINEL_MODULES != _module && modules[_module] != address(0);\n  }\n\n  /// @dev Returns array of modules.\n  ///      If all entries fit into a single page, the next pointer will be 0x1.\n  ///      If another page is present, next will be the last element of the returned array.\n  /// @param start Start of the page. Has to be a module or start pointer (0x1 address)\n  /// @param pageSize Maximum number of modules that should be returned. Has to be > 0\n  /// @return array Array of modules.\n  /// @return next Start of the next page.\n  function getModulesPaginated(\n    address start,\n    uint256 pageSize\n  ) external view override returns (address[] memory array, address next) {\n    if (start != SENTINEL_MODULES && !isModuleEnabled(start)) {\n      revert InvalidModule(start);\n    }\n    if (pageSize == 0) {\n      revert InvalidPageSize();\n    }\n\n    // Init array with max page size\n    array = new address[](pageSize);\n\n    // Populate return array\n    uint256 moduleCount = 0;\n    next = modules[start];\n    while (\n      next != address(0) && next != SENTINEL_MODULES && moduleCount < pageSize\n    ) {\n      array[moduleCount] = next;\n      next = modules[next];\n      moduleCount++;\n    }\n\n    // Because of the argument validation we can assume that\n    // the `currentModule` will always be either a module address\n    // or sentinel address (aka the end). If we haven't reached the end\n    // inside the loop, we need to set the next pointer to the last element\n    // because it skipped over to the next module which is neither included\n    // in the current page nor won't be included in the next one\n    // if you pass it as a start.\n    if (next != SENTINEL_MODULES) {\n      next = array[moduleCount - 1];\n    }\n    // Set correct size of returned array\n    // solhint-disable-next-line no-inline-assembly\n    assembly {\n      mstore(array, moduleCount)\n    }\n  }\n\n  /// @dev Initializes the modules linked list.\n  /// @notice Should be called as part of the `setUp` / initializing function and can only be called once.\n  function setupModules() internal {\n    if (modules[SENTINEL_MODULES] != address(0))\n      revert SetupModulesAlreadyCalled();\n    modules[SENTINEL_MODULES] = SENTINEL_MODULES;\n  }\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/core/Module.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.7.0 <0.9.0;\n\nimport {FactoryFriendly} from \"../factory/FactoryFriendly.sol\";\nimport {Ownable} from \"../factory/Ownable.sol\";\nimport {IAvatar} from \"../interfaces/IAvatar.sol\";\nimport \"./Operation.sol\";\n\n/// @title Module Interface - A contract that can pass messages to a Module Manager contract if enabled by that contract.\nabstract contract Module is FactoryFriendly, Ownable {\n  /// @dev Address that will ultimately execute function calls.\n  address public avatar;\n  /// @dev Address that this module will pass transactions to.\n  address public target;\n\n  /// @dev Emitted each time the avatar is set.\n  event AvatarSet(address indexed previousAvatar, address indexed newAvatar);\n  /// @dev Emitted each time the Target is set.\n  event TargetSet(address indexed previousTarget, address indexed newTarget);\n\n  /// @dev Sets the avatar to a new avatar (`newAvatar`).\n  /// @notice Can only be called by the current owner.\n  function setAvatar(address _avatar) public onlyOwner {\n    address previousAvatar = avatar;\n    avatar = _avatar;\n    emit AvatarSet(previousAvatar, _avatar);\n  }\n\n  /// @dev Sets the target to a new target (`newTarget`).\n  /// @notice Can only be called by the current owner.\n  function setTarget(address _target) public onlyOwner {\n    address previousTarget = target;\n    target = _target;\n    emit TargetSet(previousTarget, _target);\n  }\n\n  /// @dev Passes a transaction to be executed by the avatar.\n  /// @notice Can only be called by this contract.\n  /// @param to Destination address of module transaction.\n  /// @param value Ether value of module transaction.\n  /// @param data Data payload of module transaction.\n  /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.\n  function exec(\n    address to,\n    uint256 value,\n    bytes memory data,\n    Operation operation\n  ) internal virtual returns (bool success) {\n    return\n      IAvatar(target).execTransactionFromModule(to, value, data, operation);\n  }\n\n  /// @dev Passes a transaction to be executed by the target and returns data.\n  /// @notice Can only be called by this contract.\n  /// @param to Destination address of module transaction.\n  /// @param value Ether value of module transaction.\n  /// @param data Data payload of module transaction.\n  /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.\n  function execAndReturnData(\n    address to,\n    uint256 value,\n    bytes memory data,\n    Operation operation\n  ) internal virtual returns (bool success, bytes memory returnData) {\n    return\n      IAvatar(target).execTransactionFromModuleReturnData(\n        to,\n        value,\n        data,\n        operation\n      );\n  }\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/core/Operation.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.7.0 <0.9.0;\n\nenum Operation {\n  Call,\n  DelegateCall\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/factory/FactoryFriendly.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.7.0 <0.9.0;\n\nimport {Initializable} from \"./Initializable.sol\";\n\n/// @title Zodiac FactoryFriendly - A contract that allows other contracts to be initializable and pass bytes as arguments to define contract state\nabstract contract FactoryFriendly is Initializable {\n  function setUp(bytes memory initializeParams) public virtual;\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/factory/Initializable.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.7.0 <0.9.0;\n\nabstract contract Initializable {\n  bool private _initialized;\n\n  error AlreadyInitialized();\n\n  modifier initializer() {\n    if (_initialized) revert AlreadyInitialized();\n    _initialized = true;\n    _;\n  }\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/factory/Ownable.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.7.0 <0.9.0;\n\nabstract contract Ownable {\n  address public owner;\n\n  event OwnershipTransferred(\n    address indexed previousOwner,\n    address indexed newOwner\n  );\n\n  error OwnableUnauthorizedAccount(address account);\n\n  modifier onlyOwner() {\n    if (msg.sender != owner) revert OwnableUnauthorizedAccount(msg.sender);\n    _;\n  }\n\n  function transferOwnership(address newOwner) public onlyOwner {\n    _transferOwnership(newOwner);\n  }\n\n  function _transferOwnership(address newOwner) internal {\n    address oldOwner = owner;\n    owner = newOwner;\n    emit OwnershipTransferred(oldOwner, newOwner);\n  }\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/interfaces/IAvatar.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\n\n/// @title Zodiac Avatar - A contract that manages modules that can execute transactions via this contract.\npragma solidity >=0.7.0 <0.9.0;\n\nimport \"../core/Operation.sol\";\n\ninterface IAvatar {\n  event EnabledModule(address module);\n  event DisabledModule(address module);\n  event ExecutionFromModuleSuccess(address indexed module);\n  event ExecutionFromModuleFailure(address indexed module);\n\n  /// @dev Enables a module on the avatar.\n  /// @notice Can only be called by the avatar.\n  /// @notice Modules should be stored as a linked list.\n  /// @notice Must emit EnabledModule(address module) if successful.\n  /// @param module Module to be enabled.\n  function enableModule(address module) external;\n\n  /// @dev Disables a module on the avatar.\n  /// @notice Can only be called by the avatar.\n  /// @notice Must emit DisabledModule(address module) if successful.\n  /// @param prevModule Address that pointed to the module to be removed in the linked list\n  /// @param module Module to be removed.\n  function disableModule(address prevModule, address module) external;\n\n  /// @dev Allows a Module to execute a transaction.\n  /// @notice Can only be called by an enabled module.\n  /// @notice Must emit ExecutionFromModuleSuccess(address module) if successful.\n  /// @notice Must emit ExecutionFromModuleFailure(address module) if unsuccessful.\n  /// @param to Destination address of module transaction.\n  /// @param value Ether value of module transaction.\n  /// @param data Data payload of module transaction.\n  /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.\n  function execTransactionFromModule(\n    address to,\n    uint256 value,\n    bytes memory data,\n    Operation operation\n  ) external returns (bool success);\n\n  /// @dev Allows a Module to execute a transaction and return data\n  /// @notice Can only be called by an enabled module.\n  /// @notice Must emit ExecutionFromModuleSuccess(address module) if successful.\n  /// @notice Must emit ExecutionFromModuleFailure(address module) if unsuccessful.\n  /// @param to Destination address of module transaction.\n  /// @param value Ether value of module transaction.\n  /// @param data Data payload of module transaction.\n  /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.\n  function execTransactionFromModuleReturnData(\n    address to,\n    uint256 value,\n    bytes memory data,\n    Operation operation\n  ) external returns (bool success, bytes memory returnData);\n\n  /// @dev Returns if an module is enabled\n  /// @return True if the module is enabled\n  function isModuleEnabled(address module) external view returns (bool);\n\n  /// @dev Returns array of modules.\n  /// @param start Start of the page.\n  /// @param pageSize Maximum number of modules that should be returned.\n  /// @return array Array of modules.\n  /// @return next Start of the next page.\n  function getModulesPaginated(\n    address start,\n    uint256 pageSize\n  ) external view returns (address[] memory array, address next);\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/signature/ExecutionTracker.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.8.0 <0.9.0;\n\n/// @title ExecutionTracker - A contract that keeps track of executed and invalidated hashes\ncontract ExecutionTracker {\n  error HashAlreadyConsumed(bytes32);\n\n  event HashExecuted(bytes32);\n  event HashInvalidated(bytes32);\n\n  mapping(address => mapping(bytes32 => bool)) public consumed;\n\n  function invalidate(bytes32 hash) external {\n    consumed[msg.sender][hash] = true;\n    emit HashInvalidated(hash);\n  }\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/signature/IERC1271.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\n/* solhint-disable one-contract-per-file */\npragma solidity >=0.7.0 <0.9.0;\n\ninterface IERC1271 {\n  /**\n   * @notice EIP1271 method to validate a signature.\n   * @param hash Hash of the data signed on the behalf of address(this).\n   * @param signature Signature byte array associated with _data.\n   *\n   * MUST return the bytes4 magic value 0x1626ba7e when function passes.\n   * MUST NOT modify state (using STATICCALL for solc < 0.5, view modifier for solc > 0.5)\n   * MUST allow external calls\n   */\n  function isValidSignature(\n    bytes32 hash,\n    bytes memory signature\n  ) external view returns (bytes4);\n}\n"
+          },
+          "@gnosis-guild/zodiac-core/contracts/signature/SignatureChecker.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.8.0 <0.9.0;\n\nimport {Operation} from \"../core/Operation.sol\";\nimport {IERC1271} from \"./IERC1271.sol\";\n\n/// @title SignatureChecker - Verifies EIP-712 signatures over a ModuleTx.\n/// @dev Supports EOA (ECDSA) and ERC-1271 contract signatures.\nabstract contract SignatureChecker {\n  struct ModuleTx {\n    address to;\n    uint256 value;\n    bytes data;\n    Operation operation;\n  }\n\n  /**\n   * @notice Recovers the signer of a ModuleTx signature.\n   * @dev Signature layout:\n   *      - EOA:     `r || s || v`                 (65 bytes)\n   *      - ERC1271: `signer || contractSignature` (signature[0:20] = signer)\n   *\n   *      A 65-byte signature is checked as an EOA signature first. If recovery\n   *      fails, it is then checked as an ERC1271 signature.\n   *\n   *      Returns (address(0), bytes32(0)) when the signature is invalid.\n   * @return signer The recovered signer address.\n   * @return hash The ModuleTx EIP-712 digest.\n   */\n  function moduleTxSignedBy(\n    ModuleTx memory moduleTx,\n    bytes32 salt,\n    bytes calldata signature\n  ) internal view returns (address signer, bytes32 hash) {\n    if (signature.length < 20) {\n      return (address(0), bytes32(0));\n    }\n\n    hash = moduleTxHash(moduleTx, salt);\n\n    if (signature.length == 65) {\n      bytes32 r = bytes32(signature[0:32]);\n      bytes32 s = bytes32(signature[32:64]);\n      uint8 v = uint8(signature[64]);\n      signer = ecrecover(hash, v, r, s);\n      // ecrecover fails by returning address(0)\n      if (signer != address(0)) {\n        return (signer, hash);\n      }\n    }\n\n    signer = address(bytes20(signature));\n    return\n      _isValidContractSignature(signer, hash, signature[20:])\n        ? (signer, hash)\n        : (address(0), bytes32(0));\n  }\n\n  /**\n   * @notice Computes the EIP-712 digest of a ModuleTx.\n   * @return The 32-byte hash that is to be signed.\n   */\n  function moduleTxHash(\n    ModuleTx memory moduleTx,\n    bytes32 salt\n  ) public view returns (bytes32) {\n    bytes32 domainSeparator = keccak256(\n      abi.encode(DOMAIN_SEPARATOR_TYPEHASH, block.chainid, this)\n    );\n    bytes32 structHash = keccak256(\n      abi.encode(\n        MODULE_TX_TYPEHASH,\n        moduleTx.to,\n        moduleTx.value,\n        keccak256(moduleTx.data),\n        moduleTx.operation,\n        salt\n      )\n    );\n    return\n      keccak256(\n        abi.encodePacked(\n          bytes1(0x19),\n          bytes1(0x01),\n          domainSeparator,\n          structHash\n        )\n      );\n  }\n\n  /**\n   * @dev Asks the signer contract whether the signature is valid for the hash.\n   * @param signer The address of the signer contract.\n   * @param hash Hash of the data signed.\n   * @param signature The contract signature.\n   * @return result Indicates whether the signature is valid.\n   */\n  function _isValidContractSignature(\n    address signer,\n    bytes32 hash,\n    bytes calldata signature\n  ) private view returns (bool result) {\n    uint256 size;\n    // eslint-disable-line no-inline-assembly\n    assembly {\n      size := extcodesize(signer)\n    }\n    if (size == 0) {\n      return false;\n    }\n\n    (bool success, bytes memory returnData) = signer.staticcall(\n      abi.encodeWithSelector(\n        IERC1271.isValidSignature.selector,\n        hash,\n        signature\n      )\n    );\n\n    return success && bytes4(returnData) == EIP1271_MAGIC_VALUE;\n  }\n\n  // keccak256(\n  //     \"EIP712Domain(uint256 chainId,address verifyingContract)\"\n  // );\n  bytes32 private constant DOMAIN_SEPARATOR_TYPEHASH =\n    0x47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a79469218;\n\n  // keccak256(\n  //     \"ModuleTx(address to,uint256 value,bytes data,uint8 operation,bytes32 salt)\"\n  // );\n  bytes32 private constant MODULE_TX_TYPEHASH =\n    0x73d8543ad6d885f580270da0b8273accec78d8732db45947d0dd843b1f4d07e7;\n\n  // bytes4(keccak256(\n  //     \"isValidSignature(bytes32,bytes)\"\n  // ));\n  bytes4 private constant EIP1271_MAGIC_VALUE = 0x1626ba7e;\n}\n"
+          },
+          "contracts/Delay.sol": {
+            "content": "// SPDX-License-Identifier: LGPL-3.0-only\npragma solidity >=0.8.0;\n\nimport {\n    Operation,\n    Modifier\n} from \"@gnosis-guild/zodiac-core/contracts/core/Modifier.sol\";\n\ncontract Delay is Modifier {\n    event DelaySetup(\n        address indexed initiator,\n        address indexed owner,\n        address indexed avatar,\n        address target\n    );\n    event TxCooldownSet(uint256 cooldown);\n    event TxExpirationSet(uint256 expiration);\n    event TxNonceSet(uint256 nonce);\n    event TransactionAdded(\n        uint256 indexed queueNonce,\n        bytes32 indexed txHash,\n        address to,\n        uint256 value,\n        bytes data,\n        Operation operation\n    );\n\n    uint256 public txCooldown;\n    uint256 public txExpiration;\n    uint256 public txNonce;\n    uint256 public queueNonce;\n    // Mapping of queue nonce to transaction hash.\n    mapping(uint256 => bytes32) public txHash;\n    // Mapping of queue nonce to creation timestamp.\n    mapping(uint256 => uint256) public txCreatedAt;\n\n    /// @param _owner Address of the owner\n    /// @param _avatar Address of the avatar (e.g. a Gnosis Safe)\n    /// @param _target Address of the contract that will call exec function\n    /// @param _cooldown Cooldown in seconds that should be required after a transaction is proposed\n    /// @param _expiration Duration that a proposed transaction is valid for after the cooldown, in seconds (or 0 if valid forever)\n    /// @notice There need to be at least 60 seconds between end of cooldown and expiration\n    constructor(\n        address _owner,\n        address _avatar,\n        address _target,\n        uint256 _cooldown,\n        uint256 _expiration\n    ) {\n        bytes memory initParams = abi.encode(\n            _owner,\n            _avatar,\n            _target,\n            _cooldown,\n            _expiration\n        );\n        setUp(initParams);\n    }\n\n    function setUp(bytes memory initParams) public override initializer {\n        (\n            address _owner,\n            address _avatar,\n            address _target,\n            uint256 _cooldown,\n            uint256 _expiration\n        ) = abi.decode(\n                initParams,\n                (address, address, address, uint256, uint256)\n            );\n        require(_avatar != address(0), \"Avatar can not be zero address\");\n        require(_target != address(0), \"Target can not be zero address\");\n        require(\n            _expiration == 0 || _expiration >= 60,\n            \"Expiration must be 0 or at least 60 seconds\"\n        );\n\n        _transferOwnership(_owner);\n        avatar = _avatar;\n        target = _target;\n        txExpiration = _expiration;\n        txCooldown = _cooldown;\n        setupModules();\n\n        emit DelaySetup(msg.sender, _owner, _avatar, _target);\n        emit AvatarSet(address(0), _avatar);\n        emit TargetSet(address(0), _target);\n    }\n\n    /// @dev Sets the cooldown before a transaction can be executed.\n    /// @param _txCooldown Cooldown in seconds that should be required before the transaction can be executed\n    /// @notice This can only be called by the owner\n    function setTxCooldown(uint256 _txCooldown) public onlyOwner {\n        txCooldown = _txCooldown;\n        emit TxCooldownSet(_txCooldown);\n    }\n\n    /// @dev Sets the duration for which a transaction is valid.\n    /// @param _txExpiration Duration that a transaction is valid in seconds (or 0 if valid forever) after the cooldown\n    /// @notice There need to be at least 60 seconds between end of cooldown and expiration\n    /// @notice This can only be called by the owner\n    function setTxExpiration(uint256 _txExpiration) public onlyOwner {\n        require(\n            _txExpiration == 0 || _txExpiration >= 60,\n            \"Expiration must be 0 or at least 60 seconds\"\n        );\n        txExpiration = _txExpiration;\n        emit TxExpirationSet(_txExpiration);\n    }\n\n    /// @dev Sets transaction nonce. Used to invalidate or skip transactions in queue.\n    /// @param _txNonce New transaction nonce\n    /// @notice This can only be called by the owner\n    function setTxNonce(uint256 _txNonce) public onlyOwner {\n        require(\n            _txNonce > txNonce,\n            \"New nonce must be higher than current txNonce\"\n        );\n        require(_txNonce <= queueNonce, \"Cannot be higher than queueNonce\");\n        txNonce = _txNonce;\n        emit TxNonceSet(_txNonce);\n    }\n\n    /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).\n    /// @param to Destination address of module transaction\n    /// @param value Ether value of module transaction\n    /// @param data Data payload of module transaction\n    /// @param operation Operation type of module transaction\n    /// @return success Whether or not the call was successfully queued for execution\n    /// @notice Can only be called by enabled modules\n    function execTransactionFromModule(\n        address to,\n        uint256 value,\n        bytes calldata data,\n        Operation operation\n    ) public override moduleOnly returns (bool success) {\n        bytes32 hash = getTransactionHash(to, value, data, operation);\n        txHash[queueNonce] = hash;\n        txCreatedAt[queueNonce] = block.timestamp;\n        emit TransactionAdded(queueNonce, hash, to, value, data, operation);\n        queueNonce++;\n        success = true;\n    }\n\n    /// @dev Adds a transaction to the queue if signed by an enabled module.\n    /// @param to Destination address of module transaction\n    /// @param value Ether value of module transaction\n    /// @param data Data payload of module transaction\n    /// @param operation Operation type of module transaction\n    /// @param salt Salt value included in the signed module transaction\n    /// @param signature Signature over the module transaction\n    /// @return success Whether or not the call was successfully queued for execution\n    /// @notice Can be relayed by any account, but the signature must recover to an enabled module\n    function execTransactionWithSignature(\n        address to,\n        uint256 value,\n        bytes calldata data,\n        Operation operation,\n        bytes32 salt,\n        bytes calldata signature\n    )\n        public\n        moduleOnlySigned(ModuleTx(to, value, data, operation), salt, signature)\n        returns (bool success)\n    {\n        bytes32 hash = getTransactionHash(to, value, data, operation);\n        txHash[queueNonce] = hash;\n        txCreatedAt[queueNonce] = block.timestamp;\n        emit TransactionAdded(queueNonce, hash, to, value, data, operation);\n        queueNonce++;\n        success = true;\n    }\n\n    /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).\n    /// @param to Destination address of module transaction\n    /// @param value Ether value of module transaction\n    /// @param data Data payload of module transaction\n    /// @param operation Operation type of module transaction\n    /// @return success Whether or not the call was successfully queued for execution\n    /// @return returnData ABI encoded queue nonce (uint256), transaction hash (bytes32), and block.timestamp (uint256)\n    /// @notice Can only be called by enabled modules\n    function execTransactionFromModuleReturnData(\n        address to,\n        uint256 value,\n        bytes calldata data,\n        Operation operation\n    )\n        public\n        override\n        moduleOnly\n        returns (bool success, bytes memory returnData)\n    {\n        bytes32 hash = getTransactionHash(to, value, data, operation);\n        txHash[queueNonce] = hash;\n        txCreatedAt[queueNonce] = block.timestamp;\n        emit TransactionAdded(queueNonce, hash, to, value, data, operation);\n        success = true;\n        returnData = abi.encode(queueNonce, hash, block.timestamp);\n        queueNonce++;\n    }\n\n    /// @dev Executes the next transaction only if the cooldown has passed and the transaction has not expired\n    /// @param to Destination address of module transaction\n    /// @param value Ether value of module transaction\n    /// @param data Data payload of module transaction\n    /// @param operation Operation type of module transaction\n    /// @notice The txIndex used by this function is always 0\n    function executeNextTx(\n        address to,\n        uint256 value,\n        bytes calldata data,\n        Operation operation\n    ) public {\n        require(txNonce < queueNonce, \"Transaction queue is empty\");\n        uint256 txCreationTimestamp = txCreatedAt[txNonce];\n        require(\n            block.timestamp - txCreationTimestamp >= txCooldown,\n            \"Transaction is still in cooldown\"\n        );\n        if (txExpiration != 0) {\n            require(\n                txCreationTimestamp + txCooldown + txExpiration >=\n                    block.timestamp,\n                \"Transaction expired\"\n            );\n        }\n        require(\n            txHash[txNonce] == getTransactionHash(to, value, data, operation),\n            \"Transaction hashes do not match\"\n        );\n        txNonce++;\n        require(exec(to, value, data, operation), \"Module transaction failed\");\n    }\n\n    function skipExpired() public {\n        while (\n            txExpiration != 0 &&\n            txCreatedAt[txNonce] + txCooldown + txExpiration <\n                block.timestamp &&\n            txNonce < queueNonce\n        ) {\n            txNonce++;\n        }\n    }\n\n    function getTransactionHash(\n        address to,\n        uint256 value,\n        bytes memory data,\n        Operation operation\n    ) public pure returns (bytes32) {\n        return keccak256(abi.encodePacked(to, value, data, operation));\n    }\n\n    function getTxHash(uint256 _nonce) public view returns (bytes32) {\n        return (txHash[_nonce]);\n    }\n\n    function getTxCreatedAt(uint256 _nonce) public view returns (uint256) {\n        return (txCreatedAt[_nonce]);\n    }\n}\n"
+          }
+        },
+        "settings": {
+          "evmVersion": "cancun",
+          "viaIR": true,
+          "optimizer": {
+            "enabled": true,
+            "runs": 100
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }
