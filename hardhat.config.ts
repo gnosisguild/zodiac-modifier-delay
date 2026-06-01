@@ -51,13 +51,19 @@ export default {
     sources: 'contracts',
   },
   solidity: {
-    compilers: [{ version: '0.8.20' }],
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 100,
+    compilers: [
+      {
+        version: '0.8.28',
+        settings: {
+          evmVersion: 'cancun',
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 100,
+          },
+        },
       },
-    },
+    ],
   },
   networks: {
     hardhat: {
