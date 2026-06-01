@@ -142,6 +142,35 @@ contract Delay is Modifier {
         success = true;
     }
 
+    /// @dev Adds a transaction to the queue if signed by an enabled module.
+    /// @param to Destination address of module transaction
+    /// @param value Ether value of module transaction
+    /// @param data Data payload of module transaction
+    /// @param operation Operation type of module transaction
+    /// @param salt Salt value included in the signed module transaction
+    /// @param signature Signature over the module transaction
+    /// @return success Whether or not the call was successfully queued for execution
+    /// @notice Can be relayed by any account, but the signature must recover to an enabled module
+    function execTransactionWithSignature(
+        address to,
+        uint256 value,
+        bytes calldata data,
+        Operation operation,
+        bytes32 salt,
+        bytes calldata signature
+    )
+        public
+        moduleOnlySigned(ModuleTx(to, value, data, operation), salt, signature)
+        returns (bool success)
+    {
+        bytes32 hash = getTransactionHash(to, value, data, operation);
+        txHash[queueNonce] = hash;
+        txCreatedAt[queueNonce] = block.timestamp;
+        emit TransactionAdded(queueNonce, hash, to, value, data, operation);
+        queueNonce++;
+        success = true;
+    }
+
     /// @dev Adds a transaction to the queue (same as avatar interface so that this can be placed between other modules and the avatar).
     /// @param to Destination address of module transaction
     /// @param value Ether value of module transaction

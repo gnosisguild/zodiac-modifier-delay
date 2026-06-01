@@ -1,6 +1,6 @@
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
-import { AbiCoder } from 'ethers'
+import { AbiCoder, hexlify, randomBytes } from 'ethers'
 import hre from 'hardhat'
 
 const ZeroState =
@@ -399,6 +399,69 @@ describe('DelayModifier', async () => {
       )
         .to.emit(modifier, 'TransactionAdded')
         .withArgs(expectedQueueNonce, txHash, user1.address, 42, '0x', 0)
+    })
+  })
+
+  describe('execTransactionWithSignature()', async () => {
+    it('allows any relayer with an enabled module signature', async () => {
+      const [module, relayer, to] = await hre.ethers.getSigners()
+      const { avatar, modifier } = await loadFixture(setup)
+      const tx = await modifier.enableModule.populateTransaction(module.address)
+      await avatar.exec(await modifier.getAddress(), 0, tx.data)
+
+      const moduleTx = {
+        to: to.address,
+        value: 42,
+        data: '0x',
+        operation: 0,
+      }
+      const salt = hexlify(randomBytes(32))
+      const { chainId } = await hre.ethers.provider.getNetwork()
+      const signature = await module.signTypedData(
+        { chainId, verifyingContract: await modifier.getAddress() },
+        {
+          ModuleTx: [
+            { name: 'to', type: 'address' },
+            { name: 'value', type: 'uint256' },
+            { name: 'data', type: 'bytes' },
+            { name: 'operation', type: 'uint8' },
+            { name: 'salt', type: 'bytes32' },
+          ],
+        },
+        { ...moduleTx, salt }
+      )
+      const expectedQueueNonce = await modifier.queueNonce()
+      const expectedHash = await modifier.getTransactionHash(
+        moduleTx.to,
+        moduleTx.value,
+        moduleTx.data,
+        moduleTx.operation
+      )
+
+      await expect(
+        modifier
+          .connect(relayer)
+          .execTransactionWithSignature(
+            moduleTx.to,
+            moduleTx.value,
+            moduleTx.data,
+            moduleTx.operation,
+            salt,
+            signature
+          )
+      )
+        .to.emit(modifier, 'TransactionAdded')
+        .withArgs(
+          expectedQueueNonce,
+          expectedHash,
+          moduleTx.to,
+          moduleTx.value,
+          moduleTx.data,
+          moduleTx.operation
+        )
+
+      expect(await modifier.queueNonce()).to.equal(1)
+      expect(await modifier.getTxHash(0)).to.equal(expectedHash)
     })
   })
 

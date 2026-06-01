@@ -42,7 +42,7 @@ describe('Module works with factory', () => {
 
     await expect(masterCopy.setUp(encodedParams)).to.be.revertedWithCustomError(
       masterCopy,
-      'InvalidInitialization'
+      'AlreadyInitialized'
     )
   })
 

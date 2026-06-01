@@ -1,10 +1,11 @@
 import { task } from 'hardhat/config'
-import { readMastercopies, verifyMastercopy } from '@gnosis-guild/zodiac-core'
+import { loadZodiacCore } from './zodiac-core'
 
 task(
   'verify:mastercopies',
   'Verifies all mastercopies from the artifacts file, in the block explorer corresponding to the current network'
 ).setAction(async (_, hre) => {
+  const { readMastercopies, verifyMastercopy } = await loadZodiacCore()
   const apiKey = hre.config.etherscan.apiKey as string
 
   const chainId = String((await hre.ethers.provider.getNetwork()).chainId)

@@ -1,6 +1,6 @@
 import { task } from 'hardhat/config'
 
-import { writeMastercopyFromBuild } from '@gnosis-guild/zodiac-core'
+import { loadZodiacCore } from './zodiac-core'
 
 import packageJson from '../package.json'
 
@@ -10,6 +10,7 @@ task(
   'extract:mastercopy',
   'Extracts and persists current mastercopy build artifacts'
 ).setAction(async (_, hre) => {
+  const { writeMastercopyFromBuild } = await loadZodiacCore()
   writeMastercopyFromBuild({
     contractVersion: packageJson.version,
     contractName: 'Delay',
