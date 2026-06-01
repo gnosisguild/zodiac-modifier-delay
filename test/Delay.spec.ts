@@ -1,23 +1,41 @@
-import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import { AbiCoder, hexlify, randomBytes } from 'ethers'
 import hre from 'hardhat'
+
+const { ethers, provider, networkHelpers } = await hre.network.create()
+const { loadFixture } = networkHelpers
+
+type RpcBlock = { timestamp: string }
+
+async function latestBlock() {
+  return (await provider.request({
+    method: 'eth_getBlockByNumber',
+    params: ['latest', false],
+  })) as RpcBlock
+}
+
+async function setNextBlockTimestamp(timestamp: number) {
+  await provider.request({
+    method: 'evm_setNextBlockTimestamp',
+    params: [timestamp],
+  })
+}
 
 const ZeroState =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ZeroAddress = '0x0000000000000000000000000000000000000000'
 const FirstAddress = '0x0000000000000000000000000000000000000001'
 
-describe('DelayModifier', async () => {
+describe('DelayModifier', () => {
   const cooldown = 180
   const expiration = 180 * 1000
 
   async function setup() {
-    const Avatar = await hre.ethers.getContractFactory('TestAvatar')
+    const Avatar = await ethers.getContractFactory('TestAvatar')
     const avatar = await Avatar.deploy()
     const avatarAddress = await avatar.getAddress()
 
-    const Modifier = await hre.ethers.getContractFactory('Delay')
+    const Modifier = await ethers.getContractFactory('Delay')
     const modifier = await Modifier.deploy(
       avatarAddress,
       avatarAddress,
@@ -29,48 +47,53 @@ describe('DelayModifier', async () => {
     return { avatar, modifier }
   }
 
-  describe('setUp()', async () => {
+  describe('setUp()', () => {
     it('throws if not enough time between txCooldown and txExpiration', async () => {
-      const Module = await hre.ethers.getContractFactory('Delay')
+      const Module = await ethers.getContractFactory('Delay')
       await expect(
         Module.deploy(ZeroAddress, FirstAddress, FirstAddress, 1, 59)
       ).to.be.revertedWith('Expiration must be 0 or at least 60 seconds')
     })
 
     it('throws if avatar is zero address', async () => {
-      const Module = await hre.ethers.getContractFactory('Delay')
+      const Module = await ethers.getContractFactory('Delay')
       await expect(
         Module.deploy(ZeroAddress, ZeroAddress, FirstAddress, 1, 0)
       ).to.be.revertedWith('Avatar can not be zero address')
     })
 
     it('throws if target is zero address', async () => {
-      const Module = await hre.ethers.getContractFactory('Delay')
+      const Module = await ethers.getContractFactory('Delay')
       await expect(
         Module.deploy(ZeroAddress, FirstAddress, ZeroAddress, 1, 0)
       ).to.be.revertedWith('Target can not be zero address')
     })
 
     it('txExpiration can be 0', async () => {
-      const [user1] = await hre.ethers.getSigners()
-      const Module = await hre.ethers.getContractFactory('Delay')
+      const [user1] = await ethers.getSigners()
+      const Module = await ethers.getContractFactory('Delay')
       await Module.deploy(user1.address, user1.address, user1.address, 1, 0)
     })
 
     it('should emit event because of successful set up', async () => {
-      const [user1] = await hre.ethers.getSigners()
-      const Delay = await hre.ethers.getContractFactory('Delay')
-      expect(
-        await Delay.deploy(user1.address, user1.address, user1.address, 1, 0)
+      const [user1] = await ethers.getSigners()
+      const Delay = await ethers.getContractFactory('Delay')
+      const delay = await Delay.deploy(
+        user1.address,
+        user1.address,
+        user1.address,
+        1,
+        0
       )
-        .to.emit(Delay, 'DelaySetup')
-        .withArgs(user1.address, user1.address, user1.address, 1, 0)
+      await expect(delay.deploymentTransaction())
+        .to.emit(delay, 'DelaySetup')
+        .withArgs(user1.address, user1.address, user1.address, user1.address)
     })
   })
 
-  describe('disableModule()', async () => {
+  describe('disableModule()', () => {
     it.skip('throws if not authorized', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { modifier } = await loadFixture(setup)
 
       await expect(modifier.disableModule(FirstAddress, user1.address))
@@ -91,7 +114,7 @@ describe('DelayModifier', async () => {
     })
 
     it('throws if module is not added ', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const disable = await modifier.disableModule.populateTransaction(
         ZeroAddress,
@@ -104,7 +127,7 @@ describe('DelayModifier', async () => {
     })
 
     it('disables a module()', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const enable = await modifier.enableModule.populateTransaction(
         user1.address
@@ -125,9 +148,9 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('enableModule()', async () => {
+  describe('enableModule()', () => {
     it('throws if not authorized', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { modifier } = await loadFixture(setup)
 
       await expect(modifier.enableModule(user1.address))
@@ -136,7 +159,7 @@ describe('DelayModifier', async () => {
     })
 
     it('throws because module is already enabled', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const enable = await modifier.enableModule.populateTransaction(
         user1.address
@@ -160,7 +183,7 @@ describe('DelayModifier', async () => {
     })
 
     it('enables a module', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const enable = await modifier.enableModule.populateTransaction(
         user1.address
@@ -176,7 +199,7 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('setTxCooldown()', async () => {
+  describe('setTxCooldown()', () => {
     it('throws if not authorized', async () => {
       const { modifier } = await loadFixture(setup)
 
@@ -214,7 +237,7 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('setTxExpiration()', async () => {
+  describe('setTxExpiration()', () => {
     it('throws if not authorized', async () => {
       const { modifier } = await loadFixture(setup)
       await expect(modifier.setTxExpiration(42)).to.be.revertedWithCustomError(
@@ -258,7 +281,7 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('setTxNonce()', async () => {
+  describe('setTxNonce()', () => {
     it('throws if not authorized', async () => {
       const { modifier } = await loadFixture(setup)
       await expect(modifier.setTxNonce(42)).to.be.revertedWithCustomError(
@@ -271,7 +294,7 @@ describe('DelayModifier', async () => {
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.setTxExpiration.populateTransaction(60)
       const tx2 = await modifier.setTxNonce.populateTransaction(0)
-      await expect(avatar.exec(await modifier.getAddress(), 0, tx.data))
+      await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
       await expect(
         avatar.exec(await modifier.getAddress(), 0, tx2.data)
@@ -279,11 +302,11 @@ describe('DelayModifier', async () => {
     })
 
     it('throws if nonce is more than queueNonce + 1.', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       const tx2 = await modifier.setTxNonce.populateTransaction(42)
-      await expect(avatar.exec(await modifier.getAddress(), 0, tx.data))
+      await avatar.exec(await modifier.getAddress(), 0, tx.data)
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
 
       await expect(
@@ -292,7 +315,7 @@ describe('DelayModifier', async () => {
     })
 
     it('sets nonce', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
 
       const tx1 = await modifier.enableModule.populateTransaction(user1.address)
@@ -301,12 +324,12 @@ describe('DelayModifier', async () => {
       expect(await modifier.txNonce()).to.be.equals(0)
       await avatar.exec(await modifier.getAddress(), 0, tx1.data)
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
-      expect(await avatar.exec(await modifier.getAddress(), 0, tx2.data))
+      await avatar.exec(await modifier.getAddress(), 0, tx2.data)
       expect(await modifier.txNonce()).to.be.equals(1)
     })
 
     it('it emits TxNonceSet', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
 
       const tx1 = await modifier.enableModule.populateTransaction(user1.address)
@@ -322,9 +345,9 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('execTransactionFromModule()', async () => {
+  describe('execTransactionFromModule()', () => {
     it('throws if not authorized', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { modifier } = await loadFixture(setup)
       await expect(
         modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
@@ -332,7 +355,7 @@ describe('DelayModifier', async () => {
     })
 
     it('increments queueNonce', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -343,7 +366,7 @@ describe('DelayModifier', async () => {
     })
 
     it('sets txHash', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -361,7 +384,7 @@ describe('DelayModifier', async () => {
     })
 
     it('sets txCreatedAt', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
 
@@ -370,10 +393,7 @@ describe('DelayModifier', async () => {
       await expect(await modifier.getTxCreatedAt(0)).to.be.equals(0)
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
 
-      const block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
+      const block = await latestBlock()
 
       await expect(block.timestamp).to.be.equals(
         await modifier.getTxCreatedAt(0)
@@ -381,7 +401,7 @@ describe('DelayModifier', async () => {
     })
 
     it('emits transaction details', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -402,9 +422,9 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('execTransactionWithSignature()', async () => {
+  describe('execTransactionWithSignature()', () => {
     it('allows any relayer with an enabled module signature', async () => {
-      const [module, relayer, to] = await hre.ethers.getSigners()
+      const [module, relayer, to] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(module.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -416,7 +436,7 @@ describe('DelayModifier', async () => {
         operation: 0,
       }
       const salt = hexlify(randomBytes(32))
-      const { chainId } = await hre.ethers.provider.getNetwork()
+      const { chainId } = await ethers.provider.getNetwork()
       const signature = await module.signTypedData(
         { chainId, verifyingContract: await modifier.getAddress() },
         {
@@ -439,16 +459,14 @@ describe('DelayModifier', async () => {
       )
 
       await expect(
-        modifier
-          .connect(relayer)
-          .execTransactionWithSignature(
-            moduleTx.to,
-            moduleTx.value,
-            moduleTx.data,
-            moduleTx.operation,
-            salt,
-            signature
-          )
+        (modifier.connect(relayer) as any).execTransactionWithSignature(
+          moduleTx.to,
+          moduleTx.value,
+          moduleTx.data,
+          moduleTx.operation,
+          salt,
+          signature
+        )
       )
         .to.emit(modifier, 'TransactionAdded')
         .withArgs(
@@ -465,9 +483,9 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('execTransactionFromModuleReturnData()', async () => {
+  describe('execTransactionFromModuleReturnData()', () => {
     it('throws if not authorized', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { modifier } = await loadFixture(setup)
 
       await expect(
@@ -476,7 +494,7 @@ describe('DelayModifier', async () => {
     })
 
     it('increments queueNonce', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -492,7 +510,7 @@ describe('DelayModifier', async () => {
     })
 
     it('sets txHash', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -515,7 +533,7 @@ describe('DelayModifier', async () => {
     })
 
     it('sets txCreatedAt', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -528,10 +546,7 @@ describe('DelayModifier', async () => {
         0
       )
 
-      const block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
+      const block = await latestBlock()
 
       await expect(block.timestamp).to.be.equals(
         await modifier.getTxCreatedAt(0)
@@ -539,7 +554,7 @@ describe('DelayModifier', async () => {
     })
 
     it('emits transaction details', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -567,7 +582,7 @@ describe('DelayModifier', async () => {
     })
 
     it('returns ABI encoded nonce, hash, and timestamp', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -596,9 +611,9 @@ describe('DelayModifier', async () => {
     })
   })
 
-  describe('executeNextTx()', async () => {
+  describe('executeNextTx()', () => {
     it('throws if there is nothing in queue', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -609,7 +624,7 @@ describe('DelayModifier', async () => {
     })
 
     it('throws if cooldown has not passed', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       let tx = await modifier.setTxCooldown.populateTransaction(42)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -624,21 +639,21 @@ describe('DelayModifier', async () => {
     })
 
     it('throws if transaction has expired', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
       await avatar.setModule(await modifier.getAddress())
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
-      await hre.network.provider.send('evm_setNextBlockTimestamp', [4242424242])
+      await setNextBlockTimestamp(4242424242)
       await expect(
         modifier.executeNextTx(user1.address, 0, '0x', 0)
       ).to.be.revertedWith('Transaction expired')
     })
 
     it('throws if transaction hashes do not match', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
 
       // enable the module
@@ -647,58 +662,48 @@ describe('DelayModifier', async () => {
 
       await avatar.setModule(await modifier.getAddress())
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
-      mine
-      const block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
+      const block = await latestBlock()
       const timestamp = parseInt(block.timestamp) + cooldown
-      await hre.network.provider.send('evm_setNextBlockTimestamp', [timestamp])
+      await setNextBlockTimestamp(timestamp)
       await expect(
         modifier.executeNextTx(user1.address, 1, '0x', 0)
       ).to.be.revertedWith('Transaction hashes do not match')
     })
 
     it('throws if transaction module transaction throws', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
       await avatar.setModule(await modifier.getAddress())
       await modifier.execTransactionFromModule(user1.address, 1, '0x', 0)
-      const block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
+      const block = await latestBlock()
       const timestamp = parseInt(block.timestamp) + cooldown
-      await hre.network.provider.send('evm_setNextBlockTimestamp', [timestamp])
+      await setNextBlockTimestamp(timestamp)
       await expect(
         modifier.executeNextTx(user1.address, 1, '0x', 0)
       ).to.be.revertedWith('Module transaction failed')
     })
 
     it('executes transaction', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
 
       await avatar.setModule(await modifier.getAddress())
       await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
-      const block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
-      const timestamp = parseInt(block.timestamp) + 100
-      await hre.network.provider.send('evm_setNextBlockTimestamp', [timestamp])
-      await expect(modifier.executeNextTx(user1.address, 0, '0x', 0))
+      const block = await latestBlock()
+      const timestamp = parseInt(block.timestamp) + cooldown
+      await setNextBlockTimestamp(timestamp)
+      await modifier.executeNextTx(user1.address, 0, '0x', 0)
     })
   })
 
-  describe('skipExpired()', async () => {
+  describe('skipExpired()', () => {
     it('should skip to the next nonce that has not yet expired', async () => {
-      const [user1] = await hre.ethers.getSigners()
+      const [user1] = await ethers.getSigners()
       const { avatar, modifier } = await loadFixture(setup)
       const tx = await modifier.enableModule.populateTransaction(user1.address)
       await avatar.exec(await modifier.getAddress(), 0, tx.data)
@@ -707,12 +712,9 @@ describe('DelayModifier', async () => {
       for (let i = 0; i < 3; i++) {
         await modifier.execTransactionFromModule(user1.address, 0, '0x', 0)
       }
-      let block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
+      let block = await latestBlock()
       const timestamp = parseInt(block.timestamp) + 424242
-      await hre.network.provider.send('evm_setNextBlockTimestamp', [timestamp])
+      await setNextBlockTimestamp(timestamp)
 
       await expect(
         modifier.executeNextTx(user1.address, 0, '0x', 0)
@@ -725,20 +727,17 @@ describe('DelayModifier', async () => {
       await expect(await modifier.txNonce()).to.be.equals(3)
       await expect(await modifier.queueNonce()).to.be.equals(5)
 
-      await expect(modifier.executeNextTx(user1.address, 0, '0x', 0)).to.be
-        .reverted
+      await expect(
+        modifier.executeNextTx(user1.address, 0, '0x', 0)
+      ).to.be.revert(ethers)
 
-      block = await hre.network.provider.send('eth_getBlockByNumber', [
-        'latest',
-        false,
-      ])
+      block = await latestBlock()
 
-      await hre.network.provider.send('evm_setNextBlockTimestamp', [
-        parseInt(block.timestamp) + cooldown,
-      ])
+      await setNextBlockTimestamp(parseInt(block.timestamp) + cooldown)
 
-      await expect(modifier.executeNextTx(user1.address, 0, '0x', 0)).to.not.be
-        .reverted
+      await expect(
+        modifier.executeNextTx(user1.address, 0, '0x', 0)
+      ).to.not.be.revert(ethers)
     })
   })
 })

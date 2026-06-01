@@ -1,40 +1,39 @@
-import { task, types } from 'hardhat/config'
-import { loadZodiacCore } from './zodiac-core'
+import type { HardhatRuntimeEnvironment } from 'hardhat/types/hre'
 
-task(
-  'verify:mastercopy',
-  'Verifies all mastercopies from the artifacts file in the block explorer corresponding to the current network'
-)
-  .addOptionalParam(
-    'contractVersion',
-    'Filters by a specific version or lateat',
-    'latest', // Default value
-    types.string
-  )
-  .setAction(async ({ contractVersion }, hre) => {
-    const { readMastercopies, verifyMastercopy } = await loadZodiacCore()
-    const apiKey = hre.config.etherscan.apiKey as string
-    const chainId = String((await hre.ethers.provider.getNetwork()).chainId)
-    for (const artifact of readMastercopies({ contractVersion })) {
-      const { noop } = await verifyMastercopy({
-        artifact,
-        chainId: Number(chainId),
-        apiKey,
-        apiUrl: hre.config.etherscan.customChains.find(
-          (chain: any) => chain.network === hre.network.name
-        )?.urls.apiURL,
-      })
+import { readMastercopies, verifyMastercopy } from '@gnosis-guild/zodiac-core'
 
-      const { contractName, contractVersion, address } = artifact
+import { getBlockExplorerApiUrl } from './block-explorers.js'
 
-      if (noop) {
-        console.log(
-          `🔄 ${contractName}@${contractVersion}: Already verified at ${address}`
-        )
-      } else {
-        console.log(
-          `🚀 ${contractName}@${contractVersion}: Successfully verified at ${address}`
-        )
-      }
+interface VerifyMastercopyTaskArguments {
+  contractVersion: string
+}
+
+export default async function (
+  { contractVersion }: VerifyMastercopyTaskArguments,
+  hre: HardhatRuntimeEnvironment
+) {
+  const apiKey = process.env.ETHERSCAN_API_KEY ?? ''
+  const { ethers, networkName } = await hre.network.create()
+  const { chainId } = await ethers.provider.getNetwork()
+
+  for (const artifact of readMastercopies({ contractVersion })) {
+    const { noop } = await verifyMastercopy({
+      artifact,
+      chainId: Number(chainId),
+      apiKey,
+      apiUrl: getBlockExplorerApiUrl(networkName),
+    })
+
+    const { contractName, contractVersion, address } = artifact
+
+    if (noop) {
+      console.log(
+        `🔄 ${contractName}@${contractVersion}: Already verified at ${address}`
+      )
+    } else {
+      console.log(
+        `🚀 ${contractName}@${contractVersion}: Successfully verified at ${address}`
+      )
     }
-  })
+  }
+}

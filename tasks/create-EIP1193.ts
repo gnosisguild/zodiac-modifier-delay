@@ -1,13 +1,38 @@
 import type { EIP1193Provider } from '@gnosis-guild/zodiac-core'
-import { Signer } from 'ethers'
-import { EthereumProvider } from 'hardhat/types'
-import ethProvider from 'eth-provider'
+import type { Signer } from 'ethers'
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
 
 const shallUseFrame = process.env.USE_FRAME === 'true'
 
+type RequestProvider = {
+  request(args: { method: string; params?: unknown }): Promise<unknown>
+}
+
+type ProviderOpts = {
+  name: string
+  origin: string
+  infuraId: string
+  alchemyId: string
+  interval: number
+}
+
+type FrameProvider = {
+  setChain(chainId: number): void
+  request(args: { method: string; params?: unknown }): Promise<unknown>
+}
+
+type EthProviderFactory = (
+  targets?: string | string[],
+  opts?: Partial<ProviderOpts>
+) => FrameProvider
+
+const ethProvider = require('eth-provider') as EthProviderFactory
+
 export function createEIP1193(
   chainId: number | undefined,
-  provider: EthereumProvider,
+  provider: RequestProvider,
   signer: Signer
 ): EIP1193Provider {
   return {

@@ -1,9 +1,9 @@
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import { AbiCoder, keccak256, toUtf8Bytes } from 'ethers'
-import hre, { ethers } from 'hardhat'
+import hre from 'hardhat'
 
-import { Delay__factory } from '../typechain-types'
+const { ethers, networkHelpers } = await hre.network.create()
+const { loadFixture } = networkHelpers
 
 const AddressOne = '0x0000000000000000000000000000000000000001'
 
@@ -13,10 +13,10 @@ describe('Module works with factory', () => {
   const paramsTypes = ['address', 'address', 'address', 'uint256', 'uint256']
 
   async function setup() {
-    const Factory = await hre.ethers.getContractFactory('ModuleProxyFactory')
+    const Factory = await ethers.getContractFactory('TestFactory')
     const factory = await Factory.deploy()
 
-    const Delay = await hre.ethers.getContractFactory('Delay')
+    const Delay = await ethers.getContractFactory('Delay')
 
     const masterCopy = await Delay.deploy(
       AddressOne,
@@ -72,7 +72,8 @@ describe('Module works with factory', () => {
     )
 
     const entry = receipt?.logs.find(
-      (entry) => entry.topics.length > 0 && entry.topics[0] == eventAsTopic
+      (entry: { topics: readonly string[] }) =>
+        entry.topics.length > 0 && entry.topics[0] == eventAsTopic
     )
 
     const [newProxyAddress] = AbiCoder.defaultAbiCoder().decode(
@@ -80,7 +81,7 @@ describe('Module works with factory', () => {
       entry?.topics[1] as string
     )
 
-    const delay = Delay__factory.connect(newProxyAddress, hre.ethers.provider)
+    const delay = await ethers.getContractAt('Delay', newProxyAddress)
     expect(await delay.txCooldown()).to.be.eq(cooldown)
     expect(await delay.txExpiration()).to.be.eq(expiration)
   })
