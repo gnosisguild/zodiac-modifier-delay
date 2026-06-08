@@ -1,6 +1,13 @@
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
-import { AbiCoder } from 'ethers'
+import {
+  AbiCoder,
+  concat,
+  hexlify,
+  randomBytes,
+  toBeHex,
+  zeroPadValue,
+} from 'ethers'
 import hre from 'hardhat'
 
 const ZeroState =
@@ -399,6 +406,45 @@ describe('DelayModifier', async () => {
       )
         .to.emit(modifier, 'TransactionAdded')
         .withArgs(expectedQueueNonce, txHash, user1.address, 42, '0x', 0)
+    })
+
+    it('rejects a faulty ERC-1271 signer that reverts with the magic value', async () => {
+      const [, relayer, to] = await hre.ethers.getSigners()
+      const { avatar, modifier } = await loadFixture(setup)
+      const Signer = await hre.ethers.getContractFactory(
+        'FaultyErc1271Signer'
+      )
+      const signer = await Signer.deploy()
+      const signerAddress = await signer.getAddress()
+      const enable =
+        await modifier.enableModule.populateTransaction(signerAddress)
+      await avatar.exec(await modifier.getAddress(), 0, enable.data)
+
+      const moduleTx = {
+        to: to.address,
+        value: 42,
+        data: '0x',
+        operation: 0,
+      }
+      const tx = await modifier.execTransactionFromModule.populateTransaction(
+        moduleTx.to,
+        moduleTx.value,
+        moduleTx.data,
+        moduleTx.operation
+      )
+      const salt = hexlify(randomBytes(32))
+      const start = (tx.data.length - 2) / 2
+      const contractSignature = concat([
+        zeroPadValue(signerAddress, 32),
+        toBeHex(start, 32),
+        '0x00',
+      ])
+      await expect(
+        relayer.sendTransaction({
+          to: await modifier.getAddress(),
+          data: concat([tx.data, salt, contractSignature]),
+        })
+      ).to.be.revertedWithCustomError(modifier, 'NotAuthorized')
     })
   })
 
